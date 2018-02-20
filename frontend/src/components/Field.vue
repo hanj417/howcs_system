@@ -6,11 +6,11 @@ v-flex(xs12)
     v-layout(row, wrap)
       v-flex(v-bind="{[field.width]: true}",xs12, v-for='option in field.choices',:key="field.value")
         component(
-          v-model='model', 
+          v-model='model',
           hide-details,
-          :is="field.type == 'radios' ? 'v-radio' : 'v-checkbox'", 
+          :is="field.type == 'radios' ? 'v-radio' : 'v-checkbox'",
           :key='option.value',
-          :value='option.value', 
+          :value='option.value',
           :label='option.text',
         )
   template(v-else-if="['date', 'datetime', 'time'].indexOf(field.type) > -1")

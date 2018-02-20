@@ -49,6 +49,8 @@ Vue.component('v-form', VForm)
 Vue.component('v-grid', VGrid)
 Vue.component('v-field', VField)
 
+Vue.config.devtools = true
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
@@ -70,6 +72,9 @@ new Vue({
     // fetch menu from server
     this.$http.get('/menu').then(({data}) => {
       this.$store.commit('setMenu', data)
+    })
+    this.$http.get('/topMenu').then(({data}) => {
+      this.$store.commit('setTopMenu', data)
     })
     this.$store.dispatch('checkPageTitle', this.$route.path)
     this.$store.dispatch('checkAuth')

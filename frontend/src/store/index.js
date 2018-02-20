@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import menu from '../menu'
+import topMenu from '../topMenu'
 import config from '../config'
 Vue.use(Vuex)
 
@@ -8,6 +9,7 @@ const store = new Vuex.Store({
   state: {
     pageTitle: 'Home',
     menu: menu,
+    topMenu: topMenu,
     user: {},
     token: null,
     message: {
@@ -27,6 +29,9 @@ const store = new Vuex.Store({
     },
     setMenu (state, data) {
       state.menu = data
+    },
+    setTopMenu (state, data) {
+      state.topMenu = data
     },
     setPageTitle (state, data) {
       state.pageTitle = data

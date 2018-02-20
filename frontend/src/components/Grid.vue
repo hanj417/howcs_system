@@ -5,11 +5,10 @@
         <v-btn router :to="{name: 'create', params: {resource}}" primary>{{$t('Create')}}</v-btn>
       </v-col>
       <v-col md8>
-        <v-form class="row jr" :inline="true" v-model="filters.model" :fields="filters.fields" 
+        <v-form class="row jr" :inline="true" v-model="filters.model" :fields="filters.fields"
         @submit="doSearch" submitButtonText="Search" submitButtonIcon="search"></v-form>
       </v-col>
     </v-row>
-  
     <v-card >
       <v-data-table v-bind:headers="columns" v-model="data.data" hide-actions>
       <template slot="items" scope="props">
@@ -20,23 +19,19 @@
           <v-btn v-if="button && button.icon" v-for="(button, key) in actions" :key="key" router floating small dark :to="{name: 'action', params: {resource, id:props.item.id, action: key}}" :primary="button.type == 'primary' || button.type == ''" :success="button.type == 'success'">
             <v-icon>{{button.icon}}</v-icon>
           </v-btn>
-  
           <v-btn v-if="actions === true || actions.edit === true" router primary floating small dark :to="{name: 'edit', params: {resource,id:props.item.id}}">
             <v-icon>edit</v-icon>
           </v-btn>
-  
           <v-btn v-if="actions === true || actions.delete === true" @click.native="remove(props.item)" error floating small dark>
             <v-icon>delete</v-icon>
           </v-btn>
         </td>
       </template>
-      
     </v-data-table>
     <v-card-row class="jc">
         <v-pagination v-model="data.currentPage" :length="data.lastPage" circle class="ma-3"></v-pagination>
       </v-card-row>
     </v-card>
-    
   </div>
 </template>
 

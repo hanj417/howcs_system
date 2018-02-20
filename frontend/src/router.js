@@ -19,22 +19,25 @@ const router = new Router({
   scrollBehavior: () => ({ y: 0 }),
   routes: [
     route('/login', 'Login', 'login'),
+    route('/register', 'Register', 'register'),
     route('/error', 'Error', 'error'),
 
     // path, file(*.vue), name, children
 
     route('/', 'Main', null, [
       route('/', 'Home', 'home'),
-      route('/crud/:resource', 'CrudGrid', 'grid'),
-      route('/crud/:resource/:id/edit', 'CrudForm', 'edit'),
-      route('/crud/:resource/create', 'CrudForm', 'create'),
-      route('/crud/:resource/:id/:action', 'CrudForm', 'action'),
-      route('/crud/:resource/:action', 'CrudForm', 'indexAction'),
       route('/example', 'Example'),
       route('/settings', 'Settings'),
       route('/theme', 'Theme'),
       route('/chat', 'Chat'),
-      route('/about', 'About')
+      route('/about', 'About'),
+      route('/crud', 'Content', null, [
+        route('/crud/:resource', 'CrudGrid', 'grid'),
+        route('/crud/:resource/:id/edit', 'CrudForm', 'edit'),
+        route('/crud/:resource/create', 'CrudForm', 'create'),
+        route('/crud/:resource/:id/:action', 'CrudForm', 'action'),
+        route('/crud/:resource/:action', 'CrudForm', 'indexAction'),
+      ]),
     ])
 
     // Global redirect for 404
