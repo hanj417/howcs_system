@@ -4,7 +4,8 @@ import config from './config'
 
 var http = axios.create({
   baseURL: config.api,
-  timeout: 1000
+  timeout: 1000,
+  headers: { 'Content-type': 'application/json' }
   // headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
 })
 http.interceptors.request.use(function (request) {
@@ -36,3 +37,4 @@ http.interceptors.response.use(function (response) {
   return Promise.reject(error)
 })
 Vue.prototype.$http = http
+Vue.prototype.$axios = axios

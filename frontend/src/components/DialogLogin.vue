@@ -1,9 +1,6 @@
 <template>
-    <v-content>
-      <v-container fluid fill-height>
-        <v-layout align-center justify-center>
-          <v-flex xs12 sm8 md4>
-            <v-card class="elevation-12">
+    <v-dialog v-model="login_visible" width="300px">
+            <v-card width="300px" class="elevation-12">
               <v-toolbar dark color="primary">
                 <v-toolbar-title>Login form</v-toolbar-title>
               </v-toolbar>
@@ -16,20 +13,20 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" @click.stop='submit'>Login</v-btn>
+                <v-btn color="primary" @click.stop='submit' @success='onSuccess'>Login</v-btn>
               </v-card-actions>
             </v-card>
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </v-content>
+    </v-dialog>
 </template>
 
 <script>
 import { mapState } from 'vuex'
+import Vue from 'vue'
+import axios from 'axios'
+Vue.use(axios)
 
 export default {
-  name: 'Login',
+  name: 'DialogLogin',
   data () {
     return {
       username: '',
@@ -38,27 +35,34 @@ export default {
     }
   },
   computed: {
-    ...mapState(['user', 'token'])
+    ...mapState(['login_visible', 'toolbar'])
   },
   methods: {
     submit() {
-      this.$axios({
+      axios({
         method: 'post',
         url: 'http://wonzi.net:3000/api/login',
         auth: 
             {
-                username: this.username,
-                password: this.password
+                username: 'admin',
+                password: '123456',
             },
         headers: { 'Content-type': 'application/json' }
       }).then(({data}) => {
         this.$store.commit('setAuth', data)
-        this.$http.defaults.headers.common['Authorization'] = 'Bearer ' + data.token
-        this.$router.replace('/')
+        this.$store.commit('set_login_visible', false)
+        this.$emit('login_success')
       }).catch(({data}) => {
+        this.username = ''
+        this.password = ''
         this.login_failed = true
       });
     },
+    onSuccess (data) {
+      this.$store.commit('setAuth', data)
+      this.$router.replace('/')
+      this.$store.commit('set_login_visible', false)
+    }
   },
 }
 </script>

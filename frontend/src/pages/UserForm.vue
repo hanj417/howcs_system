@@ -6,7 +6,7 @@
     <v-card-title
       class="grey lighten-4 py-4 title"
     >
-      회원 가입
+      회원 정보
     </v-card-title>
     <v-container grid-list-sm class="pa-4">
       <v-form v-model="valid" ref="form" lazy-validation>
@@ -25,6 +25,9 @@
                 :rules="nameRules"
                 required
               ></v-text-field>
+              <v-btn @click="convert_student">
+                <v-icon>add</v-icon>
+              </v-btn>
             </v-layout>
           </v-flex>
           <v-flex xs12>
@@ -36,7 +39,7 @@
               required
             ></v-text-field>
           </v-flex>
-          <v-flex xs12>
+          <v-flex v-if="is_howcs_student" xs12>
             <v-text-field
               placeholder="학번"
               prepend-icon="chat"
@@ -81,10 +84,8 @@
           </v-flex>
           <v-flex xs6>
             <v-text-field
-              type="tel"
               prepend-icon="phone"
               placeholder="전화번호"
-              mask="phone"
               v-model="phone"
               autocomplete='tel'
               required
@@ -106,10 +107,10 @@
           </v-flex>
           <v-flex xs12>
             <v-menu
-              ref="menu"
+              ref="date_menu"
               lazy
               :close-on-content-click="false"
-              v-model="menu"
+              v-model="date_menu"
               transition="scale-transition"
               offset-y
               full-width
@@ -126,7 +127,7 @@
             <v-date-picker
               ref="picker"
               v-model="date"
-              @change="save"
+              @change="date_save"
               min="1950-01-01"
               :max="new Date().toISOString().substr(0, 10)"
             ></v-date-picker>
@@ -134,7 +135,7 @@
           </v-flex>
 
 
-          <v-flex xs6>
+          <v-flex v-if="is_howcs_student" xs6>
             <v-select
               :items="gender_items"
               v-model="gender"
@@ -143,53 +144,48 @@
               bottom
             ></v-select>
           </v-flex>
-          <v-flex xs6>
+          <v-flex v-if="is_howcs_student" xs6>
             <v-text-field
               prepend-icon="business"
               placeholder="주민등록번호"
               v-model="ssn"
             ></v-text-field>
           </v-flex>
-          <v-flex xs6>
+          <v-flex v-if="is_howcs_student" xs6>
             <v-text-field
               prepend-icon="business"
               placeholder="아버지 이름"
               v-model="father_name"
             ></v-text-field>
           </v-flex>
-          <v-flex xs6>
+          <v-flex v-if="is_howcs_student" xs6>
             <v-text-field
               prepend-icon="business"
               placeholder="아버지 주민등록번호"
               v-model="father_ssn"
             ></v-text-field>
           </v-flex>
-          <v-flex xs6>
+          <v-flex v-if="is_howcs_student" xs6>
             <v-text-field
               prepend-icon="business"
               placeholder="어머니 이름"
               v-model="mother_name"
             ></v-text-field>
           </v-flex>
-          <v-flex xs6>
+          <v-flex v-if="is_howcs_student" xs6>
             <v-text-field
               prepend-icon="business"
               placeholder="어머니 주민등록번호"
               v-model="mother_ssn"
             ></v-text-field>
           </v-flex>
-          <v-flex xs12>
+          <v-flex v-if="is_howcs_student" xs12>
             <v-text-field
               prepend-icon="business"
               placeholder="주소"
               v-model="address"
             ></v-text-field>
           </v-flex>
-
-
-
-
-
           <v-flex xs12>
             <v-checkbox
               color="green"
@@ -240,8 +236,8 @@
     </v-container>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn flat color="primary" @click="cancel">Cancel</v-btn>
-      <v-btn flat @click="register">Save</v-btn>
+      <v-btn flat color="primary" @click="cancel">취소</v-btn>
+      <v-btn flat @click="save">{{ save_btn_text }}</v-btn>
     </v-card-actions>
   </v-card>
 </v-layout>
@@ -253,8 +249,8 @@
 export default {
   data () {
     return {
-      date: null,
-      menu: false,
+      save_btn_text: '등록',
+      is_howcs_student: false,
       valid: true,
       username: '',
       password: '',
@@ -264,15 +260,18 @@ export default {
       phone: '',
       school: '',
       church: '',
+      date: null,
+      date_menu: false,
       student_id: '',
-      gender: '',
-      gender_items: [{ text: '남성'}, {text: '여성'}],
+      gender: {},
+      gender_items: [{ text: '남성', value:'male'}, {text: '여성', value:'female'}],
       ssn: '',
       father_name: '',
       father_ssn: '',
       mother_name: '',
       mother_ssn: '',
       address: '',
+      user: {},
       nameRules: [
         v => v.length > 0 || 'Name is required',
       ],
@@ -294,39 +293,163 @@ export default {
     }
   },
   watch: {
-    menu (val) {
+    date_menu (val) {
       val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
+    }
+  },
+  computed: {
+    action() {
+      return this.$route.params.action
+    }, 
+    id() {
+      return this.$route.params.id
     }
   },
   methods: {
     cancel() {
       this.$router.replace('/')
     },
-    register() {
-      this.$http.post(`students`, {
-        'username': this.username,
-        'password': this.password, 
-        'name': this.name,
-        'email': this.email,
-        'phone': this.phone,
-        'school': this.school,
-        'church': this.church,
-        'birthday': this.date,
-        'student_id': this.student_id,
-        'gender': this.gender['text'],
-        'ssn': this.ssn,
-        'father_name': this.father_name,
-        'father_ssn': this.father_ssn,
-        'mother_name': this.mother_name,
-        'mother_ssn': this.mother_ssn,
-        'address': this.address,
-      }).then(({data}) => {
-        this.$router.replace('/')
-      })
+    save() {
+      if (this.action == 'new') {
+        if (this.is_howcs_student == false) {
+          this.$http.post(`users`, {
+            'username': this.username,
+            'password': this.password, 
+            'name': this.name,
+            'email': this.email,
+            'phone': this.phone,
+            'school': this.school,
+            'church': this.church,
+            'birthday': this.date,
+          }).then(({data}) => {
+            this.$router.replace('/')
+          })
+        } 
+/*
+        else {
+          this.$http.post(`students/update`, {
+            'username': this.username,
+            'password': this.password, 
+            'name': this.name,
+            'email': this.email,
+            'phone': this.phone,
+            'school': this.school,
+            'church': this.church,
+            'birthday': this.date,
+            'student_id': this.student_id,
+            'gender': this.gender,
+            'ssn': this.ssn,
+            'father_name': this.father_name,
+            'father_ssn': this.father_ssn,
+            'mother_name': this.mother_name,
+            'mother_ssn': this.mother_ssn,
+            'address': this.address,
+          }).then(({data}) => {
+            this.$router.replace('/')
+          })
+        }
+*/
+      } else if (this.action == 'update') {
+        if (this.$route.params.hasOwnProperty('id')) {
+          if (this.is_howcs_student == false) {
+            this.$http.put(`users/` + this.$route.params.id, {
+              'username': this.username,
+              'password': this.password, 
+              'name': this.name,
+              'email': this.email,
+              'phone': this.phone,
+              'school': this.school,
+              'church': this.church,
+              'birthday': this.date,
+            }).then(({data}) => {
+              this.$router.replace('/')
+            })
+          }
+        } else {
+          if (localStorage['user']) {
+            this.user = JSON.parse(localStorage['user'])
+            if (this.is_howcs_student == false) {
+              this.$http.put(`users/` + this.user['id'], {
+                'username': this.username,
+                'password': this.password, 
+                'name': this.name,
+                'email': this.email,
+                'phone': this.phone,
+                'school': this.school,
+                'church': this.church,
+                'birthday': this.date,
+              }).then(({data}) => {
+                this.$router.replace('/')
+              })
+            }
+          }
+        }
+/*
+        } else {
+          this.$http.post(`students/update/` + this.id, {
+            'username': this.username,
+            'password': this.password, 
+            'name': this.name,
+            'email': this.email,
+            'phone': this.phone,
+            'school': this.school,
+            'church': this.church,
+            'birthday': this.date,
+            'student_id': this.student_id,
+            'gender': this.gender,
+            'ssn': this.ssn,
+            'father_name': this.father_name,
+            'father_ssn': this.father_ssn,
+            'mother_name': this.mother_name,
+            'mother_ssn': this.mother_ssn,
+            'address': this.address,
+          }).then(({data}) => {
+            this.$router.replace('/')
+          })
+        }
+*/
+      }
     },
-    save (date) {
-      this.$refs.menu.save(date)
+    date_save (date) {
+      this.$refs.date_menu.save(date)
+    },
+/*
+    convert_student() {
+      this.is_howcs_student = true 
     }
+*/
   },
+  created() {
+    if (this.$route.params.action == 'update') {
+      if (this.$route.params.hasOwnProperty('id')) {
+        this.$http.get(`users/` + this.$route.params.id
+        ).then(({ data }) => {
+          console.log(data)
+          this.username = data.username
+          this.name = data.name
+          this.email = data.email
+          this.phone = data.phone
+          this.school = data.school
+          this.church = data.church
+          this.date = data.birthday
+        })
+      } else {
+        if (localStorage['user']) {
+          this.user = JSON.parse(localStorage['user'])
+          this.$http.get(`users/` + this.user['id']
+          ).then(({ data }) => {
+            console.log(data)
+            this.username = data.username
+            this.name = data.name
+            this.email = data.email
+            this.phone = data.phone
+            this.school = data.school
+            this.church = data.church
+            this.date = data.birthday
+          })
+        }
+      }
+    }
+  }
 }
 </script>

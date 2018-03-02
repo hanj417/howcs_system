@@ -1,15 +1,10 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import menu from '../menu'
-import topMenu from '../topMenu'
 import config from '../config'
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    pageTitle: 'Home',
-    menu: menu,
-    topMenu: topMenu,
     user: {},
     token: null,
     message: {
@@ -17,31 +12,19 @@ const store = new Vuex.Store({
       body: null
     },
     config: config
-
   },
   mutations: {
-
     setAuth (state, { user, token }) {
       state.user = user
       state.token = token
       global.helper.ls.set('user', user)
       global.helper.ls.set('token', token)
     },
-    setMenu (state, data) {
-      state.menu = data
-    },
-    setTopMenu (state, data) {
-      state.topMenu = data
-    },
-    setPageTitle (state, data) {
-      state.pageTitle = data
-    },
     showMessage (state, type, body) {
       state.message = { type, body }
     }
   },
   actions: {
-
     checkAuth ({ commit }) {
       let data = {
         user: global.helper.ls.get('user'),
