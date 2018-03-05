@@ -70,6 +70,7 @@
 const get_default_data = () => {
   return {
     loading: false,
+    filters: {},
     columns: [
       {
         'text': 'Name',
@@ -172,16 +173,21 @@ export default {
       return value
     },
     fetch_data() {
+      this.filters = {
+        'class_id': this.$route.params.id,
+      }
+
       let sort = this.pagination.sortBy
       if (this.pagination.descending) {
         sort = '-' + sort
       }
-      //this.$route.query.query = JSON.stringify(this.filters.model)
+      this.$route.query.query = JSON.stringify(this.filters)
       this.$route.query.sort = sort
       this.$route.query.perPage = this.pagination.rowsPerPage
       this.$route.query.page = this.pagination.page
+      this.$route.query.class = this.$route.params.id
 
-      this.$http.get(`enrollments`, {params: {class: this.$route.params.id}}).then(({ data }) => {
+      this.$http.get(`enrollments`, {params: this.$route.query}).then(({ data }) => {
         this.items = data.data
         this.pagination.totalItems = data.total
       })

@@ -8,11 +8,11 @@
               <tr>
                 <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
                 <td width='160'>
-                  <v-btn fab small :to="{name: 'post_form', params: {action:'update', id:props.item.id}}">
-                    <v-icon>edit</v-icon>
-                  </v-btn>
                   <v-btn fab small @click="remove(props.item)">
                     <v-icon>delete</v-icon>
+                  </v-btn>
+                  <v-btn small @click="toggle_approval(props.item)">
+                    {{ props.item.approval }}
                   </v-btn>
                 </td>
               </tr>
@@ -24,17 +24,6 @@
         </v-card>
       </v-layout>
     </v-container>
-  <v-btn
-    fab
-    bottom
-    right
-    color="pink"
-    dark
-    fixed
-    :to="{name: 'post_form', params: {action:'new'}}"
-  >
-    <v-icon>add</v-icon>
-  </v-btn>
   </v-content>
 </template>
 
@@ -44,26 +33,30 @@ const get_default_data = () => {
     loading: false,
     columns: [
       {
-        'text': '대분류',
-        'value': 'major_category'
+        'text': 'ID',
+        'value': 'user.username'
       },
       {
-        'text': '분류',
-        'value': 'minor_category'
+        'text': 'Name',
+        'value': 'user.name'
       },
       {
-        'text': '제목',
-        'value': 'title'
+        'text': 'Email',
+        'value': 'user.email'
+      },
+      {
+        'text': 'Phone',
+        'value': 'user.phone'
+      },
+      {
+        'text': 'Church',
+        'value': 'user.church'
+      },
+      {
+        'text': 'Birthday',
+        'value': 'user.birthday'
       },
     ],
-    filters: {},
-    actions: {},
-    options: {
-      sort: 'id',
-      create: false,
-      update: true,
-      delete: false
-    },
     pagination: {
       page: 1,
       rowsPerPage: 10,
@@ -88,22 +81,8 @@ export default {
       this.fetch_data()
     },
   },
-  computed: {
-    id() {
-      return this.$route.params.id
-    }, 
-    major_category() {
-      return this.$route.params.major_category
-    }, 
-    minor_category() {
-      return this.$route.params.minor_category
-    },
-    is_category() {
-      return !!this.$route.params.minor_category
-    }
-  },
   methods: {
-    get_column_data (row, field) {
+    get_column_data(row, field) {
       // process fields like `type.name`
       let [l1, l2] = field.value.split('.')
       let value = row[l1]
@@ -119,41 +98,39 @@ export default {
       }
       return value
     },
-    fetch_data () {
+    fetch_data() {
       let sort = this.pagination.sortBy
       if (this.pagination.descending) {
         sort = '-' + sort
       }
-      this.$route.query.query = JSON.stringify(this.filters)
+      //this.$route.query.query = JSON.stringify(this.filters.model)
       this.$route.query.sort = sort
       this.$route.query.perPage = this.pagination.rowsPerPage
       this.$route.query.page = this.pagination.page
-      this.$http.get(`posts`, {params: this.$route.query}).then(({ data }) => {
+
+      this.$http.get(`agit_teacher_infos`, {params: this.$route.query}).then(({ data }) => {
         this.items = data.data
         this.pagination.totalItems = data.total
       })
     },
-    remove (item) {
-      // this.$alert('ok')
-      this.$http.delete(`posts/` + item.id).then(({ data }) => {
+    remove(item) {
+      this.$http.delete(`agit_teacher_infos/` + item.id)
+      .then(({ data }) => {
         this.fetch_data()
       })
     },
-    next () {
+    next() {
       this.pagination.page++
+    },
+    toggle_approval(item) {
+      this.$http.put(`agit_teacher_infos/` + item.id, {
+        'approval': !item.approval,
+      }).then(({data}) => {
+        this.fetch_data()
+      })
     }
   },
   created () {
-    if (!!this.$route.params.minor_category) {
-      this.filters = {
-        'major_category': this.$route.params.major_category,
-        'minor_category': this.$route.params.minor_category,
-      } 
-    } else if (!!this.$route.params.id) {
-      this.filters = {
-        'author_id': this.$route.params.id,
-      } 
-    }
     this.fetch_data()
   }
 }

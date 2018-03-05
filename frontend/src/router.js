@@ -3,21 +3,25 @@ import Router from 'vue-router'
 
 const routerOptions = [
   { path: '/', name: 'main', component: 'Main' },
-  { path: '/user', name: 'user', component: 'User' },
-  { path: '/class', name: 'class', component: 'Class' },
-  { path: '/enrollments/classes/:id', name: 'enrollment_class', component: 'EnrollmentClass' },
-  { path: '/student', name: 'student', component: 'Student' },
-  { path: '/post', name: 'post', component: 'Post' },
   { path: '/login', name: 'login', component: 'Login' },
   { path: '/register', name: 'register', component: 'Register' },
-  { path: '/register_student', name: 'register_student', component: 'RegisterStudent' },
-  { path: '/profile/:action/:id', name: 'profile', component: 'Profile' },
+  { path: '/user', name: 'user', component: 'User' },
   { path: '/user_form/:action', name: 'user_form', component: 'UserForm' },
   { path: '/user_form/:action/:id', name: 'user_form', component: 'UserForm' },
+  { path: '/class', name: 'class', component: 'Class' },
+  { path: '/class/:major_category/:id', name: 'class', component: 'Class' },
   { path: '/class_form/:action', name: 'class_form', component: 'ClassForm' },
   { path: '/class_form/:action/:id', name: 'class_form', component: 'ClassForm' },
+  { path: '/post', name: 'post', component: 'Post' },
+  { path: '/post/:major_category/:minor_category', name: 'post', component: 'Post' },
+  { path: '/post/:id', name: 'post', component: 'Post' },
   { path: '/post_form/:action', name: 'post_form', component: 'PostForm' },
   { path: '/post_form/:action/:id', name: 'post_form', component: 'PostForm' },
+  { path: '/agit_teacher_application_form', name: 'agit_teacher_application_form', component: 'AgitTeacherApplicationForm' },
+  { path: '/agit_teacher', name: 'agit_teacher', component: 'AgitTeacher' },
+  { path: '/enrollments/classes/:id', name: 'enrollment_class', component: 'EnrollmentClass' },
+  { path: '/enrollments/students/:id/:major_category', name: 'enrollment_student', component: 'EnrollmentStudent' },
+  { path: '/attendances/classes/:id', name: 'attendance_class', component: 'AttendanceClass' },
 ]
 
 const routes = routerOptions.map(route => {

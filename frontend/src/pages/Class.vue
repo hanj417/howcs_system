@@ -7,13 +7,22 @@
             <template slot='items' scope='props'>
               <tr>
                 <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
-                <td width='160'>
+                <td width='40'>
+                  <v-btn fab small :to="{name: 'attendance_class', params: {id:props.item.id}} ">
+                    <v-icon>edit</v-icon>
+                  </v-btn>
+                </td>
+                <td width='40'>
                   <v-btn fab small :to="{name: 'enrollment_class', params: {id:props.item.id}} ">
                     <v-icon>edit</v-icon>
                   </v-btn>
+                </td>
+                <td width='40'>
                   <v-btn fab small :to="{name: 'class_form', params: {action:'update', id:props.item.id}} ">
                     <v-icon>edit</v-icon>
                   </v-btn>
+                </td>
+                <td width='40'>
                   <v-btn fab small @click="remove(props.item)">
                     <v-icon>delete</v-icon>
                   </v-btn>
@@ -47,16 +56,20 @@ const get_default_data = () => {
     loading: false,
     columns: [
       {
-        'text': 'Teacher',
+        'text': '선생님',
         'value': 'teacher.name'
       },
       {
-        'text': 'Title',
+        'text': '제목',
         'value': 'title'
       },
       {
-        'text': 'Category',
-        'value': 'category'
+        'text': '대분류',
+        'value': 'major_category'
+      },
+      {
+        'text': '분류',
+        'value': 'minor_category'
       },
     ],
     pagination: {
@@ -67,11 +80,20 @@ const get_default_data = () => {
       totalItems: 0
     },
     items: [],
+    filters: {},
   }
 }
 
 export default {
   data: get_default_data,
+  computed: {
+    major_category() {
+      return this.$route.params.major_category
+    }, 
+    id() {
+      return this.$route.params.id
+    }, 
+  },
   watch: {
     'pagination.page' (val) {
       this.fetch_data()
@@ -105,7 +127,7 @@ export default {
       if (this.pagination.descending) {
         sort = '-' + sort
       }
-      //this.$route.query.query = JSON.stringify(this.filters.model)
+      this.$route.query.query = JSON.stringify(this.filters)
       this.$route.query.sort = sort
       this.$route.query.perPage = this.pagination.rowsPerPage
       this.$route.query.page = this.pagination.page
@@ -126,6 +148,12 @@ export default {
     }
   },
   created () {
+    if (!!this.$route.params.major_category) {
+      this.filters = {
+        'major_category': this.$route.params.major_category,
+        'id': this.$route.params.id,
+      } 
+    }
     this.fetch_data()
   }
 }

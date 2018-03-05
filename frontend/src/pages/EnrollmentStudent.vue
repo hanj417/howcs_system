@@ -1,16 +1,13 @@
 <template>
   <v-content>
-    <v-container fluid fill-height>
+    <v-container fluid>
       <v-layout justify-center align-center>
         <v-card>
           <v-data-table :headers='columns' :items='items' :total-items="pagination.totalItems" hide-actions :pagination.sync="pagination" :loading="loading">
             <template slot='items' scope='props'>
               <tr>
                 <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
-                <td width='160'>
-                  <v-btn fab small :to="{name: 'post_form', params: {action:'update', id:props.item.id}}">
-                    <v-icon>edit</v-icon>
-                  </v-btn>
+                <td width='40'>
                   <v-btn fab small @click="remove(props.item)">
                     <v-icon>delete</v-icon>
                   </v-btn>
@@ -24,17 +21,27 @@
         </v-card>
       </v-layout>
     </v-container>
-  <v-btn
-    fab
-    bottom
-    right
-    color="pink"
-    dark
-    fixed
-    :to="{name: 'post_form', params: {action:'new'}}"
-  >
-    <v-icon>add</v-icon>
-  </v-btn>
+    <v-container fluid>
+      <v-layout justify-center align-center>
+        <v-card>
+          <v-data-table :headers='all_columns' :items='all_items' :total-items="pagination.totalItems" hide-actions :pagination.sync="pagination" :loading="loading">
+            <template slot='items' scope='props'>
+              <tr>
+                <td v-for='column in all_columns' v-html="get_column_data(props.item, column)"></td>
+                <td width='40'>
+                  <v-btn fab small @click="enroll(props.item)">
+                    <v-icon>delete</v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
+          <div class="jc">
+            <v-pagination class="ma-3" v-model='pagination.page' :length='totalPages' circle></v-pagination>
+          </div>
+        </v-card>
+      </v-layout>
+    </v-container>
   </v-content>
 </template>
 
@@ -44,26 +51,28 @@ const get_default_data = () => {
     loading: false,
     columns: [
       {
-        'text': '대분류',
-        'value': 'major_category'
+        'text': '제목',
+        'value': 'class.title'
+      },
+      {
+        'text': '분류',
+        'value': 'class.minor_category'
+      },
+    ],
+    all_columns: [
+      {
+        'text': '제목',
+        'value': 'title'
       },
       {
         'text': '분류',
         'value': 'minor_category'
       },
       {
-        'text': '제목',
-        'value': 'title'
+        'text': '선생님',
+        'value': 'teacher.name'
       },
     ],
-    filters: {},
-    actions: {},
-    options: {
-      sort: 'id',
-      create: false,
-      update: true,
-      delete: false
-    },
     pagination: {
       page: 1,
       rowsPerPage: 10,
@@ -71,7 +80,9 @@ const get_default_data = () => {
       descending: true,
       totalItems: 0
     },
+    filters: {},
     items: [],
+    all_items: [],
   }
 }
 
@@ -91,19 +102,10 @@ export default {
   computed: {
     id() {
       return this.$route.params.id
-    }, 
-    major_category() {
-      return this.$route.params.major_category
-    }, 
-    minor_category() {
-      return this.$route.params.minor_category
-    },
-    is_category() {
-      return !!this.$route.params.minor_category
     }
   },
   methods: {
-    get_column_data (row, field) {
+    get_column_data(row, field) {
       // process fields like `type.name`
       let [l1, l2] = field.value.split('.')
       let value = row[l1]
@@ -119,7 +121,12 @@ export default {
       }
       return value
     },
-    fetch_data () {
+    fetch_data() {
+      if (!!this.$route.params.id) {
+        this.filters = {
+          'student_id': this.$route.params.id
+        }
+      }
       let sort = this.pagination.sortBy
       if (this.pagination.descending) {
         sort = '-' + sort
@@ -128,32 +135,47 @@ export default {
       this.$route.query.sort = sort
       this.$route.query.perPage = this.pagination.rowsPerPage
       this.$route.query.page = this.pagination.page
-      this.$http.get(`posts`, {params: this.$route.query}).then(({ data }) => {
+      this.$route.query.class = this.$route.params.id
+
+      this.$http.get(`enrollments`, {params: this.$route.query}).then(({ data }) => {
         this.items = data.data
         this.pagination.totalItems = data.total
       })
+
+
+      this.filters = {
+        'major_category': 'agit',
+      }
+      this.$route.query.query = JSON.stringify(this.filters)
+      this.$route.query.sort = sort
+      this.$route.query.perPage = this.pagination.rowsPerPage
+      this.$route.query.page = this.pagination.page
+      this.$route.query.class = this.$route.params.id
+
+      this.$http.get(`classes`, {params: this.$route.query}).then(({ data }) => {
+        this.all_items = data.data
+        this.pagination.totalItems = data.total
+      })
     },
-    remove (item) {
-      // this.$alert('ok')
-      this.$http.delete(`posts/` + item.id).then(({ data }) => {
+    remove(item) {
+      this.$http.delete(`enrollments/` + item.class_id + `/` + item.student_id)
+      .then(({ data }) => {
         this.fetch_data()
       })
     },
-    next () {
+    enroll(item) {
+      this.$http.post(`enrollments`, {
+        'class_id': item.id,
+        'student_id': this.$route.params.id
+      }).then(({ data }) => {
+        this.fetch_data()
+      })
+    },
+    next() {
       this.pagination.page++
-    }
+    },
   },
   created () {
-    if (!!this.$route.params.minor_category) {
-      this.filters = {
-        'major_category': this.$route.params.major_category,
-        'minor_category': this.$route.params.minor_category,
-      } 
-    } else if (!!this.$route.params.id) {
-      this.filters = {
-        'author_id': this.$route.params.id,
-      } 
-    }
     this.fetch_data()
   }
 }

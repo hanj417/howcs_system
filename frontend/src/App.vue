@@ -96,17 +96,23 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   data: () => ({
-    menu: {},
     toolbar: {},
   }),
+  computed: {
+    ...mapState(['user', 'token', 'menu'])
+  },
   methods: {
     fetch_menu() {
       this.$http.get('menu')
       .then(({data}) => 
-        this.menu = data
-      )
+        this.$store.commit('set_menu', data)
+      ).catch(function(data) {
+        console.log('error')
+      })    
       this.$http.get('toolbar')
       .then(({data}) => 
         this.toolbar = data
@@ -114,6 +120,9 @@ export default {
     },
   },
   created () {
+    if (localStorage.getItem("token") !== null) {
+      this.$http.defaults.headers.common['Authorization'] = 'Bearer ' + this.token
+    }
     this.fetch_menu()
   }
 }

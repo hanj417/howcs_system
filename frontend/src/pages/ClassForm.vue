@@ -21,10 +21,14 @@
               </v-avatar>
               <v-text-field
                 placeholder="선생님"
-                v-model="teacher"
+                v-model="teacher.name"
                 :rules="nameRules"
+                :disabled="teacher_input_disabled"
                 required
               ></v-text-field>
+              <v-btn @click="search_dialog = true">
+                <v-icon>add</v-icon>
+              </v-btn>
             </v-layout>
           </v-flex>
           <v-flex xs12>
@@ -35,9 +39,18 @@
             ></v-text-field>
           </v-flex>
           <v-flex xs12>
+            <v-select
+              :items="major_categories"
+              v-model="major_category"
+              label="대분류"
+              single-line
+              bottom
+            ></v-select>
+          </v-flex>
+          <v-flex xs12>
             <v-text-field
               placeholder="분류"
-              v-model="category"
+              v-model="minor_category"
               required
             ></v-text-field>
           </v-flex>
@@ -81,6 +94,41 @@
           </v-flex>
         </v-layout>
       </v-form>
+      <v-dialog v-model="search_dialog" width="50%">
+        <v-card>
+          <v-card-title class="title">학생 검색</v-card-title>
+          <v-spacer></v-spacer>
+          <v-text-field
+            append-icon="search"
+            label="Search"
+            single-line
+            hide-details
+            v-model="search"
+          ></v-text-field>
+          <v-card-text class="pt-4">
+            <v-data-table :headers='search_columns' :items='search_items' :total-items="pagination.totalItems" hide-actions :pagination.sync="pagination" :loading="loading" :search="search">
+              <template slot='items' scope='props'>
+                <tr>
+                  <td v-for='column in search_columns' v-html="get_column_data(props.item, column)"></td>
+                  <td width='160'>
+                    <v-btn fab small @click="search_select(props.item)">
+                      <v-icon>edit</v-icon>
+                    </v-btn>
+                  </td>
+                </tr>
+              </template>
+            </v-data-table>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              flat
+              color="purple"
+              @click="search_dialog = false"
+            >취소</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-container>
     <v-card-actions>
       <v-spacer></v-spacer>
@@ -100,14 +148,51 @@ export default {
       save_btn_text: '등록',
       valid: true,
       teacher: '',
+      teacher_input_disabled: true,
       title: '',
-      category: '',
+      major_categories: [],
+      major_category: {},
+      minor_category: '',
       year: null,
       semester: '',
       time_slot: '',
       audience: '',
       background: '',
       content: '',
+      search: '',
+      search_dialog: false,
+      search_name: '',
+      search_items: [],
+      search_columns: [
+        {
+          'text': 'ID',
+          'value': 'username'
+        },
+        {
+          'text': 'Name',
+          'value': 'name'
+        },
+        {
+          'text': 'Email',
+          'value': 'email'
+        },
+        {
+          'text': 'Phone',
+          'value': 'phone'
+        },
+        {
+          'text': 'School',
+          'value': 'school'
+        },
+        {
+          'text': 'Church',
+          'value': 'church'
+        },
+        {
+          'text': 'Birthday',
+          'value': 'birthday'
+        },
+      ],
     }
   },
   computed: {
@@ -119,15 +204,47 @@ export default {
     }
   },
   methods: {
+    get_column_data(row, field) {
+      // process fields like `type.name`
+      let [l1, l2] = field.value.split('.')
+      let value = row[l1]
+      let tag = null
+      if (l2) {
+        value = row[l1] ? row[l1][l2] : null
+      }
+      if (field.type === 'image') {
+        tag = 'img'
+      }
+      if (tag) {
+        value = `<${tag} src="${value}" class="crud-grid-thumb" controls />`
+      }
+      return value
+    },
+    fetch_data() {
+      let sort = this.pagination.sortBy
+      if (this.pagination.descending) {
+        sort = '-' + sort
+      }
+      //this.$route.query.query = JSON.stringify(this.filters.model)
+      this.$route.query.sort = sort
+      this.$route.query.perPage = this.pagination.rowsPerPage
+      this.$route.query.page = this.pagination.page
+
+      this.$http.get(`enrollments`, {params: {class: this.$route.params.id}}).then(({ data }) => {
+        this.items = data.data
+        this.pagination.totalItems = data.total
+      })
+    },
     cancel() {
       this.$router.replace('/')
     },
     save() {
       if (this.action == 'new') {
           this.$http.post(`classes`, {
-              'teacher': this.teacher,
+              'teacher_id': this.teacher.id,
               'title': this.title,
-              'category': this.category,
+              'major_category': this.major_category,
+              'minor_category': this.minor_category,
               'year': this.year,
               'semester': this.semester,
               'time_slot': this.time_slot,
@@ -140,9 +257,10 @@ export default {
       } else if (this.action == 'update') {
         if (this.$route.params.hasOwnProperty('id')) {
             this.$http.put(`classes/` + this.$route.params.id, {
-              'teacher': this.teacher,
+              'teacher_id': this.teacher.id,
               'title': this.title,
-              'category': this.category,
+              'major_category': this.major_category,
+              'minor_category': this.minor_category,
               'year': this.year,
               'semester': this.semester,
               'time_slot': this.time_slot,
@@ -155,8 +273,25 @@ export default {
         }
       }
     },
+    search() {
+      //this.$route.query.query = JSON.stringify(this.filters.model)
+      this.$http.get(`users`, {params: {name: this.search_name}}).then(({ data }) => {
+        this.search_items = data.data
+      })
+    },
+    search_select(item) {
+      this.$http.get(`users/` + item.id
+      ).then(({data}) => {
+        this.teacher = data
+        this.search_dialog = false
+      })
+    }
   },
   created() {
+    this.$http.get(`classes/major_categories`
+    ).then(({ data }) => {
+      this.major_categories = data
+    })
     if (this.$route.params.action == 'update') {
       if (this.$route.params.hasOwnProperty('id')) {
         this.$http.get(`classes/` + this.$route.params.id
@@ -164,7 +299,8 @@ export default {
           console.log(data)
           this.teacher = data.teacher
           this.title = data.title
-          this.category = data.category
+          this.major_category = data.major_category
+          this.minor_category = data.minor_category
           this.year = data.year
           this.semester = data.semester
           this.time_slot = data.time_slot

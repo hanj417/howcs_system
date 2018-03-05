@@ -6,6 +6,7 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     user: {},
+    menu: [],
     token: null,
     message: {
       type: null,
@@ -14,32 +15,27 @@ const store = new Vuex.Store({
     config: config
   },
   mutations: {
-    setAuth (state, { user, token }) {
+    set_auth (state, { user, token }) {
       state.user = user
       state.token = token
       global.helper.ls.set('user', user)
       global.helper.ls.set('token', token)
     },
-    showMessage (state, type, body) {
+    show_message (state, type, body) {
       state.message = { type, body }
-    }
+    },
+    set_menu (state, data) {
+      state.menu = data
+    },
   },
   actions: {
-    checkAuth ({ commit }) {
+    check_auth ({ commit }) {
       let data = {
         user: global.helper.ls.get('user'),
         token: global.helper.ls.get('token')
       }
-      commit('setAuth', data)
+      commit('set_auth', data)
     },
-    checkPageTitle ({commit, state}, path) {
-      for (let k in state.menu) {
-        if (state.menu[k].href === path) {
-          commit('setPageTitle', state.menu[k].title)
-          break
-        }
-      }
-    }
   }
 })
 

@@ -8,6 +8,12 @@ from datetime import datetime, date
 from ast import literal_eval
 from backend import db, app
 
+def date_from_str(date_str):
+    if date_str is None:
+        return
+    date_list = list(map(int, date_str.split('-')))
+    return date(date_list[0], date_list[1], date_list[2])
+
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -21,6 +27,7 @@ class User(db.Model):
     school = db.Column(db.String(32), nullable=True)
     birthday = db.Column(db.Date(), nullable=True)
     student_info = relationship('StudentInfo', uselist=False, back_populates='user')
+    agit_teacher_info = relationship('AgitTeacherInfo', uselist=False, back_populates='user')
     teaching_classes = relationship('Class', back_populates='teacher')
     attending_classes = relationship('Enrollment', back_populates='student')
     posts = relationship('Post', back_populates='author')
@@ -53,6 +60,14 @@ class User(db.Model):
         print(role)
         self.role = json.dumps(role)
 
+    def role_del(self, del_role):
+        role = []
+        if self.role:
+            role = literal_eval(self.role)
+        role.remove(del_role)
+        print(role)
+        self.role = json.dumps(role)
+
     @staticmethod
     def verify_auth_token(token):
         s = Serializer(app.config['SECRET_KEY'])
@@ -81,7 +96,8 @@ class Class(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     teacher_id = db.Column(db.Integer, ForeignKey('users.id'))
     title = db.Column(db.String(256))
-    category = db.Column(db.String(64))
+    major_category = db.Column(db.String(64))
+    minor_category = db.Column(db.String(64))
     year = db.Column(db.Integer)
     semester = db.Column(db.Integer)
     approval = db.Column(db.Boolean, default=False)
@@ -95,11 +111,14 @@ class Class(db.Model):
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     def required_columns(self):
-        return ['teacher', 'title', 'category', 'year', 'semester']
+        return ['teacher_id', 'title', 'major_category', 'minor_category', 'year', 'semester']
     def as_dict(self):
         dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         dic['teacher'] = self.teacher.as_dict()
         return dic
+    @staticmethod
+    def major_categories():
+        return [{'text':'홈페이지', 'value':'homepage'}, {'text':'아지트', 'value':'agit'}, {'text':'하나', 'value':'hana'}]
 
 class Enrollment(db.Model):
     __tablename__ = 'enrollments'
@@ -135,6 +154,19 @@ class StudentInfo(db.Model):
     user = relationship('User', back_populates='student_info')
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+class AgitTeacherInfo(db.Model):
+    __tablename__ = 'agit_teacher_infos'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, ForeignKey('users.id'))
+    approval = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime(), default=datetime.now)
+    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    user = relationship('User', back_populates='agit_teacher_info')
+    def as_dict(self):
+        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        dic['user'] = self.user.as_dict()
+        return dic
 
 class Post(db.Model):
     __tablename__ = 'posts'
@@ -187,8 +219,13 @@ class Attendance(db.Model):
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     class_ = relationship('Class', back_populates='attendances')
     student = relationship('User', back_populates='attendances')
+    def required_columns(self):
+        return ['class_id', 'student_id', 'date', 'category']
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    @staticmethod
+    def categories():
+        return ['출석', '결석', '지각']
 
     
 

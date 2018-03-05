@@ -34,7 +34,6 @@ new Vue({
     }
   },
   created () {
-    this.$store.dispatch('checkPageTitle', this.$route.path)
-    this.$store.dispatch('checkAuth')
+    this.$store.dispatch('check_auth')
   }
 })

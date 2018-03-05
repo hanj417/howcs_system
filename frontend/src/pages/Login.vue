@@ -38,9 +38,17 @@ export default {
     }
   },
   computed: {
-    ...mapState(['user', 'token'])
+    ...mapState(['user', 'token', 'menu'])
   },
   methods: {
+    fetch_menu() {
+      this.$http.get('menu')
+      .then(({data}) => 
+        this.$store.commit('set_menu', data)
+      ).catch(function(data) {
+        console.log('error')
+      })    
+    },
     submit() {
       this.$axios({
         method: 'post',
@@ -52,8 +60,9 @@ export default {
             },
         headers: { 'Content-type': 'application/json' }
       }).then(({data}) => {
-        this.$store.commit('setAuth', data)
+        this.$store.commit('set_auth', data)
         this.$http.defaults.headers.common['Authorization'] = 'Bearer ' + data.token
+        this.fetch_menu()
         this.$router.replace('/')
       }).catch(({data}) => {
         this.login_failed = true
