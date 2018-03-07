@@ -433,6 +433,8 @@ export default {
           this.address = data.student_info.address
         }
       })
+    } else if (this.$route.params.action == 'new_student') {
+      this.is_howcs_student = true
     }
   }
 }

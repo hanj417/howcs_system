@@ -3,7 +3,7 @@
     <v-container fluid fill-height>
       <v-layout justify-center align-center>
         <v-card>
-          <v-data-table :headers='headers' :items='items' :total-items="pagination.totalItems" hide-actions :pagination.sync="pagination" :loading="loading">
+          <v-data-table :headers='headers' :items='items' :rows-per-page-items='[10, 20, {"text":"All", "value":-1}]'>
             <template slot='items' scope='props'>
               <tr>
                 <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
@@ -18,23 +18,10 @@
               </tr>
             </template>
           </v-data-table>
-          <div class="jc">
-            <v-pagination class="ma-3" v-model='pagination.page' :length='pagination.totalPages' circle></v-pagination>
-          </div>
         </v-card>
       </v-layout>
     </v-container>
-    <v-btn
-      fab
-      bottom
-      right
-      color="pink"
-      dark
-      fixed
-      :to="{name: 'class_form_new', params: {major_category: major_category, action:'new'}}"
-    >
-      <v-icon>add</v-icon>
-    </v-btn>
+    <v-btn fab bottom right color="pink" dark fixed :to="{name: 'class_form_new', params: {major_category: major_category, action:'new'}}"><v-icon>add</v-icon></v-btn>
   </v-content>
 </template>
 
@@ -43,22 +30,10 @@ const get_default_data = () => {
   return {
     loading: false,
     columns: [
-      {
-        'text': '선생님',
-        'value': 'teacher.name'
-      },
-      {
-        'text': '제목',
-        'value': 'title'
-      },
-      {
-        'text': '대분류',
-        'value': 'major_category'
-      },
-      {
-        'text': '분류',
-        'value': 'minor_category'
-      },
+      {'text': '선생님', 'value': 'teacher.name'},
+      {'text': '제목', 'value': 'title'},
+      {'text': '대분류', 'value': 'major_category'},
+      {'text': '분류', 'value': 'minor_category'},
     ],
     headers: [
       {'text': '선생님'},
@@ -68,38 +43,16 @@ const get_default_data = () => {
       {'text': ''},
     ],
     agit_columns: [
-      {
-        'text': '선생님',
-        'value': 'teacher.name'
-      },
-      {
-        'text': '제목',
-        'value': 'title'
-      },
-      {
-        'text': '분류',
-        'value': 'minor_category'
-      },
-      {
-        'text': '대상',
-        'value': 'audience'
-      },
+      {'text': '선생님', 'value': 'teacher.name'},
+      {'text': '제목', 'value': 'title'},
+      {'text': '대분류', 'value': 'major_category'},
     ],
     agit_headers: [
       {'text': '선생님'},
       {'text': '제목'},
       {'text': '분류'},
-      {'text': '대상'},
       {'text': ''},
     ],
-    pagination: {
-      page: 1,
-      rowsPerPage: 10,
-      sortBy: 'id',
-      descending: true,
-      totalItems: 0,
-      totalPages: 1
-    },
     items: [],
     filters: {},
     attendance_visible: false,
@@ -120,22 +73,20 @@ export default {
       return this.$route.params.id
     }, 
   },
-  watch: {
-    'pagination.page' (val) {
-      this.fetch_data()
-    },
-    'pagination.sortBy' (val) {
-      this.fetch_data()
-    },
-    'pagination.descending' (val) {
-      this.fetch_data()
-    },
-    'id' (val) {
-      this.set_visibility()
-      this.fetch_data()
-    }
-  },
   methods: {
+    fetch_data() {
+      this.$route.query.query = JSON.stringify(this.filters)
+      this.$http.get(`classes`, {params: this.$route.query})
+      .then(({ data }) => {
+        this.items = data
+      })
+    },
+    remove(item) {
+      this.$http.delete(`classes/` + item.id)
+      .then(({ data }) => {
+        this.fetch_data()
+      })
+    },
     get_column_data(row, field) {
       // process fields like `type.name`
       let [l1, l2] = field.value.split('.')
@@ -152,37 +103,12 @@ export default {
       }
       return value
     },
-    fetch_data() {
-      let sort = this.pagination.sortBy
-      if (this.pagination.descending) {
-        sort = '-' + sort
-      }
-      this.$route.query.query = JSON.stringify(this.filters)
-      this.$route.query.sort = sort
-      this.$route.query.perPage = this.pagination.rowsPerPage
-      this.$route.query.page = this.pagination.page
-
-      this.$http.get(`classes`, {params: this.$route.query}).then(({ data }) => {
-        this.items = data.data
-        this.pagination.totalItems = data.total
-        this.pagination.totalPages = data.lastPage
-      })
-    },
-    remove(item) {
-      this.$http.delete(`classes/` + item.id)
-      .then(({ data }) => {
-        this.fetch_data()
-      })
-    },
     enroll(item) {
       this.$http.post(`enrollments`, {
         'class_id': item.id,
       }).then(({ data }) => {
         this.fetch_data()
       })
-    },
-    next() {
-      this.pagination.page++
     },
     set_visibility() {
       this.major_category = this.$route.params.major_category

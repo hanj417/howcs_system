@@ -9,21 +9,20 @@
       회원 정보
     </v-card-title>
     <v-container grid-list-sm class="pa-4">
-      <v-form v-model="valid" ref="form" lazy-validation>
-        <v-layout row wrap>
+      <v-form @submit.prevent="validateForm" lazy-validation>
           <v-flex xs12>
             <v-select
-              :items="major_categories"
-              v-model="major_category"
               label="대분류"
+              v-model="major_category"
+              :disabled="category_disabled"
+              :items="major_categories"
               single-line
               bottom
-              :disabled="category_disabled"
             ></v-select>
           </v-flex>
           <v-flex xs12>
             <v-text-field
-              placeholder="분류"
+              label="분류"
               v-model="minor_category"
               :disabled="category_disabled"
               required
@@ -31,7 +30,7 @@
           </v-flex>
           <v-flex xs12>
             <v-text-field
-              placeholder="제목"
+              label="제목"
               v-model="title"
               required
             ></v-text-field>
@@ -51,7 +50,7 @@
             >
               <v-text-field
                 slot="activator"
-                label="Picker in menu"
+                label="날짜"
                 v-model="date"
                 prepend-icon="event"
                 readonly
@@ -83,23 +82,18 @@
 </template>
 
 <script>
-import { VueEditor } from 'vue2-quill-editor'
-
 export default {
-  components: { VueEditor },
   data () {
     return {
-      valid: true,
+      class_id: '',
       major_categories: [],
       major_category: {},
       minor_category: '',
       category_disabled: false,
-      switches: [],
       properties: '',
+      date: null,
       title: '',
       body: '',
-      class_id: '',
-      date: null,
     }
   },
   computed: {

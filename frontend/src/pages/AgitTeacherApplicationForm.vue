@@ -19,28 +19,12 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
 export default {
-  computed: {
-    ...mapState(['menu'])
-  },
   methods: {
-    fetch_menu() {
-      this.$http.get('menu')
-      .then(({data}) => 
-        this.$store.commit('set_menu', data)
-      ).catch(function(data) {
-        console.log('error')
-      })    
-    },
     submit() {
       this.$http.post(`agit_teacher_infos`, {
       }).then(({data}) => {
-        this.fetch_menu()
         this.$router.replace('/')
-      }).catch(({data}) => {
-        console.log('error')
       });
     },
   },

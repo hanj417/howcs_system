@@ -53,33 +53,18 @@ def auth_token_new():
 # user 
 ##################################################
 @app.route('/api/users', methods=['GET'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def user_all():
-    #FIXME
-    #return jsonify
-    #users = User.query.all()
-    #users_json = []
-    #for user in users:
-    #    users_json.append(user.as_dict())
-    #return users_json
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('perPage', 10))
+    query = literal_eval(request.args.get('query'))
+
+    users = User.query
     if 'name' in request.args:
-        users = User.query.filter_by(name=request.args['name']).all()
-    else:
-        users = User.query.all()
-    offset = (page - 1) * per_page
+        users = users.filter_by(name=query['name'])
+    users = users.all()
     users_json = []
     for user in users:
         users_json.append(user.as_dict())
-    result = {
-        'currentPage': page,
-        'lastPage': math.ceil(len(users) / per_page),
-        'perPage': per_page,
-        'total': len(users),
-        'data': users_json[offset:(offset + per_page)]
-    }
-    return jsonify(result)
+    return jsonify(users_json)
 
 @app.route('/api/users', methods=['POST'])
 def user_new():
@@ -88,7 +73,7 @@ def user_new():
 
     username = request.json.get('username')
     if User.exist(username):
-        abort(400)    # existing user
+        abort(400)
 
     user = User(username=username)
     user.password = user.hash_password(request.json.get('password'))
@@ -110,14 +95,7 @@ def user_get(id):
     if not user:
         abort(404)
 
-    user_dict = user.as_dict()
-    '''
-    if 'howcs_student' in user.role:
-        student = Student.query.filter_by(username=user.username).first()
-        student_profile = student.as_dict()
-        profile.update(student_profile)
-    '''
-    return jsonify(user_dict)
+    return jsonify(user.as_dict())
 
 @app.route('/api/users/<int:id>', methods=['PUT'])
 @multi_auth.login_required
@@ -164,22 +142,12 @@ def agit_teacher_infos_all():
     if 'admin' not in user.role:
         abort(400)
 
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('perPage', 10))
-    offset = (page - 1) * per_page
     agit_teacher_infos = AgitTeacherInfo.query
     agit_teacher_infos = agit_teacher_infos.all()
     agit_teacher_infos_json = []
     for agit_teacher_info in agit_teacher_infos:
         agit_teacher_infos_json.append(agit_teacher_info.as_dict())
-    result = {
-        'currentPage': page,
-        'lastPage': math.ceil(len(agit_teacher_infos) / per_page),
-        'perPage': per_page,
-        'total': len(agit_teacher_infos),
-        'data': agit_teacher_infos_json[offset:(offset + per_page)]
-    }
-    return jsonify(result)
+    return jsonify(agit_teacher_infos_json)
 
 @app.route('/api/agit_teacher_infos', methods=['POST'])
 @multi_auth.login_required
@@ -220,7 +188,6 @@ def agit_teacher_info_update(id):
     if agit_teacher_info.approval == False:
         agit_teacher_info.user.role_del('agit_teacher')
          
-
     db.session.add(agit_teacher_info)
     db.session.commit()
     return jsonify({'agit_teacher_info': agit_teacher_info.as_dict()})
@@ -254,22 +221,12 @@ def howcs_teacher_infos_all():
     if 'admin' not in user.role:
         abort(400)
 
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('perPage', 10))
-    offset = (page - 1) * per_page
     howcs_teacher_infos = HowcsTeacherInfo.query
     howcs_teacher_infos = howcs_teacher_infos.all()
     howcs_teacher_infos_json = []
     for howcs_teacher_info in howcs_teacher_infos:
         howcs_teacher_infos_json.append(howcs_teacher_info.as_dict())
-    result = {
-        'currentPage': page,
-        'lastPage': math.ceil(len(howcs_teacher_infos) / per_page),
-        'perPage': per_page,
-        'total': len(howcs_teacher_infos),
-        'data': howcs_teacher_infos_json[offset:(offset + per_page)]
-    }
-    return jsonify(result)
+    return jsonify(howcs_teacher_infos_json)
 
 @app.route('/api/howcs_teacher_infos', methods=['POST'])
 @multi_auth.login_required
@@ -331,12 +288,8 @@ def howcs_teacher_info_del(id):
 # student
 ##################################################
 @app.route('/api/student_infos')
-#@multi_auth.login_required
+@multi_auth.login_required
 def get_student_infos_all():
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('perPage', 10))
-    offset = (page - 1) * per_page
-
     student_infos = StudentInfo.query.all()
     users = []
     for student_info in student_infos:
@@ -344,14 +297,7 @@ def get_student_infos_all():
     users_json = []
     for user in users:
         users_json.append(user.as_dict())
-    result = {
-        'currentPage': page,
-        'lastPage': math.ceil(len(users_json) / per_page),
-        'perPage': per_page,
-        'total': len(users_json),
-        'data': users_json[offset:(offset + per_page)]
-    }
-    return jsonify(result)
+    return jsonify(users_json)
 
 @app.route('/api/student_infos', methods=['POST'])
 @multi_auth.login_required
@@ -367,8 +313,6 @@ def student_new():
         abort(400)    # existing user
     if Student.query.filter_by(username=username).first() is not None:
         abort(400)    # existing user
-
-    birthday = request.json.get('birthday')
 
     user = User(username=username)
     user.password = user.hash_password(request.json.get('password'))
@@ -461,19 +405,9 @@ def get_classes_major_categories():
 
 @app.route('/api/classes', methods=['GET'])
 def class_all():
-    #FIXME
-    #return jsonify
-    #classes = Class.query.all()
-    #classes_json = []
-    #for class_ in classes:
-    #    classes_json.append(class_.as_dict())
-    #return classes_json
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('perPage', 10))
-    offset = (page - 1) * per_page
-    classes = Class.query
     query = literal_eval(request.args.get('query'))
     
+    classes = Class.query
     if 'major_category' in query:
         classes = classes.filter_by(major_category=query['major_category'])
     if 'id' in query:
@@ -482,23 +416,14 @@ def class_all():
         classes = classes.filter_by(teacher_id=query['teacher_id'])
     if 'minor_category' in query:
         classes = classes.filter_by(minor_category=query['minor_category'])
-    #if 'teacher_id' in request.args:
-    #    classes = classes.filter_by(teacher_id=request.args['teacher_id'])
-
     classes = classes.all()
     classes_json = []
     for class_ in classes:
         classes_json.append(class_.as_dict())
-    result = {
-        'currentPage': page,
-        'lastPage': math.ceil(len(classes) / per_page),
-        'perPage': per_page,
-        'total': len(classes),
-        'data': classes_json[offset:(offset + per_page)]
-    }
-    return jsonify(result)
+    return jsonify(classes_json)
 
 @app.route('/api/classes', methods=['POST'])
+@multi_auth.login_required
 def class_new():
     if not request.json:
         abort(400)
@@ -531,7 +456,7 @@ def class_new():
     return jsonify({'class': class_.as_dict()}), 201
 
 @app.route('/api/classes/<int:id>', methods=['GET'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def class_get(id):
     class_ = Class.query.get(id)
     if not class_:
@@ -540,7 +465,7 @@ def class_get(id):
     return jsonify(class_dict)
 
 @app.route('/api/classes/<int:id>', methods=['PUT'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def class_update(id):
     if not request.json:
         abort(400)
@@ -556,8 +481,8 @@ def class_update(id):
     class_.teacher_id = teacher.id
     class_.teacher = teacher
     class_.title = request.json.get('title', class_.title)
-    class_.major_category = request.json.get('major_category', class_.category)
-    class_.minor_category = request.json.get('minor_category', class_.category)
+    class_.major_category = request.json.get('major_category', class_.major_category)
+    class_.minor_category = request.json.get('minor_category', class_.minor_category)
     class_.year = int(request.json.get('year', class_.year))
     class_.semester = int(request.json.get('semester', class_.semester))
     class_.time_slot = request.json.get('time_slot', class_.time_slot)
@@ -569,7 +494,7 @@ def class_update(id):
     return jsonify({'class_': class_.as_dict()})
 
 @app.route('/api/classes/<int:id>', methods=['DELETE'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def class_del(id):
     class_ = Class.query.get(id)
     if not class_:
@@ -585,9 +510,6 @@ def class_del(id):
 @app.route('/api/enrollments', methods=['GET'])
 @multi_auth.login_required
 def enrollment_all():
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('perPage', 10))
-    offset = (page - 1) * per_page
     query = literal_eval(request.args.get('query'))
     enrollments = Enrollment.query
     if 'class_id' in query:
@@ -598,14 +520,7 @@ def enrollment_all():
     enrollments_json = []
     for enrollment in enrollments:
         enrollments_json.append(enrollment.as_dict())
-    result = {
-        'currentPage': page,
-        'lastPage': math.ceil(len(enrollments) / per_page),
-        'perPage': per_page,
-        'total': len(enrollments),
-        'data': enrollments_json[offset:(offset + per_page)]
-    }
-    return jsonify(result)
+    return jsonify(enrollments_json)
         
 
 @app.route('/api/enrollments', methods=['POST'])
@@ -619,7 +534,6 @@ def enrollment_new():
         abort(400)
 
     enrollment = Enrollment()
-    print(enrollment.required_columns())
     for column in enrollment.required_columns():
         if column not in request.json:
             abort(400)
@@ -668,7 +582,6 @@ def enrollment_del(class_id, student_id):
     db.session.commit()
     return jsonify({'result': True})
 
-
 ##################################################
 # post 
 ##################################################
@@ -685,11 +598,7 @@ def get_posts_properties():
 @app.route('/api/posts', methods=['GET'])
 @multi_auth.login_required
 def post_all():
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('perPage', 10))
-    offset = (page - 1) * per_page
     query = literal_eval(request.args.get('query'))
-
     posts = Post.query
     if 'major_category' in query:
         posts = posts.filter_by(major_category=query['major_category'])
@@ -701,14 +610,7 @@ def post_all():
     posts_json = []
     for post in posts:
         posts_json.append(post.as_dict())
-    result = {
-        'currentPage': page,
-        'lastPage': math.ceil(len(posts) / per_page),
-        'perPage': per_page,
-        'total': len(posts),
-        'data': posts_json[offset:(offset + per_page)]
-    }
-    return jsonify(result)
+    return jsonify(posts_json)
 
 @app.route('/api/posts', methods=['POST'])
 @multi_auth.login_required
@@ -880,9 +782,6 @@ def attendance_del(id):
 @app.route('/api/payments', methods=['GET'])
 @multi_auth.login_required
 def payment_all():
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('perPage', 10))
-    offset = (page - 1) * per_page
     query = literal_eval(request.args.get('query'))
     payments = Payment.query
     if 'user_id' in query:
@@ -893,14 +792,7 @@ def payment_all():
     payments_json = []
     for payment in payments:
         payments_json.append(payment.as_dict())
-    result = {
-        'currentPage': page,
-        'lastPage': math.ceil(len(payments) / per_page),
-        'perPage': per_page,
-        'total': len(payments),
-        'data': payments_json[offset:(offset + per_page)]
-    }
-    return jsonify(result)
+    return jsonify(payments_json)
         
 
 @app.route('/api/payments', methods=['POST'])
@@ -993,25 +885,11 @@ def get_menu():
         menu.append({ 'href': 'student', 'params': {}, 'text': '하우학교 학생관리', 'icon': 'mdi-account-multiple' })
         menu.append({ 'href': 'howcs_teacher', 'params': {}, 'text': '하우학교 교사관리', 'icon': 'mdi-account-settings-variant' })
         menu.append({ 'href': 'class', 'params': {'major_category':'howcs'}, 'text': '하우학교 수업관리', 'icon': 'mdi-clipboard-text' })
-    
-    
     return jsonify(menu)
 
 @app.route('/api/toolbar')
 def get_toolbar():
-    toolbar = [
-        { 'header': 'Admin' },
-        { 'href': '/', 'text': 'Home', 'icon': 'home' },
-        #{ 'href': '/crud/users', 'text': 'Users', 'icon': 'people',
-        #  'children': [
-        #        { 'href': '/', 'text': 'Home', 'icon': 'home' },
-        #  ],
-        #},
-        { 'href': '/user_form/new', 'icon': 'lock', 'text': 'Register' },
-        { 'href': '/login', 'icon': 'lock', 'text': 'Login' }
-    ]
-    return jsonify(toolbar)
-
+    return jsonify([])
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')

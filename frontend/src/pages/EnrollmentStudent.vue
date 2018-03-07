@@ -3,11 +3,11 @@
     <v-container fluid fill-height>
       <v-layout justify-center align-center>
         <v-card>
-          <v-data-table :headers='columns' :items='items' :total-items="pagination.totalItems" hide-actions :pagination.sync="pagination" :loading="loading">
+          <v-data-table :headers='columns' :items='items' :rows-per-page-items='[10, 20, {"text":"All", "value":-1}]'>
             <template slot='items' scope='props'>
               <tr>
                 <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
-                  <td class="justify-center layout px-0">
+                <td class="justify-center layout px-0">
                   <v-btn icon class="mx-0" :to="{name: 'post_class', params: {class_id: props.item.id}}">
                     <v-icon>edit</v-icon>
                   </v-btn>
@@ -18,9 +18,6 @@
               </tr>
             </template>
           </v-data-table>
-          <div class="jc">
-            <v-pagination class="ma-3" v-model='pagination.page' :length='totalPages' circle></v-pagination>
-          </div>
         </v-card>
       </v-layout>
     </v-container>
@@ -30,28 +27,11 @@
 <script>
 const get_default_data = () => {
   return {
-    loading: false,
     columns: [
-      {
-        'text': '선생님',
-        'value': 'class.teacher.name'
-      },
-      {
-        'text': '제목',
-        'value': 'class.title'
-      },
-      {
-        'text': '분류',
-        'value': 'class.minor_category'
-      },
+      {'text': '선생님', 'value': 'class.teacher.name'},
+      {'text': '제목', 'value': 'class.title'},
+      {'text': '분류', 'value': 'class.minor_category'},
     ],
-    pagination: {
-      page: 1,
-      rowsPerPage: 10,
-      sortBy: 'id',
-      descending: true,
-      totalItems: 0
-    },
     filters: {},
     items: [],
   }
@@ -59,17 +39,6 @@ const get_default_data = () => {
 
 export default {
   data: get_default_data,
-  watch: {
-    'pagination.page' (val) {
-      this.fetch_data()
-    },
-    'pagination.sortBy' (val) {
-      this.fetch_data()
-    },
-    'pagination.descending' (val) {
-      this.fetch_data()
-    },
-  },
   computed: {
     id() {
       return this.$route.params.id
@@ -101,19 +70,10 @@ export default {
           'student_id': this.$route.params.id
         }
       }
-      let sort = this.pagination.sortBy
-      if (this.pagination.descending) {
-        sort = '-' + sort
-      }
       this.$route.query.query = JSON.stringify(this.filters)
-      this.$route.query.sort = sort
-      this.$route.query.perPage = this.pagination.rowsPerPage
-      this.$route.query.page = this.pagination.page
-      this.$route.query.class = this.$route.params.id
-
-      this.$http.get(`enrollments`, {params: this.$route.query}).then(({ data }) => {
-        this.items = data.data
-        this.pagination.totalItems = data.total
+      this.$http.get(`enrollments`, {params: this.$route.query})
+      .then(({ data }) => {
+        this.items = data
       })
     },
     remove(item) {
@@ -121,9 +81,6 @@ export default {
       .then(({ data }) => {
         this.fetch_data()
       })
-    },
-    next() {
-      this.pagination.page++
     },
   },
   created () {

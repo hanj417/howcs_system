@@ -3,7 +3,7 @@
     <v-container fluid fill-height>
       <v-layout justify-center align-center>
         <v-card>
-          <v-data-table :headers='columns' :items='items' :total-items="pagination.totalItems" hide-actions :pagination.sync="pagination" :loading="loading">
+          <v-data-table :headers='columns' :items='items' :rows-per-page-items='[10, 20, {"text":"All", "value":-1}]'>
             <template slot='items' scope='props'>
               <tr @click="props.expanded = !props.expanded">
                 <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
@@ -23,9 +23,6 @@
               </v-card>
             </template>
           </v-data-table>
-          <div class="jc">
-            <v-pagination class="ma-3" v-model='pagination.page' :length='pagination.totalPages' circle></v-pagination>
-          </div>
         </v-card>
       </v-layout>
     </v-container>
@@ -46,55 +43,19 @@
 <script>
 const get_default_data = () => {
   return {
-    loading: false,
+    class_id: '',
     columns: [
-      {
-        'text': '대분류',
-        'value': 'major_category'
-      },
-      {
-        'text': '분류',
-        'value': 'minor_category'
-      },
-      {
-        'text': '제목',
-        'value': 'title'
-      },
+      {'text': '대분류', 'value': 'major_category'},
+      {'text': '분류', 'value': 'minor_category'},
+      {'text': '제목', 'value': 'title'},
     ],
     filters: {},
-    actions: {},
-    options: {
-      sort: 'id',
-      create: false,
-      update: true,
-      delete: false
-    },
-    pagination: {
-      page: 1,
-      rowsPerPage: 10,
-      sortBy: 'id',
-      descending: true,
-      totalItems: 0,
-      totalPages: 1
-    },
     items: [],
-    class_id: '',
   }
 }
 
 export default {
   data: get_default_data,
-  watch: {
-    'pagination.page' (val) {
-      this.fetch_data()
-    },
-    'pagination.sortBy' (val) {
-      this.fetch_data()
-    },
-    'pagination.descending' (val) {
-      this.fetch_data()
-    },
-  },
   computed: {
     class_id() {
       return this.$route.params.class_id
@@ -110,46 +71,25 @@ export default {
     }
   },
   methods: {
-    get_column_data (row, field) {
+    get_column_data(row, field) {
       // process fields like `type.name`
       let [l1, l2] = field.value.split('.')
       let value = row[l1]
       let tag = null
-      if (l2) {
-        value = row[l1] ? row[l1][l2] : null
-      }
-      if (field.type === 'image') {
-        tag = 'img'
-      }
-      if (tag) {
-        value = `<${tag} src="${value}" class="crud-grid-thumb" controls />`
-      }
+      if (l2) { value = row[l1] ? row[l1][l2] : null }
+      if (field.type === 'image') { tag = 'img' }
+      if (tag) { value = `<${tag} src="${value}" class="crud-grid-thumb" controls />` }
       return value
     },
     fetch_data () {
-      let sort = this.pagination.sortBy
-      if (this.pagination.descending) {
-        sort = '-' + sort
-      }
       this.$route.query.query = JSON.stringify(this.filters)
-      this.$route.query.sort = sort
-      this.$route.query.perPage = this.pagination.rowsPerPage
-      this.$route.query.page = this.pagination.page
-      this.$http.get(`posts`, {params: this.$route.query}).then(({ data }) => {
-        this.items = data.data
-        this.pagination.totalItems = data.total
-        this.pagination.totalPages = data.lastPage
-      })
+      this.$http.get(`posts`, {params: this.$route.query})
+      .then(({ data }) => { this.items = data })
     },
     remove (item) {
-      // this.$alert('ok')
-      this.$http.delete(`posts/` + item.id).then(({ data }) => {
-        this.fetch_data()
-      })
+      this.$http.delete(`posts/` + item.id)
+      .then(({ data }) => { this.fetch_data() })
     },
-    next () {
-      this.pagination.page++
-    }
   },
   created () {
     if (!!this.$route.params.minor_category) {

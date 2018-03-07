@@ -1,23 +1,20 @@
 <template>
   <v-content>
-    <v-container fluid>
+    <v-container fluid fill-height>
       <v-layout justify-center align-center>
         <v-card>
-          <v-data-table :headers='columns' :items='items' :total-items="pagination.totalItems" hide-actions :pagination.sync="pagination" :loading="loading">
+          <v-data-table :headers='columns' :items='items'>
             <template slot='items' scope='props'>
               <tr>
                 <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
-                <td width='160'>
-                  <v-btn fab small @click="remove(props.item)">
+                <td class="justify-center layout px-0">
+                  <v-btn icon class="mx-0" @click="remove(props.item)">
                     <v-icon>delete</v-icon>
                   </v-btn>
                 </td>
               </tr>
             </template>
           </v-data-table>
-          <div class="jc">
-            <v-pagination class="ma-3" v-model='pagination.page' :length='pagination.totalPages' circle></v-pagination>
-          </div>
         </v-card>
       </v-layout>
     </v-container>
@@ -28,26 +25,28 @@
       color="pink"
       dark
       fixed
-      @click="search_dialog = true"
+      @click="search"
     >
       <v-icon>add</v-icon>
     </v-btn>
       <v-dialog v-model="search_dialog" width="50%">
         <v-card>
           <v-card-title class="title">학생 검색</v-card-title>
+          <v-flex xs6>
+            <v-text-field
+              label="검색"
+              single-line
+              hide-details
+              v-model="search_name"
+            ></v-text-field>
+          </v-flex>
           <v-card-text class="pt-4">
-            <v-form>
-              <v-text-field name="search_name" label="이름" v-model="search_name" type="text"></v-text-field>
-              <v-btn @click.stop='search'>검색</v-btn>
-            </v-form>
-            <v-data-table :headers='search_columns' :items='search_items' :loading="loading">
+            <v-data-table :headers='search_columns' :items='search_items' :search="search_name">
               <template slot='items' scope='props'>
                 <tr>
                   <td v-for='column in search_columns' v-html="get_column_data(props.item, column)"></td>
                   <td class="justify-center layout px-0">
-                    <v-btn icon class="mx-0" @click="search_select(props.item)">
-                      <v-icon>add</v-icon>
-                    </v-btn>
+                    <v-btn class="mx-0" @click="search_select(props.item)">선택</v-btn>
                   </td>
                 </tr>
               </template>
@@ -69,92 +68,28 @@
 <script>
 const get_default_data = () => {
   return {
-    loading: false,
     columns: [
-      {
-        'text': 'ID',
-        'value': 'user.username'
-      },
-      {
-        'text': 'Name',
-        'value': 'user.name'
-      },
-      {
-        'text': 'Email',
-        'value': 'user.email'
-      },
-      {
-        'text': 'Phone',
-        'value': 'user.phone'
-      },
-      {
-        'text': 'Church',
-        'value': 'user.church'
-      },
-      {
-        'text': 'Birthday',
-        'value': 'user.birthday'
-      },
+      {'text': '아이디', 'value': 'user.username'},
+      {'text': '이름', 'value': 'user.name'},
+      {'text': '이메일', 'value': 'user.email'},
+      {'text': '전화번호', 'value': 'user.phone'},
     ],
-    pagination: {
-      page: 1,
-      rowsPerPage: 10,
-      sortBy: 'id',
-      descending: true,
-      totalItems: 0,
-      totalPages: 1
-    },
     items: [],
     filters: {},
     search_dialog: false,
     search_name: '',
     search_items: [],
     search_columns: [
-      {
-        'text': 'ID',
-        'value': 'username'
-      },
-      {
-        'text': 'Name',
-        'value': 'name'
-      },
-      {
-        'text': 'Email',
-        'value': 'email'
-      },
-      {
-        'text': 'Phone',
-        'value': 'phone'
-      },
-      {
-        'text': 'School',
-        'value': 'school'
-      },
-      {
-        'text': 'Church',
-        'value': 'church'
-      },
-      {
-        'text': 'Birthday',
-        'value': 'birthday'
-      },
+      {'text': '아이디', 'value': 'username'},
+      {'text': '이름', 'value': 'name'},
+      {'text': '이메일', 'value': 'email'},
+      {'text': '전화번호', 'value': 'phone'},
     ],
   }
 }
 
 export default {
   data: get_default_data,
-  watch: {
-    'pagination.page' (val) {
-      this.fetch_data()
-    },
-    'pagination.sortBy' (val) {
-      this.fetch_data()
-    },
-    'pagination.descending' (val) {
-      this.fetch_data()
-    },
-  },
   methods: {
     get_column_data(row, field) {
       // process fields like `type.name`
@@ -173,19 +108,10 @@ export default {
       return value
     },
     fetch_data() {
-      let sort = this.pagination.sortBy
-      if (this.pagination.descending) {
-        sort = '-' + sort
-      }
       this.$route.query.query = JSON.stringify(this.filters)
-      this.$route.query.sort = sort
-      this.$route.query.perPage = this.pagination.rowsPerPage
-      this.$route.query.page = this.pagination.page
-
-      this.$http.get(`howcs_teacher_infos`, {params: this.$route.query}).then(({ data }) => {
-        this.items = data.data
-        this.pagination.totalItems = data.total
-        this.pagination.totalPages = data.lastPage
+      this.$http.get(`howcs_teacher_infos`, {params: this.$route.query})
+      .then(({ data }) => {
+        this.items = data
       })
     },
     remove(item) {
@@ -193,9 +119,6 @@ export default {
       .then(({ data }) => {
         this.fetch_data()
       })
-    },
-    next() {
-      this.pagination.page++
     },
     howcs_teacher_new(item) {
       this.$http.post(`howcs_teacher_infos`, {
@@ -205,10 +128,12 @@ export default {
       })
     },
     search() {
-      //this.$route.query.query = JSON.stringify(this.filters.model)
-      this.$http.get(`users`, {params: {name: this.search_name}}).then(({ data }) => {
-        this.search_items = data.data
+      this.$route.query.query = JSON.stringify(this.filters)
+      this.$http.get(`users`, {params: this.$route.query})
+      .then(({ data }) => {
+        this.search_items = data
       })
+      this.search_dialog = true
     },
     search_select(item) {
       this.howcs_teacher_new(item)

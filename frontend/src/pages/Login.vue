@@ -53,11 +53,7 @@ export default {
       this.$axios({
         method: 'post',
         url: 'http://wonzi.net:3000/api/login',
-        auth: 
-            {
-                username: this.username,
-                password: this.password
-            },
+        auth: {username: this.username, password: this.password},
         headers: { 'Content-type': 'application/json' }
       }).then(({data}) => {
         this.$store.commit('set_auth', data)

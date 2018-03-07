@@ -9,21 +9,21 @@
       회원 정보
     </v-card-title>
     <v-container grid-list-sm class="pa-4">
-      <v-form v-model="valid" ref="form" lazy-validation>
+      <v-form @submit.prevent="validateForm" lazy-validation>
         <v-layout row wrap>
           <v-flex xs12>
             <v-select
-              :items="major_categories"
-              v-model="major_category"
               label="대분류"
+              v-model="major_category"
+              :disabled="category_disabled"
+              :items="major_categories"
               single-line
               bottom
-              :disabled="category_disabled"
             ></v-select>
           </v-flex>
           <v-flex xs12>
             <v-text-field
-              placeholder="분류"
+              label="분류"
               v-model="minor_category"
               :disabled="category_disabled"
               required
@@ -31,7 +31,7 @@
           </v-flex>
           <v-flex xs12>
             <v-text-field
-              placeholder="제목"
+              label="제목"
               v-model="title"
               required
             ></v-text-field>
@@ -51,7 +51,7 @@
             >
               <v-text-field
                 slot="activator"
-                label="Picker in menu"
+                label="날짜"
                 v-model="date"
                 prepend-icon="event"
                 readonly
@@ -90,17 +90,15 @@ export default {
   components: { VueEditor },
   data () {
     return {
-      valid: true,
+      class_id: '',
       major_categories: [],
       major_category: {},
       minor_category: '',
       category_disabled: false,
-      switches: [],
       properties: '',
+      date: null,
       title: '',
       body: '',
-      class_id: '',
-      date: null,
     }
   },
   computed: {
@@ -142,16 +140,13 @@ export default {
     },
   },
   created() {
-    this.$http.get(`posts/major_categories`
-    ).then(({ data }) => {
-      this.major_categories = data
-    })
-    this.$http.get(`posts/properties`
-    ).then(({ data }) => {
-    })
+    this.$http.get(`posts/major_categories`)
+    .then(({ data }) => { this.major_categories = data })
+    this.$http.get(`posts/properties`)
+    .then(({ data }) => {})
     if (this.$route.params.action == 'update') {
-      this.$http.get(`posts/` + this.$route.params.id
-      ).then(({ data }) => {
+      this.$http.get(`posts/` + this.$route.params.id)
+      .then(({ data }) => {
         this.major_category = data.major_category
         this.minor_category = data.minor_category
         this.properties = data.properties
@@ -162,8 +157,8 @@ export default {
         this.category_disabled = true
       })
     } else if (this.$route.params.action == 'new') {
-      this.$http.get(`classes/` + this.$route.params.id
-      ).then(({ data }) => {
+      this.$http.get(`classes/` + this.$route.params.id)
+      .then(({ data }) => {
         this.major_category = data.major_category
         this.minor_category = data.minor_category
         this.category_disabled = true

@@ -104,7 +104,7 @@
           <v-spacer></v-spacer>
           <v-btn @click="search">검색</v-btn>
           <v-card-text class="pt-4">
-            <v-data-table :headers='search_columns' :items='search_items' :total-items="pagination.totalItems" hide-actions :pagination.sync="pagination" :loading="loading">
+            <v-data-table :headers='search_columns' :items='search_items' :total-items="pagination.totalItems" rows-per-page-items="[10, 20, {"text":"All", "value":-1}]" :pagination.sync="pagination" :loading="loading">
               <template slot='items' scope='props'>
                 <tr>
                   <td v-for='column in search_columns' v-html="get_column_data(props.item, column)"></td>

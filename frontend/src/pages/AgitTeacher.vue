@@ -3,24 +3,21 @@
     <v-container fluid fill-height>
       <v-layout justify-center align-center>
         <v-card>
-          <v-data-table :headers='columns' :items='items' :total-items="pagination.totalItems" hide-actions :pagination.sync="pagination" :loading="loading">
+          <v-data-table :headers='columns' :items='items' :rows-per-page-items='[10, 20, {"text":"All", "value":-1}]'>
             <template slot='items' scope='props'>
               <tr>
                 <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
-                <td width='160'>
-                  <v-btn fab small @click="remove(props.item)">
+                <td class="justify-center layout px-0">
+                  <v-btn icon class="mx-0" @click="remove(props.item)">
                     <v-icon>delete</v-icon>
                   </v-btn>
-                  <v-btn small @click="toggle_approval(props.item)">
+                  <v-btn icon class="mx-0" @click="toggle_approval(props.item)">
                     {{ props.item.approval }}
                   </v-btn>
                 </td>
               </tr>
             </template>
           </v-data-table>
-          <div class="jc">
-            <v-pagination class="ma-3" v-model='pagination.page' :length='totalPages' circle></v-pagination>
-          </div>
         </v-card>
       </v-layout>
     </v-container>
@@ -30,58 +27,27 @@
 <script>
 const get_default_data = () => {
   return {
-    loading: false,
     columns: [
-      {
-        'text': 'ID',
-        'value': 'user.username'
-      },
-      {
-        'text': 'Name',
-        'value': 'user.name'
-      },
-      {
-        'text': 'Email',
-        'value': 'user.email'
-      },
-      {
-        'text': 'Phone',
-        'value': 'user.phone'
-      },
-      {
-        'text': 'Church',
-        'value': 'user.church'
-      },
-      {
-        'text': 'Birthday',
-        'value': 'user.birthday'
-      },
+      {'text': '아이디', 'value': 'user.username'},
+      {'text': '이름', 'value': 'user.name'},
+      {'text': '이메일', 'value': 'user.email'},
+      {'text': '전화번호', 'value': 'user.phone'},
     ],
-    pagination: {
-      page: 1,
-      rowsPerPage: 10,
-      sortBy: 'id',
-      descending: true,
-      totalItems: 0
-    },
     items: [],
+    filters: {},
   }
 }
 
 export default {
   data: get_default_data,
-  watch: {
-    'pagination.page' (val) {
-      this.fetch_data()
-    },
-    'pagination.sortBy' (val) {
-      this.fetch_data()
-    },
-    'pagination.descending' (val) {
-      this.fetch_data()
-    },
-  },
   methods: {
+    fetch_data() {
+      this.$route.query.query = JSON.stringify(this.filters)
+      this.$http.get(`agit_teacher_infos`, {params: this.$route.query})
+      .then(({ data }) => {
+        this.items = data
+      })
+    },
     get_column_data(row, field) {
       // process fields like `type.name`
       let [l1, l2] = field.value.split('.')
@@ -98,29 +64,11 @@ export default {
       }
       return value
     },
-    fetch_data() {
-      let sort = this.pagination.sortBy
-      if (this.pagination.descending) {
-        sort = '-' + sort
-      }
-      //this.$route.query.query = JSON.stringify(this.filters.model)
-      this.$route.query.sort = sort
-      this.$route.query.perPage = this.pagination.rowsPerPage
-      this.$route.query.page = this.pagination.page
-
-      this.$http.get(`agit_teacher_infos`, {params: this.$route.query}).then(({ data }) => {
-        this.items = data.data
-        this.pagination.totalItems = data.total
-      })
-    },
     remove(item) {
       this.$http.delete(`agit_teacher_infos/` + item.id)
       .then(({ data }) => {
         this.fetch_data()
       })
-    },
-    next() {
-      this.pagination.page++
     },
     toggle_approval(item) {
       this.$http.put(`agit_teacher_infos/` + item.id, {
@@ -128,7 +76,7 @@ export default {
       }).then(({data}) => {
         this.fetch_data()
       })
-    }
+    },
   },
   created () {
     this.fetch_data()
