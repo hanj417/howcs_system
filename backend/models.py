@@ -28,6 +28,7 @@ class User(db.Model):
     birthday = db.Column(db.Date(), nullable=True)
     student_info = relationship('StudentInfo', uselist=False, back_populates='user')
     agit_teacher_info = relationship('AgitTeacherInfo', uselist=False, back_populates='user')
+    howcs_teacher_info = relationship('HowcsTeacherInfo', uselist=False, back_populates='user')
     teaching_classes = relationship('Class', back_populates='teacher')
     attending_classes = relationship('Enrollment', back_populates='student')
     posts = relationship('Post', back_populates='author')
@@ -89,52 +90,9 @@ class User(db.Model):
         return 'agit_student'
 
     def as_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-
-class Class(db.Model):
-    __tablename__ = 'classes'
-    id = db.Column(db.Integer, primary_key=True)
-    teacher_id = db.Column(db.Integer, ForeignKey('users.id'))
-    title = db.Column(db.String(256))
-    major_category = db.Column(db.String(64))
-    minor_category = db.Column(db.String(64))
-    year = db.Column(db.Integer)
-    semester = db.Column(db.Integer)
-    approval = db.Column(db.Boolean, default=False)
-    time_slot = db.Column(db.String(64), nullable=True)
-    audience = db.Column(db.String(64), nullable=True)
-    background = db.Column(db.UnicodeText(), nullable=True)
-    content = db.Column(db.UnicodeText(), nullable=True)
-    teacher = relationship('User', back_populates='teaching_classes')
-    students = relationship('Enrollment', back_populates='class_')
-    attendances = relationship('Attendance', back_populates='class_')
-    created_at = db.Column(db.DateTime(), default=datetime.now)
-    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
-    def required_columns(self):
-        return ['teacher_id', 'title', 'major_category', 'minor_category', 'year', 'semester']
-    def as_dict(self):
         dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
-        dic['teacher'] = self.teacher.as_dict()
-        return dic
-    @staticmethod
-    def major_categories():
-        return [{'text':'홈페이지', 'value':'homepage'}, {'text':'아지트', 'value':'agit'}, {'text':'하나', 'value':'hana'}]
-
-class Enrollment(db.Model):
-    __tablename__ = 'enrollments'
-    class_id = db.Column(db.Integer, ForeignKey('classes.id'), primary_key=True)
-    student_id = db.Column(db.Integer, ForeignKey('users.id'), primary_key=True)
-    approval = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime(), default=datetime.now)
-    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
-    class_ = relationship('Class', back_populates='students')
-    student = relationship('User', back_populates='attending_classes')
-    def required_columns(self):
-        return ['class_id', 'student_id']
-    def as_dict(self):
-        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
-        dic['class'] = self.class_.as_dict()
-        dic['student'] = self.student.as_dict()
+        if self.student_info:
+            dic['student_info'] = self.student_info.as_dict()
         return dic
 
 class StudentInfo(db.Model):
@@ -152,8 +110,12 @@ class StudentInfo(db.Model):
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     user = relationship('User', back_populates='student_info')
+    student_records = relationship('StudentRecord', back_populates="student_info")
     def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        if self.student_records:
+            dic['student_records'] = self.student_records.as_dict()
+        return dic
 
 class AgitTeacherInfo(db.Model):
     __tablename__ = 'agit_teacher_infos'
@@ -168,10 +130,23 @@ class AgitTeacherInfo(db.Model):
         dic['user'] = self.user.as_dict()
         return dic
 
+class HowcsTeacherInfo(db.Model):
+    __tablename__ = 'howcs_teacher_infos'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, ForeignKey('users.id'))
+    created_at = db.Column(db.DateTime(), default=datetime.now)
+    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    user = relationship('User', back_populates='howcs_teacher_info')
+    def as_dict(self):
+        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        dic['user'] = self.user.as_dict()
+        return dic
+
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
     author_id = db.Column(db.Integer, ForeignKey('users.id'))
+    class_id = db.Column(db.Integer, ForeignKey('classes.id'), nullable=True)
     major_category = db.Column(db.String(64))
     minor_category = db.Column(db.String(64))
     properties = db.Column(db.String(256))
@@ -180,32 +155,80 @@ class Post(db.Model):
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     author = relationship('User', back_populates='posts')
+    class_ = relationship('Class', back_populates='posts')
     def required_columns(self):
         return ['major_category', 'minor_category', 'title', 'body']
+    def properties_new(self, new_properties):
+        properties = []
+        if self.properties:
+            properties = literal_eval(self.properties)
+        properties.append(new_properties)
+        print(properties)
+        self.properties = json.dumps(properties)
+
+    def properties_del(self, del_properties):
+        properties = []
+        if self.properties:
+            properties = literal_eval(self.properties)
+        properties.remove(del_properties)
+        print(properties)
+        self.properties = json.dumps(properties)
+
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     @staticmethod
     def major_categories():
-        return [{'text':'홈페이지', 'value':'homepage'}, {'text':'아지트', 'value':'agit'}, {'text':'하나', 'value':'hana'}]
+        return [{'text':'홈페이지', 'value':'homepage'}, {'text':'아지트', 'value':'agit'}, {'text':'하우학교', 'value':'howcs'}]
     @staticmethod
     def properties_list():
         return [{'text':'공지', 'value':'notice'}]
     
-
-class Payment(db.Model):
-    __tablename__ = 'payments'
+class Class(db.Model):
+    __tablename__ = 'classes'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, ForeignKey('users.id'))
-    cost = db.Column(db.Integer)
-    category = db.Column(db.String(64))
-    year = db.Column(db.Integer, nullable=True)
-    semester = db.Column(db.Integer, nullable=True)
+    teacher_id = db.Column(db.Integer, ForeignKey('users.id'))
+    title = db.Column(db.String(256))
+    major_category = db.Column(db.String(64))
+    minor_category = db.Column(db.String(64))
+    year = db.Column(db.Integer)
+    semester = db.Column(db.Integer)
+    approval = db.Column(db.Boolean, default=False)
+    time_slot = db.Column(db.String(64), nullable=True)
+    audience = db.Column(db.String(64), nullable=True)
+    background = db.Column(db.UnicodeText(), nullable=True)
+    content = db.Column(db.UnicodeText(), nullable=True)
+    teacher = relationship('User', back_populates='teaching_classes')
+    students = relationship('Enrollment', back_populates='class_')
+    attendances = relationship('Attendance', back_populates='class_')
+    posts = relationship('Post', back_populates='class_')
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
-    user = relationship('User', back_populates='payments')
+    def required_columns(self):
+        return ['teacher_id', 'title', 'major_category', 'minor_category', 'year', 'semester']
     def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        dic['teacher'] = self.teacher.as_dict()
+        return dic
+    @staticmethod
+    def major_categories():
+        return [{'text':'홈페이지', 'value':'homepage'}, {'text':'아지트', 'value':'agit'}, {'text':'하우학교', 'value':'howcs'}]
 
+class Enrollment(db.Model):
+    __tablename__ = 'enrollments'
+    class_id = db.Column(db.Integer, ForeignKey('classes.id'), primary_key=True)
+    student_id = db.Column(db.Integer, ForeignKey('users.id'), primary_key=True)
+    approval = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime(), default=datetime.now)
+    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    class_ = relationship('Class', back_populates='students')
+    student = relationship('User', back_populates='attending_classes')
+    def required_columns(self):
+        return ['class_id']
+    def as_dict(self):
+        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        dic['class'] = self.class_.as_dict()
+        dic['student'] = self.student.as_dict()
+        return dic
 
 class Attendance(db.Model):
     __tablename__ = 'attendances'
@@ -227,7 +250,124 @@ class Attendance(db.Model):
     def categories():
         return ['출석', '결석', '지각']
 
-    
+class Payment(db.Model):
+    __tablename__ = 'payments'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, ForeignKey('users.id'))
+    cost = db.Column(db.Integer)
+    major_category = db.Column(db.String(64))
+    year = db.Column(db.Integer, nullable=True)
+    semester = db.Column(db.Integer, nullable=True)
+    date = db.Column(db.Date())
+    created_at = db.Column(db.DateTime(), default=datetime.now)
+    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    user = relationship('User', back_populates='payments')
+    def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+class StudentRecord(db.Model):
+    __tablename__ = 'student_records'
+    id = db.Column(db.Integer, primary_key=True)
+    student_info_id = db.Column(db.Integer, ForeignKey('student_infos.id'))
+    student_info = relationship('StudentInfo', back_populates='student_records')
+    student_annual_records = relationship('StudentAnnualRecord', back_populates='student_record')
+    student_award_records = relationship('StudentAwardRecord', back_populates='student_record')
+    student_school_registration_records = relationship('StudentSchoolRegistrationRecord', back_populates='student_record')
+    created_at = db.Column(db.DateTime(), default=datetime.now)
+    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    def as_dict(self):
+        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        if self.student_annual_records:
+            dic['student_annual_records'] = self.student_annual_records.as_dict()
+        if self.student_award_records:
+            dic['student_award_records'] = self.student_award_records.as_dict()
+        if self.student_school_registration_records:
+            dic['student_school_registration_records'] = self.student_school_registration_records.as_dict()
+        return dic
+
+class StudentSchoolRegistrationRecord(db.Model):
+    __tablename__ = 'student_school_registration_records'
+    id = db.Column(db.Integer, primary_key=True)
+    student_record_id = db.Column(db.Integer, ForeignKey('student_records.id'))
+    school = db.Column(db.String(64))
+    content = db.Column(db.UnicodeText())
+    date = db.Column(db.Date(), nullable=True)
+    student_record = relationship('StudentRecord', back_populates='student_school_registration_records')
+    created_at = db.Column(db.DateTime(), default=datetime.now)
+    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+class StudentAwardRecord(db.Model):
+    __tablename__ = 'student_award_records'
+    id = db.Column(db.Integer, primary_key=True)
+    student_record_id = db.Column(db.Integer, ForeignKey('student_records.id'))
+    content = db.Column(db.UnicodeText())
+    date = db.Column(db.Date(), nullable=True)
+    student_record = relationship('StudentRecord', back_populates='student_award_records')
+    created_at = db.Column(db.DateTime(), default=datetime.now)
+    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+class StudentAnnualRecord(db.Model):
+    __tablename__ = 'student_annual_records'
+    id = db.Column(db.Integer, primary_key=True)
+    student_record_id = db.Column(db.Integer, ForeignKey('student_records.id'))
+    year = db.Column(db.Integer)
+    content = db.Column(db.UnicodeText())
+
+    student_record = relationship('StudentRecord', back_populates='student_annual_records')
+    student_attendance_records = relationship('StudentAttendanceRecord', back_populates='student_annual_record')
+    student_reading_records = relationship('StudentReadingRecord', back_populates='student_annual_record')
+    created_at = db.Column(db.DateTime(), default=datetime.now)
+    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    def as_dict(self):
+        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        if self.student_attendance_records:
+            dic['student_attendance_records'] = self.student_attendance_records.as_dict()
+        if self.student_reading_records:
+            dic['student_reading_records'] = self.student_reading_records.as_dict()
+        return dic
+
+class StudentAttendanceRecord(db.Model):
+    __tablename__ = 'student_attendance_records'
+    id = db.Column(db.Integer, primary_key=True)
+    student_annual_record_id = db.Column(db.Integer, ForeignKey('student_annual_records.id'))
+
+    school_days = db.Column(db.Integer)
+    absence = db.Column(db.Integer)
+    early_leave = db.Column(db.Integer)
+    lateness = db.Column(db.Integer)
+    absence_illness = db.Column(db.Integer)
+    absence_wo_notice = db.Column(db.Integer)
+    lateness_illness = db.Column(db.Integer)
+    lateness_wo_notice = db.Column(db.Integer)
+    early_leave_illness = db.Column(db.Integer)
+    early_leave_wo_notice = db.Column(db.Integer)
+
+    note = db.Column(db.UnicodeText())
+
+    student_annual_record = relationship('StudentAnnualRecord', back_populates='student_attendance_records')
+    created_at = db.Column(db.DateTime(), default=datetime.now)
+    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+class StudentReadingRecord(db.Model):
+    __tablename__ = 'student_reading_records'
+    id = db.Column(db.Integer, primary_key=True)
+    student_annual_record_id = db.Column(db.Integer, ForeignKey('student_annual_records.id'))
+    title = db.Column(db.String(256))
+    content = db.Column(db.UnicodeText())
+    date = db.Column(db.Date(), nullable=True)
+    student_annual_record = relationship('StudentAnnualRecord', back_populates='student_reading_records')
+    created_at = db.Column(db.DateTime(), default=datetime.now)
+    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 '''
 class Parent(db.Model):
@@ -248,16 +388,6 @@ class Teacher(db.Model):
     username = db.Column(db.String(32), ForeignKey('users.username'))
     career = db.Column(db.UnicodeText())
     user = relationship('User', backref=backref('teachers', order_by=id))
-
-class StudentRecord(db.Model):
-    __tablename__ = 'student_records'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(32), ForeignKey('users.username'))
-    year = db.Column(db.Integer)
-    content = db.Column(db.UnicodeText())
-    created_at = db.Column(db.DateTime(), default=datetime.now)
-    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
-    student = relationship('Student', backref=backref('student_records', order_by=id))
 
 '''
 

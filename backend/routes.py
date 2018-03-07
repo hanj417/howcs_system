@@ -152,6 +152,304 @@ def user_del(id):
     db.session.commit()
     return jsonify({'result': True})
 
+##################################################
+# agit_teachers
+##################################################
+@app.route('/api/agit_teacher_infos', methods=['GET'])
+@multi_auth.login_required
+def agit_teacher_infos_all():
+    user = g.user
+    if not user:
+        abort(400)
+    if 'admin' not in user.role:
+        abort(400)
+
+    page = int(request.args.get('page', 1))
+    per_page = int(request.args.get('perPage', 10))
+    offset = (page - 1) * per_page
+    agit_teacher_infos = AgitTeacherInfo.query
+    agit_teacher_infos = agit_teacher_infos.all()
+    agit_teacher_infos_json = []
+    for agit_teacher_info in agit_teacher_infos:
+        agit_teacher_infos_json.append(agit_teacher_info.as_dict())
+    result = {
+        'currentPage': page,
+        'lastPage': math.ceil(len(agit_teacher_infos) / per_page),
+        'perPage': per_page,
+        'total': len(agit_teacher_infos),
+        'data': agit_teacher_infos_json[offset:(offset + per_page)]
+    }
+    return jsonify(result)
+
+@app.route('/api/agit_teacher_infos', methods=['POST'])
+@multi_auth.login_required
+def agit_teacher_infos_new():
+    user = g.user
+    if not user:
+        abort(400)
+
+    agit_teacher_info = AgitTeacherInfo()
+    agit_teacher_info.user_id = user.id
+    agit_teacher_info.approval = False
+    agit_teacher_info.user = user
+    user.agit_teacher_info = agit_teacher_info
+
+    db.session.add(agit_teacher_info)
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({'agit_teacher_info': agit_teacher_info.as_dict()}), 201
+
+@app.route('/api/agit_teacher_infos/<int:id>', methods=['PUT'])
+@multi_auth.login_required
+def agit_teacher_info_update(id):
+    user = g.user
+    if not user:
+        abort(400)
+    if 'admin' not in user.role:
+        abort(400)
+    if not request.json:
+        abort(400)
+    agit_teacher_info = AgitTeacherInfo.query.get(id)
+    if not agit_teacher_info:
+        abort(404)
+
+    agit_teacher_info.approval = request.json.get('approval', agit_teacher_info.approval)
+
+    if agit_teacher_info.approval == True:
+        agit_teacher_info.user.role_new('agit_teacher')
+    if agit_teacher_info.approval == False:
+        agit_teacher_info.user.role_del('agit_teacher')
+         
+
+    db.session.add(agit_teacher_info)
+    db.session.commit()
+    return jsonify({'agit_teacher_info': agit_teacher_info.as_dict()})
+
+@app.route('/api/agit_teacher_infos/<int:id>', methods=['DELETE'])
+@multi_auth.login_required
+def agit_teacher_info_del(id):
+    user = g.user
+    if not user:
+        abort(400)
+    if 'admin' not in user.role:
+        abort(400)
+    agit_teacher_info = AgitTeacherInfo.query.get(id)
+    if not agit_teacher_info:
+        abort(404)
+
+    db.session.delete(agit_teacher_info)
+    db.session.commit()
+    return jsonify({'result': True})
+
+
+##################################################
+# howcs_teachers
+##################################################
+@app.route('/api/howcs_teacher_infos', methods=['GET'])
+@multi_auth.login_required
+def howcs_teacher_infos_all():
+    user = g.user
+    if not user:
+        abort(400)
+    if 'admin' not in user.role:
+        abort(400)
+
+    page = int(request.args.get('page', 1))
+    per_page = int(request.args.get('perPage', 10))
+    offset = (page - 1) * per_page
+    howcs_teacher_infos = HowcsTeacherInfo.query
+    howcs_teacher_infos = howcs_teacher_infos.all()
+    howcs_teacher_infos_json = []
+    for howcs_teacher_info in howcs_teacher_infos:
+        howcs_teacher_infos_json.append(howcs_teacher_info.as_dict())
+    result = {
+        'currentPage': page,
+        'lastPage': math.ceil(len(howcs_teacher_infos) / per_page),
+        'perPage': per_page,
+        'total': len(howcs_teacher_infos),
+        'data': howcs_teacher_infos_json[offset:(offset + per_page)]
+    }
+    return jsonify(result)
+
+@app.route('/api/howcs_teacher_infos', methods=['POST'])
+@multi_auth.login_required
+def howcs_teacher_infos_new():
+    user = g.user
+    if not user:
+        abort(400)
+    if 'admin' not in user.role:
+        abort(400)
+
+    howcs_teacher_info = HowcsTeacherInfo()
+    howcs_teacher_info.user_id = request.json.get('user_id')
+    user = User.query.filter_by(id = howcs_teacher_info.user_id).first()
+    howcs_teacher_info.user = user
+    user.role_new('howcs_teacher')
+
+    db.session.add(howcs_teacher_info)
+    db.session.commit()
+    return jsonify({'user': user.as_dict()}), 201
+
+@app.route('/api/howcs_teacher_infos/<int:id>', methods=['PUT'])
+@multi_auth.login_required
+def howcs_teacher_info_update(id):
+    user = g.user
+    if not user:
+        abort(400)
+    if 'admin' not in user.role:
+        abort(400)
+    if not request.json:
+        abort(400)
+    howcs_teacher_info = HowcsTeacherInfo.query.get(id)
+    if not howcs_teacher_info:
+        abort(404)
+
+
+    db.session.add(howcs_teacher_info)
+    db.session.commit()
+    return jsonify({'howcs_teacher_info': howcs_teacher_info.as_dict()})
+
+@app.route('/api/howcs_teacher_infos/<int:id>', methods=['DELETE'])
+@multi_auth.login_required
+def howcs_teacher_info_del(id):
+    user = g.user
+    if not user:
+        abort(400)
+    if 'admin' not in user.role:
+        abort(400)
+    howcs_teacher_info = HowcsTeacherInfo.query.get(id)
+    if not howcs_teacher_info:
+        abort(404)
+
+    howcs_teacher_info.user.role_del('howcs_teacher')
+
+    db.session.delete(howcs_teacher_info)
+    db.session.commit()
+    return jsonify({'result': True})
+
+##################################################
+# student
+##################################################
+@app.route('/api/student_infos')
+#@multi_auth.login_required
+def get_student_infos_all():
+    page = int(request.args.get('page', 1))
+    per_page = int(request.args.get('perPage', 10))
+    offset = (page - 1) * per_page
+
+    student_infos = StudentInfo.query.all()
+    users = []
+    for student_info in student_infos:
+        users.append(student_info.user)
+    users_json = []
+    for user in users:
+        users_json.append(user.as_dict())
+    result = {
+        'currentPage': page,
+        'lastPage': math.ceil(len(users_json) / per_page),
+        'perPage': per_page,
+        'total': len(users_json),
+        'data': users_json[offset:(offset + per_page)]
+    }
+    return jsonify(result)
+
+@app.route('/api/student_infos', methods=['POST'])
+@multi_auth.login_required
+def student_new():
+    if 'admin' not in g.user.role:
+        abort(400)
+
+    if not request.json or not 'username' in request.json or not 'password' in request.json:
+        abort(400)
+
+    username = request.json.get('username')
+    if User.exist(username):
+        abort(400)    # existing user
+    if Student.query.filter_by(username=username).first() is not None:
+        abort(400)    # existing user
+
+    birthday = request.json.get('birthday')
+
+    user = User(username=username)
+    user.password = user.hash_password(request.json.get('password'))
+    user.role_new(User.default_role())
+    user.role_new('agit_student')
+    user.name = request.json.get('name')
+    user.email = request.json.get('email')
+    user.phone = request.json.get('phone')
+    user.church = request.json.get('church')
+    user.school = request.json.get('school')
+    user.birthday_is(request.json.get('birthday'))
+
+    student = StudentInfo()
+    student.user_id = user.id
+    student.student_id = request.json.get('student_id')
+    student.gender = request.json.get('gender')
+    student.ssn = request.json.get('ssn')
+    student.father_name = request.json.get('father_name')
+    student.father_ssn = request.json.get('father_ssn')
+    student.mother_name = request.json.get('mother_name')
+    student.mother_ssn = request.json.get('mother_ssn')
+    student.address = request.json.get('address')
+    
+    user.student_info = student
+    db.session.add(user)
+    db.session.add(student)
+    db.session.commit()
+    return jsonify({'user': user.as_dict()}), 201
+
+@app.route('/api/student_infos/<int:id>', methods=['PUT'])
+@multi_auth.login_required
+def student_update(id):
+    if not request.json:
+        abort(400)
+    user = User.query.get(id)
+    if not user:
+        abort(404)
+
+    user.username = request.json.get('username')
+    password = request.json.get('password')
+    if password:
+        user.hash_password(password)
+    user.name = request.json.get('name', user.name)
+    user.email = request.json.get('email', user.email)
+    user.phone = request.json.get('phone', user.phone)
+    user.church = request.json.get('church', user.church)
+    user.school = request.json.get('school', user.school)
+    user.birthday_is(request.json.get('birthday'))
+
+    if user.student_info:
+        student_info = user.student_info
+    else:
+        student_info = StudentInfo()
+        student_info.user_id = user.id
+        user.role_new('agit_student')
+        user.student_info = student_info
+
+    student_info.student_id = request.json.get('student_id')
+    student_info.gender = request.json.get('gender')
+    student_info.ssn = request.json.get('ssn')
+    student_info.father_name = request.json.get('father_name')
+    student_info.father_ssn = request.json.get('father_ssn')
+    student_info.mother_name = request.json.get('mother_name')
+    student_info.mother_ssn = request.json.get('mother_ssn')
+    student_info.address = request.json.get('address')
+
+    db.session.add(user)
+    db.session.add(student_info)
+    db.session.commit()
+    return jsonify({'user': user.as_dict()})
+
+@app.route('/api/student_infos/<int:id>', methods=['DELETE'])
+@multi_auth.login_required
+def student_del(id):
+    user = User.query.get(id)
+    if not user:
+        abort(404)
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({'result': True})
+
 
 ##################################################
 # class
@@ -179,7 +477,9 @@ def class_all():
     if 'major_category' in query:
         classes = classes.filter_by(major_category=query['major_category'])
     if 'id' in query:
-        classes = classes.filter_by(teacher_id=query['id'])
+        classes = classes.filter_by(id=query['id'])
+    if 'teacher_id' in query:
+        classes = classes.filter_by(teacher_id=query['teacher_id'])
     if 'minor_category' in query:
         classes = classes.filter_by(minor_category=query['minor_category'])
     #if 'teacher_id' in request.args:
@@ -283,15 +583,8 @@ def class_del(id):
 # enrollment 
 ##################################################
 @app.route('/api/enrollments', methods=['GET'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def enrollment_all():
-    #FIXME
-    #return jsonify
-    #enrollments = Enrollment.query.all()
-    #enrollments_json = []
-    #for enrollment in enrollments:
-    #    enrollments_json.append(enrollment.as_dict())
-    #return enrollments_json
     page = int(request.args.get('page', 1))
     per_page = int(request.args.get('perPage', 10))
     offset = (page - 1) * per_page
@@ -316,8 +609,13 @@ def enrollment_all():
         
 
 @app.route('/api/enrollments', methods=['POST'])
+@multi_auth.login_required
 def enrollment_new():
     if not request.json:
+        abort(400)
+
+    user = g.user
+    if not user:
         abort(400)
 
     enrollment = Enrollment()
@@ -327,7 +625,7 @@ def enrollment_new():
             abort(400)
 
     enrollment.class_id = request.json.get('class_id')
-    enrollment.student_id = request.json.get('student_id')
+    enrollment.student_id = request.json.get('student_id', user.id)
     enrollment.approval = False
     enrollment.student = User.query.filter_by(id = enrollment.student_id).first()
     class_ = Class.query.filter_by(id = enrollment.class_id).first()
@@ -337,7 +635,7 @@ def enrollment_new():
     return jsonify({'enrollment': enrollment.as_dict()}), 201
 
 @app.route('/api/enrollments/<int:class_id>/<int:student_id>', methods=['GET'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def enrollment_get(class_id, student_id):
     enrollment = Enrollment.query.filter_by(class_id = class_id, student_id = student_id).first()
     if not enrollment:
@@ -346,7 +644,7 @@ def enrollment_get(class_id, student_id):
     return jsonify(enrollmentdict)
 
 @app.route('/api/enrollments/<int:class_id>/<int:student_id>', methods=['PUT'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def enrollment_update(class_id, student_id):
     if not request.json:
         abort(400)
@@ -361,7 +659,7 @@ def enrollment_update(class_id, student_id):
     return jsonify({'enrollment': enrollment.as_dict()})
 
 @app.route('/api/enrollments/<int:class_id>/<int:student_id>', methods=['DELETE'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def enrollment_del(class_id, student_id):
     enrollment = Enrollment.query.filter_by(class_id = class_id, student_id = student_id).first()
     if not enrollment:
@@ -385,27 +683,21 @@ def get_posts_properties():
     return jsonify(properties)
 
 @app.route('/api/posts', methods=['GET'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def post_all():
-    #FIXME
-    #return jsonify
-    #posts = Post.query.all()
-    #posts_json = []
-    #for post in posts:
-    #    posts_json.append(post.as_dict())
-    #return posts_json
     page = int(request.args.get('page', 1))
     per_page = int(request.args.get('perPage', 10))
     offset = (page - 1) * per_page
-    if 'major_category' in request.args:
-        if 'minor_category' in request.args:
-            posts = Post.query.filter_by(major_category=request.args['major_category'], minor_category=request.args['minor_category']).all()
-        else:
-            posts = Post.query.filter_by(major_category=request.args['major_category']).all()
-    elif 'author_id' in request.args:
-        posts = Post.query.filter_by(author_id=request.args['author_id']).all()
-    else:
-        posts = Post.query.all()
+    query = literal_eval(request.args.get('query'))
+
+    posts = Post.query
+    if 'major_category' in query:
+        posts = posts.filter_by(major_category=query['major_category'])
+    if 'minor_category' in query:
+        posts = posts.filter_by(minor_category=query['minor_category'])
+    if 'class_id' in query:
+        posts = posts.filter_by(class_id=query['class_id'])
+    posts = posts.all()
     posts_json = []
     for post in posts:
         posts_json.append(post.as_dict())
@@ -419,6 +711,7 @@ def post_all():
     return jsonify(result)
 
 @app.route('/api/posts', methods=['POST'])
+@multi_auth.login_required
 def post_new():
     if not request.json:
         abort(400)
@@ -432,9 +725,16 @@ def post_new():
     post.author_id = request.json.get('author_id', 1)
     post.major_category = request.json.get('major_category')
     post.minor_category = request.json.get('minor_category')
-    post.properties = json.dumps(request.json.get('properties'))
+
+    properties = request.json.get('properties', [])
+    for prop in properties:
+        post.properties_new(prop)
     post.title = request.json.get('title')
     post.body = request.json.get('body')
+    class_id = request.json.get('class_id', None)
+    if class_id:
+        post.class_id = class_id
+        post.class_ = Class.query.filter_by(id = class_id).first()
 
     author = User.query.filter_by(id = post.author_id).first()
     post.author = author
@@ -443,7 +743,7 @@ def post_new():
     return jsonify({'post': post.as_dict()}), 201
 
 @app.route('/api/posts/<int:id>', methods=['GET'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def post_get(id):
     post = Post.query.get(id)
     if not post:
@@ -452,7 +752,7 @@ def post_get(id):
     return jsonify(postdict)
 
 @app.route('/api/posts/<int:id>', methods=['PUT'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def post_update(id):
     if not request.json:
         abort(400)
@@ -466,12 +766,19 @@ def post_update(id):
     post.title = request.json.get('title', post.title)
     post.body = request.json.get('body', post.body)
 
+    properties = request.json.get('properties', post.properties)
+    post.properties = '[]'
+    if properties is None:
+        properties = []
+    for prop in properties:
+        post.properties_new(prop)
+
     db.session.add(post)
     db.session.commit()
     return jsonify({'post': post.as_dict()})
 
 @app.route('/api/posts/<int:id>', methods=['DELETE'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def post_del(id):
     post = Post.query.filter_by(id = id).first()
     if not post:
@@ -489,15 +796,8 @@ def get_attendances_categories():
     return jsonify(categories)
 
 @app.route('/api/attendances', methods=['GET'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def attendance_all():
-    #FIXME
-    #return jsonify
-    #attendances = Attendance.query.all()
-    #attendances_json = []
-    #for attendance in attendances:
-    #    attendances_json.append(attendance.as_dict())
-    #return attendances_json
     attendances = Attendance.query
     if 'category' in request.args:
         attendances = attendances.filter_by(category=request.args['category'])
@@ -514,6 +814,7 @@ def attendance_all():
     return jsonify(attendances_json)
 
 @app.route('/api/attendances', methods=['POST'])
+@multi_auth.login_required
 def attendance_new():
     if not request.json:
         abort(400)
@@ -539,7 +840,7 @@ def attendance_new():
     return jsonify({'attendance': attendance.as_dict()}), 201
 
 @app.route('/api/attendances/<int:id>', methods=['GET'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def attendance_get(id):
     attendance = Attendance.query.get(id)
     if not attendance:
@@ -548,7 +849,7 @@ def attendance_get(id):
     return jsonify(attendancedict)
 
 @app.route('/api/attendances/<int:id>', methods=['PUT'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def attendance_update(id):
     if not request.json:
         abort(400)
@@ -564,7 +865,7 @@ def attendance_update(id):
     return jsonify({'attendance': attendance.as_dict()})
 
 @app.route('/api/attendances/<int:id>', methods=['DELETE'])
-#@multi_auth.login_required
+@multi_auth.login_required
 def attendance_del(id):
     attendance = Attendance.query.get(id)
     if not attendance:
@@ -573,283 +874,92 @@ def attendance_del(id):
     db.session.commit()
     return jsonify({'result': True})
 
-
 ##################################################
-# agit_teachers
+# payment 
 ##################################################
-@app.route('/api/agit_teacher_infos', methods=['GET'])
+@app.route('/api/payments', methods=['GET'])
 @multi_auth.login_required
-def agit_teacher_infos_all():
-    user = g.user
-    if not user:
-        abort(400)
-    if 'admin' not in user.role:
-        abort(400)
-
+def payment_all():
     page = int(request.args.get('page', 1))
     per_page = int(request.args.get('perPage', 10))
     offset = (page - 1) * per_page
-    agit_teacher_infos = AgitTeacherInfo.query
-    agit_teacher_infos = agit_teacher_infos.all()
-    agit_teacher_infos_json = []
-    for agit_teacher_info in agit_teacher_infos:
-        agit_teacher_infos_json.append(agit_teacher_info.as_dict())
+    query = literal_eval(request.args.get('query'))
+    payments = Payment.query
+    if 'user_id' in query:
+        payments = payments.filter_by(class_id=query['user_id'])
+    if 'major_category' in query:
+        payments = payments.filter_by(student_id=query['major_category'])
+    payments = payments.all()
+    payments_json = []
+    for payment in payments:
+        payments_json.append(payment.as_dict())
     result = {
         'currentPage': page,
-        'lastPage': math.ceil(len(agit_teacher_infos) / per_page),
+        'lastPage': math.ceil(len(payments) / per_page),
         'perPage': per_page,
-        'total': len(agit_teacher_infos),
-        'data': agit_teacher_infos_json[offset:(offset + per_page)]
+        'total': len(payments),
+        'data': payments_json[offset:(offset + per_page)]
     }
     return jsonify(result)
+        
 
-@app.route('/api/agit_teacher_infos', methods=['POST'])
+@app.route('/api/payments', methods=['POST'])
 @multi_auth.login_required
-def agit_teacher_infos_new():
-    user = g.user
-    if not user:
-        abort(400)
-
-    agit_teacher_info = AgitTeacherInfo()
-    agit_teacher_info.user_id = user.id
-    agit_teacher_info.approval = False
-    agit_teacher_info.user = user
-    user.agit_teacher_info = agit_teacher_info
-
-    db.session.add(agit_teacher_info)
-    db.session.add(user)
-    db.session.commit()
-    return jsonify({'agit_teacher_info': agit_teacher_info.as_dict()}), 201
-
-@app.route('/api/agit_teacher_infos/<int:id>', methods=['PUT'])
-@multi_auth.login_required
-def agit_teacher_info_update(id):
-    user = g.user
-    if not user:
-        abort(400)
-    if 'admin' not in user.role:
-        abort(400)
+def payment_new():
     if not request.json:
         abort(400)
-    agit_teacher_info = AgitTeacherInfo.query.get(id)
-    if not agit_teacher_info:
-        abort(404)
-
-    agit_teacher_info.approval = request.json.get('approval', agit_teacher_info.approval)
-
-    if agit_teacher_info.approval == True:
-        agit_teacher_info.user.role_new('agit_teacher')
-    if agit_teacher_info.approval == False:
-        agit_teacher_info.user.role_del('agit_teacher')
-         
-
-    db.session.add(agit_teacher_info)
-    db.session.commit()
-    return jsonify({'agit_teacher_info': agit_teacher_info.as_dict()})
-
-'''
-
-@app.route('/api/students', methods=['POST'])
-#@multi_auth.login_required
-def student_new():
-    username = request.json.get('username')
-    password = request.json.get('password')
-    name = request.json.get('name')
-    email = request.json.get('email')
-    phone = request.json.get('phone')
-    church = request.json.get('church')
-    school = request.json.get('school')
-    birthday = request.json.get('birthday')
-    student_id = request.json.get('student_id')
-    gender = request.json.get('gender')
-    ssn = request.json.get('ssn')
-    father_name = request.json.get('father_name')
-    father_ssn = request.json.get('father_ssn')
-    mother_name = request.json.get('mother_name')
-    mother_ssn = request.json.get('mother_ssn')
-    address = request.json.get('address')
-    if username is None or password is None:
-        abort(400)    # missing arguments
-    if User.query.filter_by(username=username).first() is not None:
-        abort(400)    # existing user
-    if Student.query.filter_by(username=username).first() is not None:
-        abort(400)    # existing user
-    user = User(username=username)
-    user.hash_password(password)
-    user.role = json.dumps(['agit_student', 'howcs_student'])
-    user.name = name
-    user.email = email
-    user.phone = phone
-    user.church = church
-    user.school = school
-    birthday_list = list(map(int, birthday.split('-')))
-    user.birthday = datetime.date(birthday_list[0], birthday_list[1], birthday_list[2])
-    student = Student(username=username)
-    student.birthday = datetime.date(birthday_list[0], birthday_list[1], birthday_list[2])
-    student.student_id = student_id
-    student.gender = gender
-    student.ssn = ssn
-    student.father_name = father_name
-    student.father_ssn = father_ssn
-    student.mother_name = mother_name
-    student.mother_ssn = mother_ssn
-    student.address = address
-    db.session.add(user)
-    db.session.add(student)
-    db.session.commit()
-    return (jsonify({'username': user.username}))
-
-@app.route('/api/students/update', methods=['POST'])
-#@multi_auth.login_required
-def student_update():
-    username = request.json.get('username')
-    password = request.json.get('password')
-    name = request.json.get('name')
-    email = request.json.get('email')
-    phone = request.json.get('phone')
-    church = request.json.get('church')
-    school = request.json.get('school')
-    birthday = request.json.get('birthday')
-    student_id = request.json.get('student_id')
-    gender = request.json.get('gender')
-    ssn = request.json.get('ssn')
-    father_name = request.json.get('father_name')
-    father_ssn = request.json.get('father_ssn')
-    mother_name = request.json.get('mother_name')
-    mother_ssn = request.json.get('mother_ssn')
-    address = request.json.get('address')
-    if username is None or password is None:
-        abort(400)    # missing arguments
-    if User.query.filter_by(username=username).first() is None:
-        abort(400)    # existing user
-    if Student.query.filter_by(username=username).first() is None:
-        abort(400)    # existing user
 
     user = g.user
-    if User.query.filter_by(username=username).first() != user:
-        abort(400)    # existing user
-    student = Student.query.filter_by(username=username).first()
-
-    if password:
-        user.hash_password(password)
-    user.name = name
-    user.email = email
-    user.phone = phone
-    user.church = church
-    user.school = school
-    birthday_list = list(map(int, birthday.split('-')))
-    user.birthday = datetime.date(birthday_list[0], birthday_list[1], birthday_list[2])
-
-    student.student_id = student_id
-    student.gender = gender
-    student.ssn = ssn
-    student.father_name = father_name
-    student.father_ssn = father_ssn
-    student.mother_name = mother_name
-    student.mother_ssn = mother_ssn
-    student.address = address
-    db.session.add(user)
-    db.session.add(student)
-    db.session.commit()
-    return (jsonify({'username': user.username}))
-
-
-@app.route('/api/students/update/<int:id>', methods=['POST'])
-#@multi_auth.login_required
-def student_edit(id):
-    username = request.json.get('username')
-    password = request.json.get('password')
-    name = request.json.get('name')
-    email = request.json.get('email')
-    phone = request.json.get('phone')
-    church = request.json.get('church')
-    school = request.json.get('school')
-    birthday = request.json.get('birthday')
-    student_id = request.json.get('student_id')
-    gender = request.json.get('gender')
-    ssn = request.json.get('ssn')
-    father_name = request.json.get('father_name')
-    father_ssn = request.json.get('father_ssn')
-    mother_name = request.json.get('mother_name')
-    mother_ssn = request.json.get('mother_ssn')
-    address = request.json.get('address')
-    if username is None or password is None:
-        abort(400)    # missing arguments
-    if User.query.filter_by(username=username).first() is None:
-        abort(400)    # existing user
-
-    user = User.query.get(id)
     if not user:
         abort(400)
 
+    payment = Payment()
+    print(payment.required_columns())
+    for column in payment.required_columns():
+        if column not in request.json:
+            abort(400)
 
-    if password:
-        user.hash_password(password)
-    user.name = name
-    user.email = email
-    user.phone = phone
-    user.church = church
-    user.school = school
-    birthday_list = list(map(int, birthday.split('-')))
-    user.birthday = datetime.date(birthday_list[0], birthday_list[1], birthday_list[2])
+    payment.user_id = request.json.get('user_id')
+    payment.cost = request.json.get('cost')
+    payment.major_category = request.json.get('major_category')
+    payment.year = request.json.get('year')
+    payment.semester = request.json.get('semester')
+    payment.date = request.json.get('date')
 
-    if Student.query.filter_by(username=username).first() is None:
-        student = Student(username=username)
-        if 'howcs_student' not in user.role:
-            user.role = [x.strip().strip('"') for x in user.role.strip("[").strip("]").split(',')]
-            print (user.role)
-            user.role.append('howcs_student')
-            user.role = json.dumps(user.role)
-    else:
-        student = Student.query.filter_by(username=username).first()
-    student.birthday = datetime.date(birthday_list[0], birthday_list[1], birthday_list[2])
-    student.student_id = student_id
-    student.gender = gender
-    student.ssn = ssn
-    student.father_name = father_name
-    student.father_ssn = father_ssn
-    student.mother_name = mother_name
-    student.mother_ssn = mother_ssn
-    student.address = address
-    db.session.add(user)
-    db.session.add(student)
+    payment.user = User.query.filter_by(id = payment.user_id).first()
+    db.session.add(payment)
     db.session.commit()
-    return (jsonify({'username': user.username}))
+    return jsonify({'payment': payment.as_dict()}), 201
 
-
-@app.route('/api/students')
-#@multi_auth.login_required
-def get_students_all():
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('perPage', 10))
-    offset = (page - 1) * per_page
-    users_json = []
-    for user, student in db.session.query(User, Student).filter(User.username == Student.username).all():
-        user_dict = student.as_dict()
-        user_dict.update(user.as_dict())
-        users_json.append(user_dict)
-        print(users_json)
-    result = {
-        'currentPage': page,
-        'lastPage': math.ceil(len(users_json) / per_page),
-        'perPage': per_page,
-        'total': len(users_json),
-        'data': users_json[offset:(offset + per_page)]
-    }
-    return jsonify(result)
-
-@app.route('/api/students/delete', methods=['POST'])
-#@multi_auth.login_required
-def delete_student():
-    id = request.json.get('id')
-    user = User.query.get(id)
-    if not user:
+@app.route('/api/payments/<int:id>', methods=['PUT'])
+@multi_auth.login_required
+def payment_update(id):
+    if not request.json:
         abort(400)
-    db.session.delete(user)
-    db.session.commit()
-    return jsonify({'id': user.username})
+    payment = Payment.query.get(id)
+    if not payment:
+        abort(404)
 
-'''
+    payment.cost = request.json.get('cost')
+    payment.major_category = request.json.get('major_category')
+    payment.year = request.json.get('year')
+    payment.semester = request.json.get('semester')
+    payment.date = request.json.get('date')
+    
+    db.session.add(payment)
+    db.session.commit()
+    return jsonify({'payment': payment.as_dict()})
+
+@app.route('/api/payments/<int:id>', methods=['DELETE'])
+@multi_auth.login_required
+def payment_del(id):
+    payment = Payment.query.get(id)
+    if not payment:
+        abort(404)
+    db.session.delete(payment)
+    db.session.commit()
+    return jsonify({'result': True})
+
 
 @app.route('/api/menu')
 @multi_auth.login_required
@@ -859,20 +969,30 @@ def get_menu():
         abort(404)
 
     menu = [
-        { 'href': 'user_form', 'params': {'action':'update'}, 'text': '회원정보', 'icon': 'home' },
-        { 'href': 'enrollment_student', 'params': {'major_category':'agit', 'id':user.id}, 'text': '아지트 수강', 'icon': 'home' },
-        { 'href': 'post', 'params': {}, 'text': '글', 'icon': 'home' },
+        { 'href': 'user_form', 'params': {'action':'update'}, 'text': '회원정보', 'icon': 'mdi-account' },
+        { 'heading': '아지트' },
+        { 'href': 'class', 'params': {'major_category':'agit'}, 'text': '수강신청', 'icon': 'mdi-plus' },
+        { 'href': 'enrollment_student', 'params': {'major_category':'agit', 'id':user.id}, 'text': '수강과목', 'icon': 'mdi-pencil' },
     ]
 
-    if 'agit_student' in user.role and 'agit_teacher' not in user.role:
-        menu.append({ 'href': 'agit_teacher_application_form', 'params': {}, 'text': '아지트 교사 신청', 'icon': 'home' })
+    if 'agit_student' in user.role and 'agit_teacher' not in user.role and 'admin' not in user.role:
+        menu.append({ 'href': 'agit_teacher_application_form', 'params': {}, 'text': '교사 신청', 'icon': 'mdi-teach' })
     
     if 'agit_teacher' in user.role:
-        menu.append({ 'href': 'class', 'params': {'major_category':'agit', 'id':user.id}, 'text': '아지트 수업 관리', 'icon': 'home' })
+        menu.append({ 'href': 'class_teacher', 'params': {'major_category':'agit', 'id':user.id}, 'text': '수업 관리', 'icon': 'mdi-clipboard-text' })
+    
+    if 'howcs_teacher' in user.role:
+        menu.append({ 'heading': '하우학교'})
+        menu.append({ 'href': 'teaching_classes', 'params': {'major_category':'howcs', 'id':user.id}, 'text': '수업 관리', 'icon': 'mdi-clipboard-text' })
     
     if 'admin' in user.role:
-        menu.append({ 'href': 'user', 'params': {}, 'text': '아지트회원', 'icon': 'home' })
-        menu.append({ 'href': 'agit_teacher', 'params': {}, 'text': '아지트 교사', 'icon': 'home' })
+        menu.append({ 'heading': '관리자'})
+        menu.append({ 'href': 'user', 'params': {}, 'text': '아지트 회원관리', 'icon': 'mdi-account-edit' })
+        menu.append({ 'href': 'agit_teacher', 'params': {}, 'text': '아지트 교사관리', 'icon': 'mdi-account-plus' })
+        menu.append({ 'href': 'payment', 'params': {}, 'text': '아지트 회비관리', 'icon': 'mdi-currency-krw' })
+        menu.append({ 'href': 'student', 'params': {}, 'text': '하우학교 학생관리', 'icon': 'mdi-account-multiple' })
+        menu.append({ 'href': 'howcs_teacher', 'params': {}, 'text': '하우학교 교사관리', 'icon': 'mdi-account-settings-variant' })
+        menu.append({ 'href': 'class', 'params': {'major_category':'howcs'}, 'text': '하우학교 수업관리', 'icon': 'mdi-clipboard-text' })
     
     
     return jsonify(menu)

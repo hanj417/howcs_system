@@ -5,41 +5,36 @@
         <v-card>
           <v-data-table :headers='columns' :items='items' :total-items="pagination.totalItems" hide-actions :pagination.sync="pagination" :loading="loading">
             <template slot='items' scope='props'>
-              <tr @click="props.expanded = !props.expanded">
+              <tr>
                 <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
-                <td class="justify-center layout px-0">
-                  <v-btn icon class="mx-0" :to="{name: 'post_form', params: {action:'update', id:props.item.id}}">
+                <td width='160'>
+                  <v-btn fab small :to="{name: 'payment_form_admin', params: {action:'update', id:props.item.id}} ">
                     <v-icon>edit</v-icon>
                   </v-btn>
-                  <v-btn icon class="mx-0" @click="remove(props.item)">
+                  <v-btn fab small @click="remove(props.item)">
                     <v-icon>delete</v-icon>
                   </v-btn>
                 </td>
               </tr>
             </template>
-            <template slot="expand" slot-scope="props">
-              <v-card flat>
-                <v-card-text><span v-html="props.item.body"></span></v-card-text>
-              </v-card>
-            </template>
           </v-data-table>
           <div class="jc">
-            <v-pagination class="ma-3" v-model='pagination.page' :length='pagination.totalPages' circle></v-pagination>
+            <v-pagination class="ma-3" v-model='pagination.page' :length='totalPages' circle></v-pagination>
           </div>
         </v-card>
       </v-layout>
     </v-container>
-  <v-btn
-    fab
-    bottom
-    right
-    color="pink"
-    dark
-    fixed
-    :to="{name: 'post_form', params: {action:'new', id:class_id}}"
-  >
-    <v-icon>add</v-icon>
-  </v-btn>
+    <v-btn
+      fab
+      bottom
+      right
+      color="pink"
+      dark
+      fixed
+      :to="{name: 'payment_form', params: {action:'new'}}"
+    >
+      <v-icon>add</v-icon>
+    </v-btn>
   </v-content>
 </template>
 
@@ -49,36 +44,35 @@ const get_default_data = () => {
     loading: false,
     columns: [
       {
-        'text': '대분류',
-        'value': 'major_category'
+        'text': '이름',
+        'value': 'user.name'
+      },
+      {
+        'text': 'Email',
+        'value': 'user.email'
+      },
+      {
+        'text': '전화번호',
+        'value': 'user.phone'
+      },
+      {
+        'text': '금액',
+        'value': 'cost'
       },
       {
         'text': '분류',
-        'value': 'minor_category'
-      },
-      {
-        'text': '제목',
-        'value': 'title'
+        'value': 'major_category'
       },
     ],
-    filters: {},
-    actions: {},
-    options: {
-      sort: 'id',
-      create: false,
-      update: true,
-      delete: false
-    },
     pagination: {
       page: 1,
       rowsPerPage: 10,
       sortBy: 'id',
       descending: true,
-      totalItems: 0,
-      totalPages: 1
+      totalItems: 0
     },
     items: [],
-    class_id: '',
+    filters: {},
   }
 }
 
@@ -95,22 +89,8 @@ export default {
       this.fetch_data()
     },
   },
-  computed: {
-    class_id() {
-      return this.$route.params.class_id
-    }, 
-    major_category() {
-      return this.$route.params.major_category
-    }, 
-    minor_category() {
-      return this.$route.params.minor_category
-    },
-    is_category() {
-      return !!this.$route.params.minor_category
-    }
-  },
   methods: {
-    get_column_data (row, field) {
+    get_column_data(row, field) {
       // process fields like `type.name`
       let [l1, l2] = field.value.split('.')
       let value = row[l1]
@@ -126,7 +106,7 @@ export default {
       }
       return value
     },
-    fetch_data () {
+    fetch_data() {
       let sort = this.pagination.sortBy
       if (this.pagination.descending) {
         sort = '-' + sort
@@ -135,34 +115,23 @@ export default {
       this.$route.query.sort = sort
       this.$route.query.perPage = this.pagination.rowsPerPage
       this.$route.query.page = this.pagination.page
-      this.$http.get(`posts`, {params: this.$route.query}).then(({ data }) => {
+
+      this.$http.get(`payments`, {params: this.$route.query}).then(({ data }) => {
         this.items = data.data
         this.pagination.totalItems = data.total
-        this.pagination.totalPages = data.lastPage
       })
     },
-    remove (item) {
-      // this.$alert('ok')
-      this.$http.delete(`posts/` + item.id).then(({ data }) => {
+    remove(item) {
+      this.$http.delete(`payments/` + item.id)
+      .then(({ data }) => {
         this.fetch_data()
       })
     },
-    next () {
+    next() {
       this.pagination.page++
     }
   },
   created () {
-    if (!!this.$route.params.minor_category) {
-      this.filters = {
-        'major_category': this.$route.params.major_category,
-        'minor_category': this.$route.params.minor_category,
-      } 
-    } else if (!!this.$route.params.class_id) {
-      this.filters = {
-        'class_id': this.$route.params.class_id,
-      } 
-      this.class_id = this.$route.params.class_id
-    }
     this.fetch_data()
   }
 }

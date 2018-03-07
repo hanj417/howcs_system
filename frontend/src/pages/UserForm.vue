@@ -9,7 +9,7 @@
       회원 정보
     </v-card-title>
     <v-container grid-list-sm class="pa-4">
-      <v-form v-model="valid" ref="form" lazy-validation>
+      <v-form @submit.prevent="validateForm" lazy-validation>
         <v-layout row wrap>
           <v-flex xs12 align-center>
             <v-layout align-center>
@@ -20,30 +20,24 @@
                 >
               </v-avatar>
               <v-text-field
-                placeholder="아이디"
+                label="아이디"
                 v-model="username"
-                :rules="nameRules"
+                data-vv-name="username"
+                :error-messages="errors.collect('username')"
+                v-validate="'required'"
                 required
               ></v-text-field>
-              <v-btn @click="convert_student">
-                <v-icon>add</v-icon>
-              </v-btn>
+              <v-btn v-if="is_admin && !is_howcs_student" @click="convert_student">하우학교 학생 전환</v-btn>
             </v-layout>
           </v-flex>
           <v-flex xs12>
             <v-text-field
-              placeholder="이름"
+              label="이름"
               prepend-icon="chat"
-              :rules="nameRules"
               v-model="name"
-              required
-            ></v-text-field>
-          </v-flex>
-          <v-flex v-if="is_howcs_student" xs12>
-            <v-text-field
-              placeholder="학번"
-              prepend-icon="chat"
-              v-model="student_id"
+              data-vv-name="name"
+              :error-messages="errors.collect('name')"
+              v-validate="'required'"
               required
             ></v-text-field>
           </v-flex>
@@ -51,12 +45,11 @@
             <v-text-field
               type="password"
               prepend-icon="lock"
-              placeholder="비밀번호"
+              label="비밀번호"
               v-model="password"
-              min="4"
-              counter
-              hint="4글자 이상"
-              autocomplete='on'
+              name="password"
+              :error-messages="errors.collect('password')"
+              v-validate="'required'"
               required
             ></v-text-field>
           </v-flex>
@@ -64,45 +57,54 @@
             <v-text-field
               type="password"
               prepend-icon="lock"
-              placeholder="비밀번호 확인"
-              v-model="password_confirmation"
-              min="4"
-              counter
-              autocomplete='on'
+              label="비밀번호 확인"
+              name="password_confirmation"
+              data-vv-as="password"
+              :error-messages="errors.collect('password_confirmation')"
+              v-validate="'required|confirmed:password'"
               required
             ></v-text-field>
           </v-flex>
           <v-flex xs6>
             <v-text-field
               prepend-icon="mail"
-              placeholder="이메일"
-              :rules="emailRules"
+              label="이메일"
               v-model="email"
               autocomplete='email'
+              data-vv-name="email"
+              :error-messages="errors.collect('email')"
+              v-validate="'required'"
               required
             ></v-text-field>
           </v-flex>
           <v-flex xs6>
             <v-text-field
               prepend-icon="phone"
-              placeholder="전화번호"
+              label="전화번호"
               v-model="phone"
               autocomplete='tel'
+              data-vv-name="phone"
+              :error-messages="errors.collect('phone')"
+              v-validate="'required'"
               required
             ></v-text-field>
           </v-flex>
           <v-flex xs6>
             <v-text-field
               prepend-icon="business"
-              placeholder="출석 교회"
+              label="출석 교회"
               v-model="church"
+              data-vv-name="church"
+              :error-messages="errors.collect('church')"
             ></v-text-field>
           </v-flex>
           <v-flex xs6>
             <v-text-field
               prepend-icon="business"
-              placeholder="소속 학교"
+              label="소속 학교"
               v-model="school"
+              data-vv-name="school"
+              :error-messages="errors.collect('school')"
             ></v-text-field>
           </v-flex>
           <v-flex xs12>
@@ -134,7 +136,14 @@
             </v-menu>
           </v-flex>
 
-
+          <v-flex v-if="is_howcs_student" xs12>
+            <v-text-field
+              label="학번"
+              prepend-icon="chat"
+              v-model="student_id"
+              required
+            ></v-text-field>
+          </v-flex>
           <v-flex v-if="is_howcs_student" xs6>
             <v-select
               :items="gender_items"
@@ -147,55 +156,55 @@
           <v-flex v-if="is_howcs_student" xs6>
             <v-text-field
               prepend-icon="business"
-              placeholder="주민등록번호"
+              label="주민등록번호"
               v-model="ssn"
             ></v-text-field>
           </v-flex>
           <v-flex v-if="is_howcs_student" xs6>
             <v-text-field
               prepend-icon="business"
-              placeholder="아버지 이름"
+              label="아버지 이름"
               v-model="father_name"
             ></v-text-field>
           </v-flex>
           <v-flex v-if="is_howcs_student" xs6>
             <v-text-field
               prepend-icon="business"
-              placeholder="아버지 주민등록번호"
+              label="아버지 주민등록번호"
               v-model="father_ssn"
             ></v-text-field>
           </v-flex>
           <v-flex v-if="is_howcs_student" xs6>
             <v-text-field
               prepend-icon="business"
-              placeholder="어머니 이름"
+              label="어머니 이름"
               v-model="mother_name"
             ></v-text-field>
           </v-flex>
           <v-flex v-if="is_howcs_student" xs6>
             <v-text-field
               prepend-icon="business"
-              placeholder="어머니 주민등록번호"
+              label="어머니 주민등록번호"
               v-model="mother_ssn"
             ></v-text-field>
           </v-flex>
           <v-flex v-if="is_howcs_student" xs12>
             <v-text-field
               prepend-icon="business"
-              placeholder="주소"
+              label="주소"
               v-model="address"
             ></v-text-field>
           </v-flex>
-          <v-flex xs12>
+          <v-flex v-if="action == 'new'" xs12>
             <v-checkbox
               color="green"
               v-model="terms_check"
             >
               <div slot="label" @click.stop="">
-                Do you accept the
-                <a href="javascript:;" @click.stop="terms = true">terms</a>
-                and
-                <a href="javascript:;" @click.stop="conditions = true">conditions?</a>
+                <a href="javascript:;" @click.stop="terms = true">개인정보/수집 및 이용 동의</a>
+                와
+                <a href="javascript:;" @click.stop="conditions = true">회원 약관</a>
+                에 동의합니다.
               </div>
             </v-checkbox>
           </v-flex>
@@ -246,11 +255,17 @@
 </template>
 
 <script>
+import Vue from 'vue'
+import VeeValidate from 'vee-validate'
+Vue.use(VeeValidate)
+
 export default {
   data () {
     return {
       save_btn_text: '등록',
+      is_admin: false,
       is_howcs_student: false,
+      user_id: '',
       valid: true,
       username: '',
       password: '',
@@ -272,20 +287,6 @@ export default {
       mother_ssn: '',
       address: '',
       user: {},
-      nameRules: [
-        v => v.length > 0 || 'Name is required',
-      ],
-      emailRules: [
-        v => !!v || 'E-mail is required',
-        v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
-      ],
-      passwordRules: [
-        v => !!v || 'Password is required',
-      ],
-      passwordConfirmRules: [
-        v => !!v || 'Password is required',
-        v => this.password_confirmation == this.password || "Does not match"
-      ],
       conditions: false,
       content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc.`,
       terms: false,
@@ -324,10 +325,8 @@ export default {
           }).then(({data}) => {
             this.$router.replace('/')
           })
-        } 
-/*
-        else {
-          this.$http.post(`students/update`, {
+        } else {
+          this.$http.post(`student_infos`, {
             'username': this.username,
             'password': this.password, 
             'name': this.name,
@@ -348,45 +347,22 @@ export default {
             this.$router.replace('/')
           })
         }
-*/
       } else if (this.action == 'update') {
-        if (this.$route.params.hasOwnProperty('id')) {
-          if (this.is_howcs_student == false) {
-            this.$http.put(`users/` + this.$route.params.id, {
-              'username': this.username,
-              'password': this.password, 
-              'name': this.name,
-              'email': this.email,
-              'phone': this.phone,
-              'school': this.school,
-              'church': this.church,
-              'birthday': this.date,
-            }).then(({data}) => {
-              this.$router.replace('/')
-            })
-          }
+        if (this.is_howcs_student == false) {
+          this.$http.put(`users/` + this.user_id, {
+            'username': this.username,
+            'password': this.password, 
+            'name': this.name,
+            'email': this.email,
+            'phone': this.phone,
+            'school': this.school,
+            'church': this.church,
+            'birthday': this.date,
+          }).then(({data}) => {
+            this.$router.replace('/')
+          })
         } else {
-          if (localStorage['user']) {
-            this.user = JSON.parse(localStorage['user'])
-            if (this.is_howcs_student == false) {
-              this.$http.put(`users/` + this.user['id'], {
-                'username': this.username,
-                'password': this.password, 
-                'name': this.name,
-                'email': this.email,
-                'phone': this.phone,
-                'school': this.school,
-                'church': this.church,
-                'birthday': this.date,
-              }).then(({data}) => {
-                this.$router.replace('/')
-              })
-            }
-          }
-        }
-/*
-        } else {
-          this.$http.post(`students/update/` + this.id, {
+          this.$http.put(`student_infos/` + this.user_id, {
             'username': this.username,
             'password': this.password, 
             'name': this.name,
@@ -407,48 +383,56 @@ export default {
             this.$router.replace('/')
           })
         }
-*/
       }
     },
     date_save (date) {
       this.$refs.date_menu.save(date)
     },
-/*
     convert_student() {
       this.is_howcs_student = true 
+    },
+    validateForm() {
+      this.$validator.validateAll()
+        .then(() => {
+          console.log("data");
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
-*/
   },
   created() {
     if (this.$route.params.action == 'update') {
       if (this.$route.params.hasOwnProperty('id')) {
-        this.$http.get(`users/` + this.$route.params.id
-        ).then(({ data }) => {
-          console.log(data)
-          this.username = data.username
-          this.name = data.name
-          this.email = data.email
-          this.phone = data.phone
-          this.school = data.school
-          this.church = data.church
-          this.date = data.birthday
-        })
-      } else {
-        if (localStorage['user']) {
-          this.user = JSON.parse(localStorage['user'])
-          this.$http.get(`users/` + this.user['id']
-          ).then(({ data }) => {
-            console.log(data)
-            this.username = data.username
-            this.name = data.name
-            this.email = data.email
-            this.phone = data.phone
-            this.school = data.school
-            this.church = data.church
-            this.date = data.birthday
-          })
-        }
+        this.is_admin = true
+        this.user_id = this.$route.params.id
+      } else if (localStorage['user']) {
+        this.user = JSON.parse(localStorage['user'])
+        this.user_id = this.user['id']
       }
+      this.$http.get(`users/` + this.user_id
+      ).then(({ data }) => {
+        console.log(data)
+        this.username = data.username
+        this.name = data.name
+        this.email = data.email
+        this.phone = data.phone
+        this.school = data.school
+        this.church = data.church
+        var d = new Date(data.birthday)
+        this.date = d.toISOString().substr(0,10)
+        if (data.hasOwnProperty('student_info')) {
+          this.is_howcs_student = true
+          this.student_id = data.student_info.student_id
+          this.gender = data.student_info.gender
+          this.ssn = data.student_info.ssn
+          this.father_name = data.student_info.father_name
+          this.father_ssn = data.student_info.father_ssn
+          this.mother_name = data.student_info.mother_name
+          this.mother_ssn = data.student_info.mother_ssn
+          this.address = data.student_info.address
+        }
+      })
     }
   }
 }

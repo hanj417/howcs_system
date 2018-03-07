@@ -9,7 +9,7 @@
       회원 가입
     </v-card-title>
     <v-container grid-list-sm class="pa-4">
-      <v-form v-model="valid" ref="form" lazy-validation>
+      <form @submit.prevent="validateForm">
         <v-layout row wrap>
           <v-flex xs12 align-center>
             <v-layout align-center>
@@ -20,80 +20,73 @@
                 >
               </v-avatar>
               <v-text-field
-                placeholder="아이디"
-                v-model="username"
-                :rules="nameRules"
-                required
+                label="아이디"
+                v-model="form.username"
+                :rules="rules.name"
+                v-validate="'required'"
               ></v-text-field>
             </v-layout>
           </v-flex>
           <v-flex xs12>
             <v-text-field
-              placeholder="이름"
-              prepend-icon="chat"
-              :rules="nameRules"
+              label="이름"
+              :rules="rules.name"
               v-model="name"
-              required
+              v-validate="'required'"
             ></v-text-field>
           </v-flex>
           <v-flex xs6>
             <v-text-field
               type="password"
-              prepend-icon="lock"
-              placeholder="비밀번호"
-              v-model="password"
+              label="비밀번호"
+              v-model="form.password"
               min="4"
               counter
               hint="4글자 이상"
               autocomplete='on'
-              required
+              v-validate="'required'"
             ></v-text-field>
           </v-flex>
           <v-flex xs6>
             <v-text-field
               type="password"
-              prepend-icon="lock"
-              placeholder="비밀번호 확인"
-              v-model="password_confirmation"
+              label="비밀번호 확인"
+              v-model="form.password_confirmation"
               min="4"
               counter
               autocomplete='on'
-              required
+              v-validate="'required'"
             ></v-text-field>
           </v-flex>
           <v-flex xs6>
             <v-text-field
-              prepend-icon="mail"
-              placeholder="이메일"
-              :rules="emailRules"
-              v-model="email"
+              label="이메일"
+              :rules="rules.email"
+              v-model="form.email"
               autocomplete='email'
-              required
+              v-validate="'required'"
             ></v-text-field>
           </v-flex>
           <v-flex xs6>
             <v-text-field
               type="tel"
-              prepend-icon="phone"
-              placeholder="전화번호"
+              label="전화번호"
               mask="phone"
-              v-model="phone"
+              v-model="form.phone"
               autocomplete='tel'
-              required
+              v-validate="'required'"
             ></v-text-field>
           </v-flex>
           <v-flex xs6>
             <v-text-field
-              prepend-icon="business"
-              placeholder="출석 교회"
-              v-model="church"
+              label="출석 교회"
+              v-model="form.church"
             ></v-text-field>
           </v-flex>
           <v-flex xs6>
             <v-text-field
-              prepend-icon="business"
-              placeholder="소속 학교"
-              v-model="school"
+              label="소속 학교"
+              v-model="form.school"
             ></v-text-field>
           </v-flex>
           <v-flex xs12>
@@ -110,14 +103,13 @@
             >
             <v-text-field
               slot="activator"
-              label="Birthday date"
-              v-model="date"
-              prepend-icon="event"
+              label="생년월일"
+              v-model="form.date"
               readonly
             ></v-text-field>
             <v-date-picker
               ref="picker"
-              v-model="date"
+              v-model="form.date"
               @change="save"
               min="1950-01-01"
               :max="new Date().toISOString().substr(0, 10)"
@@ -128,12 +120,13 @@
             <v-checkbox
               color="green"
               v-model="terms_check"
+              v-validate="'required'"
             >
               <div slot="label" @click.stop="">
-                Do you accept the
                 <a href="javascript:;" @click.stop="terms = true">terms</a>
-                and
+                와 
                 <a href="javascript:;" @click.stop="conditions = true">conditions?</a>
+                에 동의합니다.
               </div>
             </v-checkbox>
           </v-flex>
@@ -184,34 +177,35 @@
 </template>
 
 <script>
+import Vue from 'vue'
+import VeeValidate from 'vee-validate'
+Vue.use(VeeValidate)
+
 export default {
   data () {
     return {
-      date: null,
+      form: {
+        username: '',
+        password: '',
+        password_confirmation: '',
+        name: '',
+        email: '',
+        phone: '',
+        school: '',
+        church: '',
+        date: null,
+      },
+      rules: {
+        username: [],
+        password: [],
+        name: [],
+        email: [],
+        phone: [],
+        school: [],
+        church: [],
+        date: [],
+      },
       menu: false,
-      valid: true,
-      username: '',
-      password: '',
-      password_confirmation: '',
-      name: '',
-      email: '',
-      phone: '',
-      school: '',
-      church: '',
-      nameRules: [
-        v => v.length > 0 || 'Name is required',
-      ],
-      emailRules: [
-        v => !!v || 'E-mail is required',
-        v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
-      ],
-      passwordRules: [
-        v => !!v || 'Password is required',
-      ],
-      passwordConfirmRules: [
-        v => !!v || 'Password is required',
-        v => this.password_confirmation == this.password || "Does not match"
-      ],
       conditions: false,
       content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc.`,
       terms: false,
@@ -221,7 +215,15 @@ export default {
   watch: {
     menu (val) {
       val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
-    }
+    },
+    errors: {
+      handler: function(val, oldVal) {
+        _.forEach(this.rules, (val, key) => {
+          this.rules[key] = [() => (this.errors.has(key) ? this.errors.first(key) : true)];
+        });
+      },
+      deep: true
+    },
   },
   methods: {
     cancel() {
@@ -243,6 +245,15 @@ export default {
     },
     save (date) {
       this.$refs.menu.save(date)
+    },
+    validateForm() {
+      this.$validator.validateAll()
+        .then(() => {
+          console.log("data", this.form);
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   },
 }

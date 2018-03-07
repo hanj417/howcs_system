@@ -66,7 +66,7 @@
           <v-flex xs12>
             <label> 본문 </label>
             <div class="pt-2">
-              <vue-editor v-model='body'/>
+              {{ body }}
             </div>
           </v-flex>
         </v-layout>
@@ -75,7 +75,6 @@
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn flat color="primary" @click="cancel">Cancel</v-btn>
-      <v-btn flat @click="save">Save</v-btn>
     </v-card-actions>
   </v-card>
 </v-layout>
@@ -104,9 +103,6 @@ export default {
     }
   },
   computed: {
-    action() {
-      return this.$route.params.action
-    }, 
     id() {
       return this.$route.params.id
     },
@@ -115,60 +111,19 @@ export default {
     cancel() {
       this.$router.replace('/')
     },
-    save() {
-      if (this.action == 'new') {
-        this.$http.post(`posts`, {
-          'major_category': this.major_category,
-          'minor_category': this.minor_category,
-          'properties': this.properties,
-          'title': this.title,
-          'body': this.body,
-          'class_id': this.$route.params.id,
-          'date': this.date
-        }).then(({data}) => {
-          this.$router.replace('/')
-        })
-      } else if (this.action == 'update') {
-        this.$http.put(`posts/` + this.$route.params.id, {
-          'major_category': this.major_category,
-          'minor_category': this.minor_category,
-          'properties': this.properties,
-          'title': this.title,
-          'body': this.body,
-        }).then(({data}) => {
-          this.$router.replace('/')
-        })
-      } 
-    },
   },
   created() {
-    this.$http.get(`posts/major_categories`
+    this.$http.get(`posts/` + this.$route.params.id
     ).then(({ data }) => {
-      this.major_categories = data
+      this.major_category = data.major_category
+      this.minor_category = data.minor_category
+      this.properties = data.properties
+      this.title = data.title
+      this.body = data.body
+      this.class_id = data.class_id
+      this.date = data.date
+      this.category_disabled = true
     })
-    this.$http.get(`posts/properties`
-    ).then(({ data }) => {
-    })
-    if (this.$route.params.action == 'update') {
-      this.$http.get(`posts/` + this.$route.params.id
-      ).then(({ data }) => {
-        this.major_category = data.major_category
-        this.minor_category = data.minor_category
-        this.properties = data.properties
-        this.title = data.title
-        this.body = data.body
-        this.class_id = data.class_id
-        this.date = data.date
-        this.category_disabled = true
-      })
-    } else if (this.$route.params.action == 'new') {
-      this.$http.get(`classes/` + this.$route.params.id
-      ).then(({ data }) => {
-        this.major_category = data.major_category
-        this.minor_category = data.minor_category
-        this.category_disabled = true
-      })
-    }
   }
 }
 </script>

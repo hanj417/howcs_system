@@ -1,35 +1,17 @@
 <template>
   <v-content>
-    <v-container fluid>
+    <v-container fluid fill-height>
       <v-layout justify-center align-center>
         <v-card>
           <v-data-table :headers='columns' :items='items' :total-items="pagination.totalItems" hide-actions :pagination.sync="pagination" :loading="loading">
             <template slot='items' scope='props'>
               <tr>
                 <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
-                <td width='40'>
-                  <v-btn fab small @click="remove(props.item)">
-                    <v-icon>delete</v-icon>
+                  <td class="justify-center layout px-0">
+                  <v-btn icon class="mx-0" :to="{name: 'post_class', params: {class_id: props.item.id}}">
+                    <v-icon>edit</v-icon>
                   </v-btn>
-                </td>
-              </tr>
-            </template>
-          </v-data-table>
-          <div class="jc">
-            <v-pagination class="ma-3" v-model='pagination.page' :length='totalPages' circle></v-pagination>
-          </div>
-        </v-card>
-      </v-layout>
-    </v-container>
-    <v-container fluid>
-      <v-layout justify-center align-center>
-        <v-card>
-          <v-data-table :headers='all_columns' :items='all_items' :total-items="pagination.totalItems" hide-actions :pagination.sync="pagination" :loading="loading">
-            <template slot='items' scope='props'>
-              <tr>
-                <td v-for='column in all_columns' v-html="get_column_data(props.item, column)"></td>
-                <td width='40'>
-                  <v-btn fab small @click="enroll(props.item)">
+                  <v-btn icon class="mx-0" @click="remove(props.item)">
                     <v-icon>delete</v-icon>
                   </v-btn>
                 </td>
@@ -51,26 +33,16 @@ const get_default_data = () => {
     loading: false,
     columns: [
       {
+        'text': '선생님',
+        'value': 'class.teacher.name'
+      },
+      {
         'text': '제목',
         'value': 'class.title'
       },
       {
         'text': '분류',
         'value': 'class.minor_category'
-      },
-    ],
-    all_columns: [
-      {
-        'text': '제목',
-        'value': 'title'
-      },
-      {
-        'text': '분류',
-        'value': 'minor_category'
-      },
-      {
-        'text': '선생님',
-        'value': 'teacher.name'
       },
     ],
     pagination: {
@@ -82,7 +54,6 @@ const get_default_data = () => {
     },
     filters: {},
     items: [],
-    all_items: [],
   }
 }
 
@@ -107,11 +78,14 @@ export default {
   methods: {
     get_column_data(row, field) {
       // process fields like `type.name`
-      let [l1, l2] = field.value.split('.')
+      let [l1, l2, l3] = field.value.split('.')
       let value = row[l1]
       let tag = null
       if (l2) {
         value = row[l1] ? row[l1][l2] : null
+      }
+      if (l3) {
+        value = row[l1] ? (row[l1][l2] ? row[l1][l2][l3] : null) : null
       }
       if (field.type === 'image') {
         tag = 'img'
@@ -141,33 +115,10 @@ export default {
         this.items = data.data
         this.pagination.totalItems = data.total
       })
-
-
-      this.filters = {
-        'major_category': 'agit',
-      }
-      this.$route.query.query = JSON.stringify(this.filters)
-      this.$route.query.sort = sort
-      this.$route.query.perPage = this.pagination.rowsPerPage
-      this.$route.query.page = this.pagination.page
-      this.$route.query.class = this.$route.params.id
-
-      this.$http.get(`classes`, {params: this.$route.query}).then(({ data }) => {
-        this.all_items = data.data
-        this.pagination.totalItems = data.total
-      })
     },
     remove(item) {
       this.$http.delete(`enrollments/` + item.class_id + `/` + item.student_id)
       .then(({ data }) => {
-        this.fetch_data()
-      })
-    },
-    enroll(item) {
-      this.$http.post(`enrollments`, {
-        'class_id': item.id,
-        'student_id': this.$route.params.id
-      }).then(({ data }) => {
         this.fetch_data()
       })
     },

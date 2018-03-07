@@ -1,29 +1,29 @@
 <template>
-    <v-content>
-      <v-container fluid fill-height>
-        <v-layout justify-center align-center>
-          <v-card>
-            <v-data-table :headers='columns' :items='items' :total-items="pagination.totalItems" hide-actions :pagination.sync="pagination" :loading="loading">
-              <template slot='items' scope='props'>
-                <tr>
-                  <td v-for='column in columns' v-html="getColumnData(props.item, column)"></td>
-                  <td width='160'>
-                    <v-btn fab small @click="edit(props.item)">
-                      <v-icon>edit</v-icon>
-                    </v-btn>
-                    <v-btn fab small @click="remove(props.item)">
-                      <v-icon>delete</v-icon>
-                    </v-btn>
-                  </td>
-                </tr>
-              </template>
-            </v-data-table>
-            <div class="jc">
-              <v-pagination class="ma-3" v-model='pagination.page' :length='totalPages' circle></v-pagination>
-            </div>
-          </v-card>
-        </v-layout>
-      </v-container>
+  <v-content>
+    <v-container fluid fill-height>
+      <v-layout justify-center align-center>
+        <v-card>
+          <v-data-table :headers='columns' :items='items' :total-items="pagination.totalItems" hide-actions :pagination.sync="pagination" :loading="loading">
+            <template slot='items' scope='props'>
+              <tr>
+                <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
+                <td width='160'>
+                  <v-btn fab small :to="{name: 'user_form_admin', params: {action:'update', id:props.item.id}} ">
+                    <v-icon>edit</v-icon>
+                  </v-btn>
+                  <v-btn fab small @click="remove(props.item)">
+                    <v-icon>delete</v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
+          <div class="jc">
+            <v-pagination class="ma-3" v-model='pagination.page' :length='totalPages' circle></v-pagination>
+          </div>
+        </v-card>
+      </v-layout>
+    </v-container>
     <v-btn
       fab
       bottom
@@ -31,35 +31,47 @@
       color="pink"
       dark
       fixed
-      :to="{name: 'register_student'}"
+      :to="{name: 'user_form', params: {action:'new'}}"
     >
       <v-icon>add</v-icon>
     </v-btn>
-    </v-content>
+  </v-content>
 </template>
 
 <script>
-const getDefaultData = () => {
+const get_default_data = () => {
   return {
-    form: {
-      model: {},
-      fields: {},
-      rules: {},
-      messages: {}
-    },
-    filters: {
-      model: {},
-      fields: null
-    },
     loading: false,
-    columns: [], // fetch grid setup params from server if `columns` is empty
-    actions: {},
-    options: {
-      sort: 'id',
-      create: false,
-      update: true,
-      delete: false
-    },
+    columns: [
+      {
+        'text': 'ID',
+        'value': 'username'
+      },
+      {
+        'text': 'Name',
+        'value': 'name'
+      },
+      {
+        'text': 'Email',
+        'value': 'email'
+      },
+      {
+        'text': 'Phone',
+        'value': 'phone'
+      },
+      {
+        'text': 'School',
+        'value': 'school'
+      },
+      {
+        'text': 'Church',
+        'value': 'church'
+      },
+      {
+        'text': 'Birthday',
+        'value': 'birthday'
+      },
+    ],
     pagination: {
       page: 1,
       rowsPerPage: 10,
@@ -67,31 +79,26 @@ const getDefaultData = () => {
       descending: true,
       totalItems: 0
     },
-    isShowEdit: false,
-    currentItem: false,
     items: [],
-    dialog: false
+    filters: {},
   }
 }
 
 export default {
-  data: getDefaultData,
+  data: get_default_data,
   watch: {
     'pagination.page' (val) {
-      this.fetchData()
+      this.fetch_data()
     },
     'pagination.sortBy' (val) {
-      this.fetchData()
+      this.fetch_data()
     },
     'pagination.descending' (val) {
-      this.fetchData()
-    },
-    'dialog' (val) {
-      this.fetchData()
+      this.fetch_data()
     },
   },
   methods: {
-    getColumnData (row, field) {
+    get_column_data(row, field) {
       // process fields like `type.name`
       let [l1, l2] = field.value.split('.')
       let value = row[l1]
@@ -107,30 +114,7 @@ export default {
       }
       return value
     },
-    fetchGrid () {
-      return new Promise((resolve, reject) => {
-        this.$http.get(`students/grid`).then(({ data }) => {
-          this.columns = data.columns || {}
-          this.actions = data.actions || {}
-          this.filters = data.filters || {}
-          this.options = data.options || {}
-
-          if (this.options && this.options.sort) {
-            let sortData = this.options.sort.split('-')
-            let desc = sortData.length > 1
-            let sortField = sortData.pop()
-
-            // if (sortField.indexOf('.') < 0) {
-            //   sortField = sortField
-            // }
-            this.pagination.sort = sortField
-            this.pagination.descending = desc
-          }
-          resolve()
-        })
-      })
-    },
-    preFetch () {
+    fetch_data() {
       let sort = this.pagination.sortBy
       if (this.pagination.descending) {
         sort = '-' + sort
@@ -139,31 +123,24 @@ export default {
       this.$route.query.sort = sort
       this.$route.query.perPage = this.pagination.rowsPerPage
       this.$route.query.page = this.pagination.page
-    },
-    fetchData () {
-      this.preFetch()
-      this.$http.get(`students`, {params: this.$route.query}).then(({ data }) => {
+
+      this.$http.get(`student_infos`, {params: this.$route.query}).then(({ data }) => {
         this.items = data.data
         this.pagination.totalItems = data.total
       })
     },
-    remove (item) {
-      // this.$alert('ok')
-      this.$http.post(`students/delete`, {'id': item.id}).then(({ data }) => {
-        this.fetchData()
+    remove(item) {
+      this.$http.delete(`student_infos/` + item.id)
+      .then(({ data }) => {
+        this.fetch_data()
       })
     },
-    edit (item) {
-      // this.$alert('ok')
-    },
-    next () {
-      // console.log('next')
+    next() {
       this.pagination.page++
     }
   },
   created () {
-    this.fetchGrid().then(() => {})
-    this.fetchData()
+    this.fetch_data()
   }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <v-content>
-    <v-container fluid fill-height>
+    <v-container fluid>
       <v-layout justify-center align-center>
         <v-card>
           <v-data-table :headers='columns' :items='items' :total-items="pagination.totalItems" hide-actions :pagination.sync="pagination" :loading="loading">
@@ -16,7 +16,7 @@
             </template>
           </v-data-table>
           <div class="jc">
-            <v-pagination class="ma-3" v-model='pagination.page' :length='totalPages' circle></v-pagination>
+            <v-pagination class="ma-3" v-model='pagination.page' :length='pagination.totalPages' circle></v-pagination>
           </div>
         </v-card>
       </v-layout>
@@ -70,27 +70,30 @@
 const get_default_data = () => {
   return {
     loading: false,
-    filters: {},
     columns: [
       {
+        'text': 'ID',
+        'value': 'user.username'
+      },
+      {
         'text': 'Name',
-        'value': 'student.name'
+        'value': 'user.name'
       },
       {
         'text': 'Email',
-        'value': 'student.email'
+        'value': 'user.email'
       },
       {
         'text': 'Phone',
-        'value': 'student.phone'
+        'value': 'user.phone'
       },
       {
-        'text': 'School',
-        'value': 'student.school'
+        'text': 'Church',
+        'value': 'user.church'
       },
       {
         'text': 'Birthday',
-        'value': 'student.birthday'
+        'value': 'user.birthday'
       },
     ],
     pagination: {
@@ -98,9 +101,11 @@ const get_default_data = () => {
       rowsPerPage: 10,
       sortBy: 'id',
       descending: true,
-      totalItems: 0
+      totalItems: 0,
+      totalPages: 1
     },
     items: [],
+    filters: {},
     search_dialog: false,
     search_name: '',
     search_items: [],
@@ -121,6 +126,18 @@ const get_default_data = () => {
         'text': 'Phone',
         'value': 'phone'
       },
+      {
+        'text': 'School',
+        'value': 'school'
+      },
+      {
+        'text': 'Church',
+        'value': 'church'
+      },
+      {
+        'text': 'Birthday',
+        'value': 'birthday'
+      },
     ],
   }
 }
@@ -137,11 +154,6 @@ export default {
     'pagination.descending' (val) {
       this.fetch_data()
     },
-  },
-  computed: {
-    id() {
-      return this.$route.params.id
-    }
   },
   methods: {
     get_column_data(row, field) {
@@ -161,10 +173,6 @@ export default {
       return value
     },
     fetch_data() {
-      this.filters = {
-        'class_id': this.$route.params.id,
-      }
-
       let sort = this.pagination.sortBy
       if (this.pagination.descending) {
         sort = '-' + sort
@@ -173,21 +181,28 @@ export default {
       this.$route.query.sort = sort
       this.$route.query.perPage = this.pagination.rowsPerPage
       this.$route.query.page = this.pagination.page
-      this.$route.query.class = this.$route.params.id
 
-      this.$http.get(`enrollments`, {params: this.$route.query}).then(({ data }) => {
+      this.$http.get(`howcs_teacher_infos`, {params: this.$route.query}).then(({ data }) => {
         this.items = data.data
         this.pagination.totalItems = data.total
+        this.pagination.totalPages = data.lastPage
       })
     },
     remove(item) {
-      this.$http.delete(`enrollments/` + item.class_id + `/` + item.student_id)
+      this.$http.delete(`howcs_teacher_infos/` + item.id)
       .then(({ data }) => {
         this.fetch_data()
       })
     },
     next() {
       this.pagination.page++
+    },
+    howcs_teacher_new(item) {
+      this.$http.post(`howcs_teacher_infos`, {
+        'user_id': item.id
+      }).then(({ data }) => {
+        this.fetch_data()
+      })
     },
     search() {
       //this.$route.query.query = JSON.stringify(this.filters.model)
@@ -196,12 +211,8 @@ export default {
       })
     },
     search_select(item) {
-      this.$http.post(`enrollments`, {
-        'class_id': this.$route.params.id,
-        'student_id': item.id,
-      }).then(({data}) => {
-        this.$router.replace('/')
-      })
+      this.howcs_teacher_new(item)
+      this.search_dialog = false
     }
   },
   created () {

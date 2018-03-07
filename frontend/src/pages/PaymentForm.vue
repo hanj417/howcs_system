@@ -6,7 +6,7 @@
     <v-card-title
       class="grey lighten-4 py-4 title"
     >
-      학급  정보
+      회원 정보
     </v-card-title>
     <v-container grid-list-sm class="pa-4">
       <v-form v-model="valid" ref="form" lazy-validation>
@@ -20,22 +20,16 @@
                 >
               </v-avatar>
               <v-text-field
-                label="선생님"
-                v-model="teacher.name"
-                :disabled="teacher_input_disabled"
+                label="이름"
+                v-model="user.name"
+                :rules="nameRules"
+                :disabled="name_input_disabled"
                 required
               ></v-text-field>
               <v-btn @click="search_dialog = true">
                 <v-icon>add</v-icon>
               </v-btn>
             </v-layout>
-          </v-flex>
-          <v-flex xs12>
-            <v-text-field
-              label="학급명"
-              v-model="title"
-              required
-            ></v-text-field>
           </v-flex>
           <v-flex xs12>
             <v-select
@@ -45,13 +39,6 @@
               single-line
               bottom
             ></v-select>
-          </v-flex>
-          <v-flex xs12>
-            <v-text-field
-              label="분류"
-              v-model="minor_category"
-              required
-            ></v-text-field>
           </v-flex>
           <v-flex xs12>
             <v-text-field
@@ -69,33 +56,43 @@
           </v-flex>
           <v-flex xs12>
             <v-text-field
-              label="수업시간"
-              v-model="time_slot"
+              label="금액"
+              v-model="cost"
             ></v-text-field>
           </v-flex>
           <v-flex xs12>
+            <v-menu
+              ref="date_menu"
+              lazy
+              :close-on-content-click="false"
+              v-model="date_menu"
+              transition="scale-transition"
+              offset-y
+              full-width
+              :nudge-right="40"
+              min-width="290px"
+            >
             <v-text-field
-              label="대상"
-              v-model="audience"
+              slot="activator"
+              label="Birthday date"
+              v-model="date"
+              prepend-icon="event"
+              readonly
             ></v-text-field>
-          </v-flex>
-          <v-flex xs12>
-            <v-text-field
-              label="배경"
-              v-model="background"
-            ></v-text-field>
-          </v-flex>
-          <v-flex xs12>
-            <v-text-field
-              label="내용"
-              v-model="content"
-            ></v-text-field>
+            <v-date-picker
+              ref="picker"
+              v-model="date"
+              @change="date_save"
+              min="1950-01-01"
+              :max="new Date().toISOString().substr(0, 10)"
+            ></v-date-picker>
+            </v-menu>
           </v-flex>
         </v-layout>
       </v-form>
       <v-dialog v-model="search_dialog" width="50%">
         <v-card>
-          <v-card-title class="title">교사 검색</v-card-title>
+          <v-card-title class="title">학생 검색</v-card-title>
           <v-flex xs6>
           <v-text-field
             label="이름"
@@ -146,19 +143,17 @@ export default {
     return {
       save_btn_text: '등록',
       valid: true,
+      filters: {},
       user: '',
-      teacher: '',
-      teacher_input_disabled: true,
+      user_id: '',
+      user_input_disabled: true,
       title: '',
       major_categories: [],
       major_category: {},
-      minor_category: '',
       year: null,
       semester: '',
-      time_slot: '',
-      audience: '',
-      background: '',
-      content: '',
+      cost: '',
+      date: null,
       pagination: {
         page: 1,
         rowsPerPage: 10,
@@ -219,10 +214,6 @@ export default {
     'pagination.descending' (val) {
       this.fetch_data()
     },
-    'id' (val) {
-      this.set_visibility()
-      this.fetch_data()
-    }
   },
   methods: {
     get_column_data(row, field) {
@@ -246,7 +237,7 @@ export default {
       if (this.pagination.descending) {
         sort = '-' + sort
       }
-      //this.$route.query.query = JSON.stringify(this.filters.model)
+      this.$route.query.query = JSON.stringify(this.filters)
       this.$route.query.sort = sort
       this.$route.query.perPage = this.pagination.rowsPerPage
       this.$route.query.page = this.pagination.page
@@ -261,37 +252,27 @@ export default {
     },
     save() {
       if (this.action == 'new') {
-          this.$http.post(`classes`, {
-              'teacher_id': this.teacher.id,
-              'title': this.title,
-              'major_category': this.major_category,
-              'minor_category': this.minor_category,
-              'year': this.year,
-              'semester': this.semester,
-              'time_slot': this.time_slot,
-              'audience': this.audience,
-              'background': this.background,
-              'content': this.content,
-          }).then(({data}) => {
-            this.$router.replace('/')
-          })
+        this.$http.post(`payments`, {
+            'user_id': this.user_id,
+            'major_category': this.major_category,
+            'year': this.year,
+            'semester': this.semester,
+            'cost': this.cost,
+            'date': this.date,
+        }).then(({data}) => {
+          this.$router.replace('/')
+        })
       } else if (this.action == 'update') {
-        if (this.$route.params.hasOwnProperty('id')) {
-            this.$http.put(`classes/` + this.$route.params.id, {
-              'teacher_id': this.teacher.id,
-              'title': this.title,
-              'major_category': this.major_category,
-              'minor_category': this.minor_category,
-              'year': this.year,
-              'semester': this.semester,
-              'time_slot': this.time_slot,
-              'audience': this.audience,
-              'background': this.background,
-              'content': this.content,
-            }).then(({data}) => {
-              this.$router.replace('/')
-            })
-        }
+        this.$http.put(`payments/` + this.$route.params.id, {
+            'user_id': this.user_id,
+            'major_category': this.major_category,
+            'year': this.year,
+            'semester': this.semester,
+            'cost': this.cost,
+            'date': this.date,
+        }).then(({data}) => {
+          this.$router.replace('/')
+        })
       }
     },
     search() {
@@ -303,38 +284,27 @@ export default {
     search_select(item) {
       this.$http.get(`users/` + item.id
       ).then(({data}) => {
-        this.teacher = data
+        this.user = data
+        this.user_id = data.id
         this.search_dialog = false
       })
     }
   },
   created() {
-    this.user = JSON.parse(localStorage['user'])
-    if (JSON.parse(this.user.role).includes('admin')) {
-        this.teacher = this.user
-    }
-    this.major_category = this.$route.params.major_category
     this.$http.get(`classes/major_categories`
     ).then(({ data }) => {
       this.major_categories = data
     })
     if (this.$route.params.action == 'update') {
-      if (this.$route.params.hasOwnProperty('id')) {
-        this.$http.get(`classes/` + this.$route.params.id
-        ).then(({ data }) => {
-          console.log(data)
-          this.teacher = data.teacher
-          this.title = data.title
-          this.major_category = data.major_category
-          this.minor_category = data.minor_category
-          this.year = data.year
-          this.semester = data.semester
-          this.time_slot = data.time_slot
-          this.audience = data.audience
-          this.background = data.background
-          this.content = data.content
-        })
-      }
+      this.$http.get(`payments/` + this.$route.params.id
+      ).then(({ data }) => {
+        console.log(data)
+        this.major_category = data.major_category
+        this.year = data.year
+        this.semester = data.semester
+        this.cost = data.cost
+        this.date = data.date
+      })
     }
   }
 }

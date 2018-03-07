@@ -7,11 +7,11 @@
             <template slot='items' scope='props'>
               <tr>
                 <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
-                <td width='160'>
-                  <v-btn fab small :to="{name: 'user_form', params: {action:'update', id:props.item.id}} ">
+                <td class="justify-center layout px-0">
+                  <v-btn icon class="mx-0" :to="{name: 'user_form_admin', params: {action:'update', id:props.item.id}} ">
                     <v-icon>edit</v-icon>
                   </v-btn>
-                  <v-btn fab small @click="remove(props.item)">
+                  <v-btn icon class="mx-0" @click="remove(props.item)">
                     <v-icon>delete</v-icon>
                   </v-btn>
                 </td>
@@ -67,10 +67,6 @@ const get_default_data = () => {
         'text': 'Church',
         'value': 'church'
       },
-      {
-        'text': 'Birthday',
-        'value': 'birthday'
-      },
     ],
     pagination: {
       page: 1,
@@ -80,6 +76,7 @@ const get_default_data = () => {
       totalItems: 0
     },
     items: [],
+    filters: {},
   }
 }
 
@@ -118,7 +115,7 @@ export default {
       if (this.pagination.descending) {
         sort = '-' + sort
       }
-      //this.$route.query.query = JSON.stringify(this.filters.model)
+      this.$route.query.query = JSON.stringify(this.filters)
       this.$route.query.sort = sort
       this.$route.query.perPage = this.pagination.rowsPerPage
       this.$route.query.page = this.pagination.page
