@@ -43,7 +43,7 @@ export default {
   methods: {
     fetch_data() {
       this.$route.query.query = JSON.stringify(this.filters)
-      this.$http.get(`agit_teacher_infos`, {params: this.$route.query})
+      this.$axios.get(`agit_teacher_infos`, {params: this.$route.query})
       .then(({ data }) => {
         this.items = data
       })
@@ -65,13 +65,13 @@ export default {
       return value
     },
     remove(item) {
-      this.$http.delete(`agit_teacher_infos/` + item.id)
+      this.$axios.delete(`agit_teacher_infos/` + item.id)
       .then(({ data }) => {
         this.fetch_data()
       })
     },
     toggle_approval(item) {
-      this.$http.put(`agit_teacher_infos/` + item.id, {
+      this.$axios.put(`agit_teacher_infos/` + item.id, {
         'approval': !item.approval,
       }).then(({data}) => {
         this.fetch_data()

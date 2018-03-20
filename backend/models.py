@@ -27,8 +27,12 @@ class User(db.Model):
     school = db.Column(db.String(32), nullable=True)
     birthday = db.Column(db.Date(), nullable=True)
     student_info = relationship('StudentInfo', uselist=False, back_populates='user')
+    parent_info = relationship('ParentInfo', uselist=False, back_populates='user')
     agit_teacher_info = relationship('AgitTeacherInfo', uselist=False, back_populates='user')
     howcs_teacher_info = relationship('HowcsTeacherInfo', uselist=False, back_populates='user')
+    #children = relationship('FamilyRelation', back_populates='parent')
+    #parents = relationship('FamilyRelation', back_populates='child')
+
     teaching_classes = relationship('Class', back_populates='teacher')
     attending_classes = relationship('Enrollment', back_populates='student')
     posts = relationship('Post', back_populates='author')
@@ -95,6 +99,20 @@ class User(db.Model):
             dic['student_info'] = self.student_info.as_dict()
         return dic
 
+class FamilyRelation(db.Model):
+    __tablename__ = 'family_relations'
+    id = db.Column(db.Integer, primary_key=True)
+    parent_id = db.Column(db.String(32), ForeignKey('users.id'))
+    child_id = db.Column(db.String(32), ForeignKey('users.id'))
+    created_at = db.Column(db.DateTime(), default=datetime.now)
+    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    #parent = relationship('User', foreign_keys=[parent_id], back_populates='children')
+    #child = relationship('User', foreign_keys=[child_id], back_populates='parents')
+    parent = relationship('User', foreign_keys=[parent_id], backref='children')
+    child = relationship('User', foreign_keys=[child_id], backref='parents')
+    def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 class StudentInfo(db.Model):
     __tablename__ = 'student_infos'
     id = db.Column(db.Integer, primary_key=True)
@@ -117,10 +135,24 @@ class StudentInfo(db.Model):
             dic['student_records'] = self.student_records.as_dict()
         return dic
 
+class ParentInfo(db.Model):
+    __tablename__ = 'parent_infos'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, ForeignKey('users.id'))
+    created_at = db.Column(db.DateTime(), default=datetime.now)
+    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    user = relationship('User', back_populates='parent_info')
+    def as_dict(self):
+        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        if self.student_records:
+            dic['student_records'] = self.student_records.as_dict()
+        return dic
+
 class AgitTeacherInfo(db.Model):
     __tablename__ = 'agit_teacher_infos'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, ForeignKey('users.id'))
+    career = db.Column(db.UnicodeText()) 
     approval = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
@@ -175,7 +207,12 @@ class Post(db.Model):
         self.properties = json.dumps(properties)
 
     def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        if self.author:
+            dic['author'] = self.author.as_dict()
+        if self.class_:
+            dic['class'] = self.class_.as_dict()
+        return dic
     @staticmethod
     def major_categories():
         return [{'text':'홈페이지', 'value':'homepage'}, {'text':'아지트', 'value':'agit'}, {'text':'하우학교', 'value':'howcs'}]
@@ -191,12 +228,13 @@ class Class(db.Model):
     major_category = db.Column(db.String(64))
     minor_category = db.Column(db.String(64))
     year = db.Column(db.Integer)
-    semester = db.Column(db.Integer)
+    semester = db.Column(db.Integer, nullable=True)
     approval = db.Column(db.Boolean, default=False)
     time_slot = db.Column(db.String(64), nullable=True)
     audience = db.Column(db.String(64), nullable=True)
     background = db.Column(db.UnicodeText(), nullable=True)
     content = db.Column(db.UnicodeText(), nullable=True)
+    google_calendar = db.Column(db.String(256), nullable=True)
     teacher = relationship('User', back_populates='teaching_classes')
     students = relationship('Enrollment', back_populates='class_')
     attendances = relationship('Attendance', back_populates='class_')
@@ -273,6 +311,7 @@ class StudentRecord(db.Model):
     student_annual_records = relationship('StudentAnnualRecord', back_populates='student_record')
     student_award_records = relationship('StudentAwardRecord', back_populates='student_record')
     student_school_registration_records = relationship('StudentSchoolRegistrationRecord', back_populates='student_record')
+    student_health_records = relationship('StudentHealthRecord', back_populates='student_record')
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     def as_dict(self):
@@ -368,26 +407,15 @@ class StudentReadingRecord(db.Model):
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
-
-'''
-class Parent(db.Model):
-    __tablename__ = 'parents'
+class StudentHealthRecord(db.Model):
+    __tablename__ = 'student_health_records'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(32), ForeignKey('users.username'))
-    parent_id = db.Column(db.String(32))
-    
+    student_record_id = db.Column(db.Integer, ForeignKey('student_records.id'))
+    content = db.Column(db.UnicodeText())
+    date = db.Column(db.Date(), nullable=True)
+    student_record = relationship('StudentRecord', back_populates='student_health_records')
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
-    user = relationship('User', backref=backref('students', order_by=id))
     def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-
-class Teacher(db.Model):
-    __tablename__ = 'teachers'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(32), ForeignKey('users.username'))
-    career = db.Column(db.UnicodeText())
-    user = relationship('User', backref=backref('teachers', order_by=id))
-
-'''
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 

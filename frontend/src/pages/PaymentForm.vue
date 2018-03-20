@@ -242,17 +242,17 @@ export default {
       this.$route.query.perPage = this.pagination.rowsPerPage
       this.$route.query.page = this.pagination.page
 
-      this.$http.get(`enrollments`, {params: {class: this.$route.params.id}}).then(({ data }) => {
+      this.$axios.get(`enrollments`, {params: {class: this.$route.params.id}}).then(({ data }) => {
         this.items = data.data
         this.pagination.totalItems = data.total
       })
     },
     cancel() {
-      this.$router.replace('/')
+      this.$router.go(-1)
     },
     save() {
       if (this.action == 'new') {
-        this.$http.post(`payments`, {
+        this.$axios.post(`payments`, {
             'user_id': this.user_id,
             'major_category': this.major_category,
             'year': this.year,
@@ -260,10 +260,10 @@ export default {
             'cost': this.cost,
             'date': this.date,
         }).then(({data}) => {
-          this.$router.replace('/')
+          this.$router.go(-1)
         })
       } else if (this.action == 'update') {
-        this.$http.put(`payments/` + this.$route.params.id, {
+        this.$axios.put(`payments/` + this.$route.params.id, {
             'user_id': this.user_id,
             'major_category': this.major_category,
             'year': this.year,
@@ -271,18 +271,18 @@ export default {
             'cost': this.cost,
             'date': this.date,
         }).then(({data}) => {
-          this.$router.replace('/')
+          this.$router.go(-1)
         })
       }
     },
     search() {
       //this.$route.query.query = JSON.stringify(this.filters.model)
-      this.$http.get(`users`, {params: {name: this.search_name}}).then(({ data }) => {
+      this.$axios.get(`users`, {params: {name: this.search_name}}).then(({ data }) => {
         this.search_items = data.data
       })
     },
     search_select(item) {
-      this.$http.get(`users/` + item.id
+      this.$axios.get(`users/` + item.id
       ).then(({data}) => {
         this.user = data
         this.user_id = data.id
@@ -291,12 +291,12 @@ export default {
     }
   },
   created() {
-    this.$http.get(`classes/major_categories`
+    this.$axios.get(`classes/major_categories`
     ).then(({ data }) => {
       this.major_categories = data
     })
     if (this.$route.params.action == 'update') {
-      this.$http.get(`payments/` + this.$route.params.id
+      this.$axios.get(`payments/` + this.$route.params.id
       ).then(({ data }) => {
         console.log(data)
         this.major_category = data.major_category

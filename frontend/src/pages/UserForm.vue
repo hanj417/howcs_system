@@ -1,4 +1,109 @@
 <template>
+<q-page padding class="row justify-center">
+<div style="width: 500px; max-width: 80vw;">
+  <q-input v-model="username" float-label="아이디" />
+  <q-input v-model="password" type="password" float-label="비밀번호" />
+  <q-input v-model="name" float-label="이름" />
+  <q-input v-model="email" type="email" float-label="이메일" />
+  <q-input v-model="phone" float-label="전화번호" />
+  <q-input v-model="church" float-label="출석교회" />
+  <q-input v-model="school" float-label="소속학교" />
+  <q-datetime v-model="birthday" type="date" float-label="생년월일" />
+  <q-input v-model="student_id" float-label="학번" />
+  <q-option-group 
+    type="radio"
+    v-model="gender"
+    :options="[
+      { label: '남학생', value: 'male' },
+      { label: '여학생', value: 'female' },
+    ]"
+  />
+  <q-input v-model="father_name" float-label="부 성명" />
+  <q-input v-model="father_rrn" float-label="부 주민등록번호" />
+  <q-input v-model="mother_name" float-label="모 성명" />
+  <q-input v-model="mother_rrn" float-label="모 주민등록번호 " />
+  <q-input v-model="address" float-label="주소" />
+  <q-btn @click="store" label="수정" />
+</div>
+</q-page>
+</template>
+
+<script>
+import { LocalStorage } from 'quasar'
+
+export default {
+  data () {
+    return {
+      username: '',
+      password: '',
+      password_confirm: '',
+      name: '',
+      email: '',
+      phone: '',
+      school: '',
+      church: '',
+      birthday: null,
+      student_id: '',
+      gender: {},
+      rrn: '',
+      father_name: '',
+      father_rrn: '',
+      mother_name: '',
+      mother_rrn: '',
+      address: '',
+      conditions: false,
+      content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc.`,
+      terms: false,
+      terms_check: false,
+    }
+  },
+  props: ['action', 'id'],
+  methods: {
+    store() {
+      console.log('store')
+      console.log(this.id)
+    },
+  },
+  created() {
+    let logged_in = LocalStorage.has('user_')
+    if (this.action == 'update') {
+      if (this.id) {
+        this.is_admin = true
+        this.user_id = this.id
+      } else if (logged_in) {
+        this.user = LocalStorage.get.item('user_')
+        this.user_id = this.user['id']
+      }
+      this.$axios.get(`users/` + this.user_id
+      ).then(({ data }) => {
+        console.log(data)
+        this.username = data.username
+        this.name = data.name
+        this.email = data.email
+        this.phone = data.phone
+        this.school = data.school
+        this.church = data.church
+        var d = new Date(data.birthday)
+        this.date = d.toISOString().substr(0,10)
+        if (data.hasOwnProperty('student_info')) {
+          this.is_howcs_student = true
+          this.student_id = data.student_info.student_id
+          this.gender = data.student_info.gender
+          this.rrn = data.student_info.rrn
+          this.father_name = data.student_info.father_name
+          this.father_rrn = data.student_info.father_rrn
+          this.mother_name = data.student_info.mother_name
+          this.mother_rrn = data.student_info.mother_rrn
+          this.address = data.student_info.address
+        }
+      })
+    } else if (this.action == 'new_student') {
+      this.is_howcs_student = true
+    }
+  }
+}
+</script>
+/*
 <v-content>
   <v-container fluid fill-height>
    <v-layout justify-center align-center>
@@ -157,7 +262,7 @@
             <v-text-field
               prepend-icon="business"
               label="주민등록번호"
-              v-model="ssn"
+              v-model="rrn"
             ></v-text-field>
           </v-flex>
           <v-flex v-if="is_howcs_student" xs6>
@@ -171,7 +276,7 @@
             <v-text-field
               prepend-icon="business"
               label="아버지 주민등록번호"
-              v-model="father_ssn"
+              v-model="father_rrn"
             ></v-text-field>
           </v-flex>
           <v-flex v-if="is_howcs_student" xs6>
@@ -185,7 +290,7 @@
             <v-text-field
               prepend-icon="business"
               label="어머니 주민등록번호"
-              v-model="mother_ssn"
+              v-model="mother_rrn"
             ></v-text-field>
           </v-flex>
           <v-flex v-if="is_howcs_student" xs12>
@@ -252,9 +357,7 @@
 </v-layout>
 </v-container>
 </v-content>
-</template>
 
-<script>
 import Vue from 'vue'
 import VeeValidate from 'vee-validate'
 Vue.use(VeeValidate)
@@ -280,11 +383,11 @@ export default {
       student_id: '',
       gender: {},
       gender_items: [{ text: '남성', value:'male'}, {text: '여성', value:'female'}],
-      ssn: '',
+      rrn: '',
       father_name: '',
-      father_ssn: '',
+      father_rrn: '',
       mother_name: '',
-      mother_ssn: '',
+      mother_rrn: '',
       address: '',
       user: {},
       conditions: false,
@@ -308,12 +411,12 @@ export default {
   },
   methods: {
     cancel() {
-      this.$router.replace('/')
+      this.$router.go(-1)
     },
     save() {
       if (this.action == 'new') {
         if (this.is_howcs_student == false) {
-          this.$http.post(`users`, {
+          this.$axios.post(`users`, {
             'username': this.username,
             'password': this.password, 
             'name': this.name,
@@ -323,10 +426,10 @@ export default {
             'church': this.church,
             'birthday': this.date,
           }).then(({data}) => {
-            this.$router.replace('/')
+            this.$router.go(-1)
           })
         } else {
-          this.$http.post(`student_infos`, {
+          this.$axios.post(`student_infos`, {
             'username': this.username,
             'password': this.password, 
             'name': this.name,
@@ -337,19 +440,19 @@ export default {
             'birthday': this.date,
             'student_id': this.student_id,
             'gender': this.gender,
-            'ssn': this.ssn,
+            'rrn': this.rrn,
             'father_name': this.father_name,
-            'father_ssn': this.father_ssn,
+            'father_rrn': this.father_rrn,
             'mother_name': this.mother_name,
-            'mother_ssn': this.mother_ssn,
+            'mother_rrn': this.mother_rrn,
             'address': this.address,
           }).then(({data}) => {
-            this.$router.replace('/')
+            this.$router.go(-1)
           })
         }
       } else if (this.action == 'update') {
         if (this.is_howcs_student == false) {
-          this.$http.put(`users/` + this.user_id, {
+          this.$axios.put(`users/` + this.user_id, {
             'username': this.username,
             'password': this.password, 
             'name': this.name,
@@ -359,10 +462,10 @@ export default {
             'church': this.church,
             'birthday': this.date,
           }).then(({data}) => {
-            this.$router.replace('/')
+            this.$router.go(-1)
           })
         } else {
-          this.$http.put(`student_infos/` + this.user_id, {
+          this.$axios.put(`student_infos/` + this.user_id, {
             'username': this.username,
             'password': this.password, 
             'name': this.name,
@@ -373,14 +476,14 @@ export default {
             'birthday': this.date,
             'student_id': this.student_id,
             'gender': this.gender,
-            'ssn': this.ssn,
+            'rrn': this.rrn,
             'father_name': this.father_name,
-            'father_ssn': this.father_ssn,
+            'father_rrn': this.father_rrn,
             'mother_name': this.mother_name,
-            'mother_ssn': this.mother_ssn,
+            'mother_rrn': this.mother_rrn,
             'address': this.address,
           }).then(({data}) => {
-            this.$router.replace('/')
+            this.$router.go(-1)
           })
         }
       }
@@ -410,7 +513,7 @@ export default {
         this.user = JSON.parse(localStorage['user'])
         this.user_id = this.user['id']
       }
-      this.$http.get(`users/` + this.user_id
+      this.$axios.get(`users/` + this.user_id
       ).then(({ data }) => {
         console.log(data)
         this.username = data.username
@@ -425,11 +528,11 @@ export default {
           this.is_howcs_student = true
           this.student_id = data.student_info.student_id
           this.gender = data.student_info.gender
-          this.ssn = data.student_info.ssn
+          this.rrn = data.student_info.rrn
           this.father_name = data.student_info.father_name
-          this.father_ssn = data.student_info.father_ssn
+          this.father_rrn = data.student_info.father_rrn
           this.mother_name = data.student_info.mother_name
-          this.mother_ssn = data.student_info.mother_ssn
+          this.mother_rrn = data.student_info.mother_rrn
           this.address = data.student_info.address
         }
       })
@@ -438,4 +541,4 @@ export default {
     }
   }
 }
-</script>
+*/

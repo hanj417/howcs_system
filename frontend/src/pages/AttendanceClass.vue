@@ -1,25 +1,18 @@
 <template>
   <v-content>
     <v-container fluid fill-height>
-      <v-layout align-center justify-center>
-        <v-form v-model="valid" ref="form" lazy-validation>
-          <v-flex xs12>
-            <v-layout>
-              <v-menu ref="menu" lazy :close-on-content-click="false" v-model="menu" transition="scale-transition" offset-y full-width :nudge-right="40" min-width="290px" :return-value.sync="date">
-                <v-text-field slot="activator" label="Picker in menu" v-model="date" prepend-icon="event" readonly></v-text-field>
-                <v-date-picker v-model="date" no-title scrollable>
-                  <v-spacer></v-spacer>
-                  <v-btn flat color="primary" @click="menu = false">취소</v-btn>
-                  <v-btn flat color="primary" @click="$refs.menu.save(date)">결정</v-btn>
-                </v-date-picker>
-              </v-menu>
-            </v-layout>
-          </v-flex>
-        </v-form>
-      </v-layout>
-      <v-layout justify-center align-center>
+      <v-layout align-center justify-center row wrap>
+        <v-flex xs6>
+          <v-date-picker
+            full-width
+            landscape
+            class="mt-3"
+            v-model="date"
+          ></v-date-picker>
+        </v-flex>
+        <v-flex xs10>
         <v-card>
-          <v-data-table :headers='columns' :items='attendance_items' :rows-per-page-items='[10, 20, {"text":"All", "value":-1}]'>
+          <v-data-table :headers='headers' :items='attendance_items' :rows-per-page-items='[10, 20, {"text":"All", "value":-1}]'>
             <template slot='items' scope='props'>
               <tr>
                 <td>{{ props.item['name'] }}</td>
@@ -32,6 +25,7 @@
             </template>
           </v-data-table>
         </v-card>
+        </v-flex>
       </v-layout>
     </v-container>
   </v-content>
@@ -88,9 +82,7 @@ export default {
         item['id'] = this.enrollment_items[i].student_id
         item['name'] = this.enrollment_items[i].student.name
         for (var d = new Date(this.first_date.getTime()); d <= this.last_date; d.setDate(d.getDate() + 1)) {
-          item[d.toISOString().slice(0,10)] = {}
-          item[d.toISOString().slice(0,10)]['value'] = '출석'
-          item[d.toISOString().slice(0,10)]['id'] = null 
+          item[d.toISOString().slice(0,10)] = {'value':'출석', 'id':null}
         }
         this.attendance_items.push(item)
       }
@@ -99,10 +91,12 @@ export default {
       for (var i = 0; i < this.enrollment_items.length; i++) {
         var student_id = this.enrollment_items[i].student_id
         for (var d = new Date(this.first_date.getTime()); d <= this.last_date; d.setDate(d.getDate() + 1)) {
-          this.$http.get(`attendances`, {params: {class_id: this.$route.params.id, student_id:student_id, date:d.toISOString().slice(0,10)}})
+          this.$axios.get(`attendances`, {params: {class_id: this.$route.params.id, student_id:student_id, date:d.toISOString().slice(0,10)}})
           .then(({ data }) => {
-            var index = this.student_id_items[student_id]
             if (data.length != 0) {
+console.log(data[0])
+              var index = this.student_id_items[data[0].student_id]
+console.log('index', index, data)
               var dd = new Date(data[0].date)
               this.attendance_items[index][dd.toISOString().slice(0,10)]['value'] = data[0].category
               this.attendance_items[index][dd.toISOString().slice(0,10)]['id'] = data[0].id
@@ -116,16 +110,17 @@ export default {
         'class_id': this.$route.params.id,
       }
       this.$route.query.query = JSON.stringify(this.filters)
-      this.$http.get(`enrollments`, {params: this.$route.query}).then(({ data }) => {
+      this.$axios.get(`enrollments`, {params: this.$route.query}).then(({ data }) => {
 console.log(data)
         this.enrollment_items = data
         this.fetch_attendance_data()
       })
 
       // column setting
+      this.headers = [{'text':'이름', 'value':'name'}]
       this.columns = []
-      //this.columns = [{'text':'이름', 'value':'name'}]
       for (var d = new Date(this.first_date.getTime()); d <= this.last_date; d.setDate(d.getDate() + 1)) {
+        this.headers.push({'text':d.toISOString().slice(5,10), 'value':d.toISOString().slice(0,10)})
         this.columns.push({'text':d.toISOString().slice(0,10), 'value':d.toISOString().slice(0,10)})
       }
     },
@@ -152,41 +147,37 @@ console.log(data)
       item[index].value = this.categories[i]
 
       if (i == 0) {
-        this.$http.delete(`attendances/` + item[index].id
+        this.$axios.delete(`attendances/` + item[index].id
         ).then(({data}) => {
-          this.fetch_data()
         })
       } else if (i == 1) {
-        this.$http.post(`attendances`, {
+        this.$axios.post(`attendances`, {
           'class_id': this.$route.params.id,
           'student_id': item.id,
           'date': index,
           'category': item[index].value,
         }).then(({data}) => {
           item[index].id = data.id
-          this.fetch_data()
         })
       } else {
-        this.$http.put(`attendances/` + item[index].id, {
+        this.$axios.put(`attendances/` + item[index].id, {
           'class_id': this.$route.params.id,
           'student_id': item.id,
           'date': index,
           'category': item[index].value,
         }).then(({data}) => {
-          this.fetch_data()
         })
       }
     }
   },
   created () {
-    this.$http.get(`attendances/categories`)
+    this.$axios.get(`attendances/categories`)
     .then(({ data }) => {
       this.categories = data
     })
 
-    this.date = new Date()
-    this.date = this.date.toISOString().slice(0,10)
-    this.set_date(this.date)
+    var today = new Date()
+    this.date = today.toISOString().slice(0,10)
     this.fetch_data()
   }
 }

@@ -3,7 +3,7 @@
     <v-container fluid fill-height>
       <v-layout justify-center align-center>
         <v-card>
-          <v-data-table :headers='columns' :items='items' :rows-per-page-items='[10, 20, {"text":"All", "value":-1}]'>
+          <v-data-table :headers='headers' :items='items' :rows-per-page-items='[10, 20, {"text":"All", "value":-1}]'>
             <template slot='items' scope='props'>
               <tr>
                 <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
@@ -28,9 +28,19 @@
 const get_default_data = () => {
   return {
     columns: [
-      {'text': '선생님', 'value': 'class.teacher.name'},
-      {'text': '제목', 'value': 'class.title'},
       {'text': '분류', 'value': 'class.minor_category'},
+      {'text': '제목', 'value': 'class.title'},
+      {'text': '선생님', 'value': 'class.teacher.name'},
+      {'text': '요일', 'value': 'class.weekday'},
+      {'text': '시간', 'value': 'class.hour'},
+    ],
+    headers: [
+      {'text': '분류'},
+      {'text': '제목', 'width':400},
+      {'text': '선생님'},
+      {'text': '요일'},
+      {'text': '시간'},
+      {'text': ''},
     ],
     filters: {},
     items: [],
@@ -71,13 +81,13 @@ export default {
         }
       }
       this.$route.query.query = JSON.stringify(this.filters)
-      this.$http.get(`enrollments`, {params: this.$route.query})
+      this.$axios.get(`enrollments`, {params: this.$route.query})
       .then(({ data }) => {
         this.items = data
       })
     },
     remove(item) {
-      this.$http.delete(`enrollments/` + item.class_id + `/` + item.student_id)
+      this.$axios.delete(`enrollments/` + item.class_id + `/` + item.student_id)
       .then(({ data }) => {
         this.fetch_data()
       })

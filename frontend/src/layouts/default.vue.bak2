@@ -1,0 +1,145 @@
+<template>
+<q-layout view="lhh lpr lff">
+  <div id="main-container" style="opacity: 0;">
+    <nav class="navbar navbar-default navbar-fixed-top navbar--transparent">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="icon-bar navbar__icon-bar"></span>
+            <span class="icon-bar navbar__icon-bar"></span>
+            <span class="icon-bar navbar__icon-bar"></span>
+          </button>
+          <a href="/home" class="navbar-brand">
+            <img src="~assets/img/logo4.png" class="navbar__logo" />
+          </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li>
+              <a href="/about" class="navbar__menu">학교소개</a>
+            </li>
+            <li>
+              <a href="/entrance" class="navbar__menu">입학안내</a>
+            </li>
+            <li class="dropdown">
+              <a href="/edu/edu1" class="dropdown-toggle navbar__menu" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">교육 <span class="caret"></span></a>
+    
+              <ul class="dropdown-menu">
+                <li>
+                  <a href="/edu/edu1">교육특징</a>
+                </li>
+                <li>
+                  <a href="/edu/edu2">교육과정</a>
+                </li>
+    			<li>
+                  <a href="/edu/edu3">교과&학습과정편성</a>
+                </li>
+    			<li>
+                  <a href="/edu/edu4">주요일정</a>
+                </li>
+    			<li>
+                  <a href="/edu/edu5">하우의 하루</a>
+                </li><li>
+                  <a href="/edu/edu6">교사소개</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="/story/notice" class="dropdown-toggle navbar__menu" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">이야기 <span class="caret"></span></a>
+    
+    			 <ul class="dropdown-menu">
+                <li>
+                  <a href="/story/notice">공지사항</a>
+                </li>
+                <li>
+                  <a href="/story/story">하우하다</a>
+                </li>
+    			<li>
+                  <a href="/story/photo">하우포토</a>
+                </li>
+    
+              </ul>
+            </li>
+    		<li>
+              <a href="/agit/" class="navbar__menu">아지트</a>
+            </li>
+    		<li>
+              <a href="/community/" class="navbar__menu">교육공동체</a>
+            </li>
+    		<li>
+              <a href="/login" class="navbar__menu">로그인</a>
+            </li>
+    		<li>
+              <a href="/register" class="navbar__menu">회원가입</a>
+            </li>
+    
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <q-page-container>
+      <router-view />
+    </q-page-container>
+  </div>
+</q-layout>
+</template>
+
+<script>
+export default {
+  name: 'LayoutDefault',
+  data () {
+    return {
+      leftDrawerOpen: false,
+      //leftDrawerOpen: this.$q.platform.is.desktop,
+    }
+  },
+  computed: {
+    menu: {
+      get() {
+        return this.$store.state.menu.menu_
+      },
+      set(val) {
+        this.$store.commit('menu/UpdateMenu', val)
+      },
+    }
+  },
+  methods: {
+  }
+}
+
+import _ from 'lodash'
+global.jQuery = require('jquery');
+var $ = global.jQuery;
+window.$ = $;
+
+// Make navigation bar tranparent when scroll downwards
+function updateNavigationBarTransparency() {
+  if ($(window).scrollTop() > 100) $('.navbar').removeClass('navbar--transparent');
+  else $('.navbar').addClass('navbar--transparent');
+}
+
+// Adapt throttle function when scrolling
+$(window).on('scroll', _.throttle(updateNavigationBarTransparency, 1000));
+
+
+// Slide down effect when drop down
+$('.dropdown').on('show.bs.dropdown', function(e){
+  $(this).find('.dropdown-menu').first().stop(true, true).slideDown();
+});
+
+// Slide up effect when drop up
+$('.dropdown').on('hide.bs.dropdown', function(e){
+  $(this).find('.dropdown-menu').first().stop(true, true).slideUp();
+});
+
+$(window).on('load', function() {
+  // Ease effect when body DOM loads
+  $('#main-container').animate({opacity: 1}, 700);
+
+  // Hide loading icon
+  $('#loading-icon').addClass('hidden');
+});
+</script>
+
+<style>
+</style>

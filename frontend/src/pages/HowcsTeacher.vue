@@ -18,27 +18,14 @@
         </v-card>
       </v-layout>
     </v-container>
-    <v-btn
-      fab
-      bottom
-      right
-      color="pink"
-      dark
-      fixed
-      @click="search"
-    >
+    <v-btn fab bottom right color="pink" dark fixed @click="search">
       <v-icon>add</v-icon>
     </v-btn>
-      <v-dialog v-model="search_dialog" width="50%">
+      <v-dialog v-model="search_dialog" width="60%">
         <v-card>
           <v-card-title class="title">학생 검색</v-card-title>
-          <v-flex xs6>
-            <v-text-field
-              label="검색"
-              single-line
-              hide-details
-              v-model="search_name"
-            ></v-text-field>
+          <v-flex xs6 offset-xs2>
+            <v-text-field label="검색" single-line hide-details v-model="search_name"></v-text-field>
           </v-flex>
           <v-card-text class="pt-4">
             <v-data-table :headers='search_columns' :items='search_items' :search="search_name">
@@ -46,7 +33,7 @@
                 <tr>
                   <td v-for='column in search_columns' v-html="get_column_data(props.item, column)"></td>
                   <td class="justify-center layout px-0">
-                    <v-btn class="mx-0" @click="search_select(props.item)">선택</v-btn>
+                    <v-btn small icon class="mx-0" @click="search_select(props.item)"><v-icon>add</v-icon></v-btn>
                   </td>
                 </tr>
               </template>
@@ -109,19 +96,19 @@ export default {
     },
     fetch_data() {
       this.$route.query.query = JSON.stringify(this.filters)
-      this.$http.get(`howcs_teacher_infos`, {params: this.$route.query})
+      this.$axios.get(`howcs_teacher_infos`, {params: this.$route.query})
       .then(({ data }) => {
         this.items = data
       })
     },
     remove(item) {
-      this.$http.delete(`howcs_teacher_infos/` + item.id)
+      this.$axios.delete(`howcs_teacher_infos/` + item.id)
       .then(({ data }) => {
         this.fetch_data()
       })
     },
     howcs_teacher_new(item) {
-      this.$http.post(`howcs_teacher_infos`, {
+      this.$axios.post(`howcs_teacher_infos`, {
         'user_id': item.id
       }).then(({ data }) => {
         this.fetch_data()
@@ -129,7 +116,7 @@ export default {
     },
     search() {
       this.$route.query.query = JSON.stringify(this.filters)
-      this.$http.get(`users`, {params: this.$route.query})
+      this.$axios.get(`users`, {params: this.$route.query})
       .then(({ data }) => {
         this.search_items = data
       })
@@ -137,7 +124,6 @@ export default {
     },
     search_select(item) {
       this.howcs_teacher_new(item)
-      this.search_dialog = false
     }
   },
   created () {

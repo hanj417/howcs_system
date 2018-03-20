@@ -103,11 +103,11 @@ export default {
   },
   methods: {
     cancel() {
-      this.$router.replace('/')
+      this.$router.go(-1)
     },
   },
   created() {
-    this.$http.get(`posts/` + this.$route.params.id
+    this.$axios.get(`posts/` + this.$route.params.id
     ).then(({ data }) => {
       this.major_category = data.major_category
       this.minor_category = data.minor_category

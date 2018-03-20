@@ -20,7 +20,7 @@
                     v-validate="'required'"
                     required
                   ></v-text-field>
-                  <v-btn v-if="teacher_select" @click="search_dialog = true"><v-icon>search</v-icon></v-btn>
+                  <v-btn v-if="teacher_select" @click="search"><v-icon>search</v-icon></v-btn>
                 </v-layout>
               </v-flex>
               <v-flex xs12>
@@ -80,6 +80,12 @@
               </v-flex>
               <v-flex xs12>
                 <v-text-field
+                  label="구글 캘린더 ID"
+                  v-model="google_calendar"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12>
+                <v-text-field
                   label="대상"
                   v-model="audience"
                 ></v-text-field>
@@ -98,16 +104,11 @@
               </v-flex>
             </v-layout>
           </v-form>
-          <v-dialog v-model="search_dialog" width="50%">
+          <v-dialog v-model="search_dialog" width="60%">
             <v-card>
               <v-card-title class="title">교사 검색</v-card-title>
-              <v-flex xs6>
-                <v-text-field
-                  label="검색"
-                  single-line
-                  hide-details
-                  v-model="search_name"
-                ></v-text-field>
+              <v-flex xs6 offset-xs1>
+                <v-text-field label="검색" single-line hide-details v-model="search_name"></v-text-field>
               </v-flex>
               <v-card-text class="pt-4">
                 <v-data-table :headers='search_columns' :items='search_items' :search="search_name">
@@ -115,7 +116,7 @@
                     <tr>
                       <td v-for='column in search_columns' v-html="get_column_data(props.item, column)"></td>
                       <td class="justify-center layout px-0">
-                        <v-btn class="mx-0" @click="search_select(props.item)">선택</v-btn>
+                        <v-btn small icon class="mx-0" @click="search_select(props.item)"><v-icon>add</v-icon></v-btn>
                       </td>
                     </tr>
                   </template>
@@ -160,6 +161,7 @@ export default {
       year: null,
       semester: '',
       time_slot: '',
+      google_calendar: '',
       audience: '',
       background: '',
       content: '',
@@ -186,15 +188,6 @@ export default {
     }
   },
   watch: {
-    'pagination.page' (val) {
-      this.fetch_data()
-    },
-    'pagination.sortBy' (val) {
-      this.fetch_data()
-    },
-    'pagination.descending' (val) {
-      this.fetch_data()
-    },
     'id' (val) {
       this.set_visibility()
       this.fetch_data()
@@ -218,17 +211,18 @@ export default {
       return value
     },
     fetch_data() {
+      this.filters = {}
       this.$route.query.query = JSON.stringify(this.filters)
-      this.$http.get(`enrollments`, {params: {class: this.$route.params.id}}).then(({ data }) => {
+      this.$axios.get(`enrollments`, {params: {class: this.$route.params.id}}).then(({ data }) => {
         this.items = data
       })
     },
     cancel() {
-      this.$router.replace('/')
+      this.$router.go(-1)
     },
     save() {
       if (this.action == 'new') {
-          this.$http.post(`classes`, {
+          this.$axios.post(`classes`, {
               'teacher_id': this.teacher.id,
               'title': this.title,
               'major_category': this.major_category,
@@ -236,15 +230,16 @@ export default {
               'year': this.year,
               'semester': this.semester,
               'time_slot': this.time_slot,
+              'google_calendar': this.google_calendar,
               'audience': this.audience,
               'background': this.background,
               'content': this.content,
           }).then(({data}) => {
-            this.$router.replace('/')
+            this.$router.go(-1)
           })
       } else if (this.action == 'update') {
         if (this.$route.params.hasOwnProperty('id')) {
-            this.$http.put(`classes/` + this.$route.params.id, {
+            this.$axios.put(`classes/` + this.$route.params.id, {
               'teacher_id': this.teacher.id,
               'title': this.title,
               'major_category': this.major_category,
@@ -252,17 +247,28 @@ export default {
               'year': this.year,
               'semester': this.semester,
               'time_slot': this.time_slot,
+              'google_calendar': this.google_calendar,
               'audience': this.audience,
               'background': this.background,
               'content': this.content,
             }).then(({data}) => {
-              this.$router.replace('/')
+              this.$router.go(-1)
             })
         }
       }
     },
+    search() {
+      this.filters = {
+        'role': 'howcs_teacher',
+      }
+      this.$route.query.query = JSON.stringify(this.filters)
+      this.$axios.get(`users`, {params: this.$route.query}).then(({ data }) => {
+        this.search_items = data
+      })
+      this.search_dialog = true
+    },
     search_select(item) {
-      this.$http.get(`users/` + item.id
+      this.$axios.get(`users/` + item.id
       ).then(({data}) => {
         this.teacher = data
         this.search_dialog = false
@@ -272,23 +278,19 @@ export default {
   created() {
     var user = JSON.parse(localStorage['user'])
     if (JSON.parse(user.role).includes('admin')) {
-      this.$route.query.query = JSON.stringify(this.filters)
-      this.$http.get(`users`, {params: this.$route.query}).then(({ data }) => {
-        this.search_items = data
-      })
       this.teacher_select = true
     } else {
       this.teacher = user
     }
 
     this.major_category = this.$route.params.major_category
-    this.$http.get(`classes/major_categories`
+    this.$axios.get(`classes/major_categories`
     ).then(({ data }) => {
       this.major_categories = data
     })
 
     if (this.$route.params.action == 'update') {
-      this.$http.get(`classes/` + this.$route.params.id
+      this.$axios.get(`classes/` + this.$route.params.id
       ).then(({ data }) => {
         console.log(data)
         this.teacher = data.teacher
@@ -299,6 +301,7 @@ export default {
         this.year = data.year
         this.semester = data.semester
         this.time_slot = data.time_slot
+        this.google_calendar = data.google_calendar
         this.audience = data.audience
         this.background = data.background
         this.content = data.content

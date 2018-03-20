@@ -2,8 +2,11 @@
   <v-content>
     <v-container fluid fill-height>
       <v-layout justify-center align-center>
+        <v-flex xs6 offset-xs1>
+          <v-text-field label="검색" single-line hide-details v-model="search_enrollment"></v-text-field>
+        </v-flex>
         <v-card>
-          <v-data-table :headers='columns' :items='items' :rows-per-page-items='[10, 20, {"text":"All", "value":-1}]'>
+          <v-data-table :headers='columns' :items='items' :rows-per-page-items='[10, 20, {"text":"All", "value":-1}]' :sesarch="search_enrollment">
             <template slot='items' scope='props'>
               <tr>
                 <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
@@ -18,27 +21,14 @@
         </v-card>
       </v-layout>
     </v-container>
-    <v-btn
-      fab
-      bottom
-      right
-      color="pink"
-      dark
-      fixed
-      @click="search"
-    >
+    <v-btn fab bottom right color="pink" dark fixed @click="search">
       <v-icon>add</v-icon>
     </v-btn>
-      <v-dialog v-model="search_dialog" width="50%">
+      <v-dialog v-model="search_dialog" width="60%">
         <v-card>
           <v-card-title class="title">학생 검색</v-card-title>
-          <v-flex xs6>
-            <v-text-field
-              label="검색"
-              single-line
-              hide-details
-              v-model="search_name"
-            ></v-text-field>
+          <v-flex xs6 offset-xs1>
+            <v-text-field label="검색" single-line hide-details v-model="search_name"></v-text-field>
           </v-flex>
           <v-card-text class="pt-4">
             <v-data-table :headers='search_columns' :items='search_items' :search="search_name">
@@ -99,6 +89,7 @@ const get_default_data = () => {
       {'text': '전화번호', 'value': 'student.phone'},
     ],
     items: [],
+    search_enrollment: '',
     search_dialog: false,
     search_name: '',
     search_items: [],
@@ -138,26 +129,26 @@ export default {
     fetch_data() {
       this.filters = {'class_id': this.$route.params.id}
       this.$route.query.query = JSON.stringify(this.filters)
-      this.$http.get(`enrollments`, {params: this.$route.query})
+      this.$axios.get(`enrollments`, {params: this.$route.query})
       .then(({ data }) => {
         this.items = data
       })
     },
     remove(item) {
-      this.$http.delete(`enrollments/` + item.class_id + `/` + item.student_id)
+      this.$axios.delete(`enrollments/` + item.class_id + `/` + item.student_id)
       .then(({ data }) => {
         this.fetch_data()
       })
     },
     search() {
       this.$route.query.query = JSON.stringify(this.filters)
-      this.$http.get(`users`, {params: this.$route.query}).then(({ data }) => {
+      this.$axios.get(`users`, {params: this.$route.query}).then(({ data }) => {
         this.search_items = data
       })
       this.search_dialog = true
     },
     search_select(item) {
-      this.$http.post(`enrollments`, {
+      this.$axios.post(`enrollments`, {
         'class_id': this.$route.params.id,
         'student_id': item.id,
       }).then(({data}) => {

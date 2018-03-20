@@ -3,7 +3,10 @@
     <v-container fluid fill-height>
       <v-layout justify-center align-center>
         <v-card>
-          <v-data-table :headers='columns' :items='items' rows-per-page-items="[10, 20, {"text":"All", "value":-1}]">
+          <v-flex xs6 offset-xs2>
+            <v-text-field label="검색" single-line hide-details v-model="search_name"></v-text-field>
+          </v-flex>
+          <v-data-table :headers='columns' :items='items' :rows-per-page-items='[10, 20, {"text":"All", "value":-1}]' :search="search_name">
             <template slot='items' scope='props'>
               <tr>
                 <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
@@ -21,7 +24,7 @@
         </v-card>
       </v-layout>
     </v-container>
-    <v-btn fab bottom right color="pink" dark fixed :to="{name: 'user_form', params: {action:'new'}}">
+    <v-btn fab bottom right color="pink" dark fixed :to="{name: 'user_form', params: {action:'new_student'}}">
       <v-icon>add</v-icon>
     </v-btn>
   </v-content>
@@ -38,6 +41,7 @@ const get_default_data = () => {
     ],
     items: [],
     filters: {},
+    search_name: '',
   }
 }
 
@@ -56,11 +60,11 @@ export default {
     },
     fetch_data() {
       this.$route.query.query = JSON.stringify(this.filters.model)
-      this.$http.get(`student_infos`, {params: this.$route.query})
+      this.$axios.get(`student_infos`, {params: this.$route.query})
       .then(({ data }) => { this.items = data })
     },
     remove(item) {
-      this.$http.delete(`student_infos/` + item.id)
+      this.$axios.delete(`student_infos/` + item.id)
       .then(({ data }) => { this.fetch_data() })
     },
   },

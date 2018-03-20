@@ -1,31 +1,72 @@
 <template>
-    <v-content>
-      <v-container fluid fill-height>
-        <v-layout align-center justify-center>
-          <v-flex xs12 sm8 md4>
-            <v-card class="elevation-12">
-              <v-toolbar dark color="primary">
-                <v-toolbar-title>로그인</v-toolbar-title>
-              </v-toolbar>
-              <v-card-text>
-                <v-form>
-                  <v-text-field prepend-icon="person" name="username" label="아이디" v-model="username" type="text"></v-text-field>
-                  <v-text-field prepend-icon="lock" name="password" label="비밀번호" id="password" v-model="password" type="password"></v-text-field>
-                  <div v-if="login_failed" class="flex pb-2">아이디 혹은 비밀번호가 잘못 되었습니다.</div>
-                </v-form>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="primary" @click.stop='submit'>Login</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </v-content>
+<q-page padding class="row justify-center">
+    <div class="page-intro">
+      <img src="~assets/img/login_background_image.png" class="section__background-image" />
+
+      <div class="title--emphasized">
+		하우학교에 오신것을 환영합니다!
+      </div>
+     
+    </div>
+
+   <div class="container">
+      <div class="page-name">
+      로그인
+      </div>
+      <hr class="page-name--bottom-border" />
+    </div> 
+<div style="width: 400px; max-width: 80vw;">
+    <q-input v-model="username" float-label="아이디" autofocus style="border-bottom: 1px solid;" />
+    <q-input v-model="password" float-label="비밀번호" type="password" style="border-bottom: 1px solid;" />
+<div class="row justify-end">
+  <q-btn @click="login" label="로그인" />
+</div>
+</div>
+
+</q-page>
 </template>
 
 <script>
+import { LocalStorage } from 'quasar'
+import './docs-input.styl'
+
+export default {
+  data () {
+    return {
+      username: '',
+      password: '',
+      login_fail: false,
+    }
+  },
+  methods: {
+    fetch_menu() {
+      this.$axios.get('menu')
+      .then(({data}) => 
+        this.$store.commit('menu/UpdateMenu', data)
+      ).catch(function(data) {
+        console.log('error')
+      })    
+    },
+    login() {
+      this.$axios({
+        method: 'post',
+        url: 'login',
+        auth: {username: this.username, password: this.password},
+        headers: { 'Content-type': 'application/json' }
+      }).then(({data}) => {
+        this.$store.commit('auth/SetAuth', data)
+        this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + data.token
+        this.fetch_menu()
+        LocalStorage.set('user_', data.user)
+        LocalStorage.set('token_', data.token)
+        this.$router.replace('/')
+      }).catch(({data}) => {
+        this.login_fail = true
+      });
+    },
+  },
+}
+/*
 import { mapState } from 'vuex'
 
 export default {
@@ -42,9 +83,9 @@ export default {
   },
   methods: {
     fetch_menu() {
-      this.$http.get('menu')
+      this.$axios.get('menu')
       .then(({data}) => 
-        this.$store.commit('set_menu', data)
+        this.$store.commit('menu/SetMenu', data)
       ).catch(function(data) {
         console.log('error')
       })    
@@ -52,12 +93,12 @@ export default {
     submit() {
       this.$axios({
         method: 'post',
-        url: 'http://wonzi.net:3000/api/login',
+        url: 'http://howcs.kr:3000/api/login',
         auth: {username: this.username, password: this.password},
         headers: { 'Content-type': 'application/json' }
       }).then(({data}) => {
         this.$store.commit('set_auth', data)
-        this.$http.defaults.headers.common['Authorization'] = 'Bearer ' + data.token
+        this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + data.token
         this.fetch_menu()
         this.$router.replace('/')
       }).catch(({data}) => {
@@ -66,4 +107,5 @@ export default {
     },
   },
 }
+*/
 </script>

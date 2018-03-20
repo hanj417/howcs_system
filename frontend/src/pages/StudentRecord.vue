@@ -275,11 +275,11 @@ export default {
   },
   methods: {
     cancel() {
-      this.$router.replace('/')
+      this.$router.go(-1)
     },
     save() {
       if (this.action == 'update') {
-        this.$http.put(`student_infos/` + this.user_id, {
+        this.$axios.put(`student_infos/` + this.user_id, {
           'username': this.username,
           'password': this.password, 
           'name': this.name,
@@ -297,7 +297,7 @@ export default {
           'mother_ssn': this.mother_ssn,
           'address': this.address,
         }).then(({data}) => {
-          this.$router.replace('/')
+          this.$router.go(-1)
         })
       }
     },
@@ -308,7 +308,7 @@ export default {
   created() {
     if (this.$route.params.action == 'update') {
       this.user_id = this.$route.params.id
-      this.$http.get(`students/` + this.user_id
+      this.$axios.get(`students/` + this.user_id
       ).then(({ data }) => {
         console.log(data)
         this.username = data.username
