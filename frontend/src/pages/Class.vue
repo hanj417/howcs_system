@@ -1,14 +1,21 @@
 <template>
-<q-page padding>
+  <q-page
+    padding
+    class="row justify-center">
     <q-table
       :data="table_data"
       :columns="columns"
       :filter="filter"
       :visible-columns="visible_columns"
-      row-key="name"
+      selection="single"
+      :selected.sync="item"
+      row-key="id"
       color="secondary"
+      class="col-xs-11"
     >
-      <template slot="top-left" slot-scope="props">
+      <template
+        slot="top-left"
+        slot-scope="props">
         <q-search
           hide-underline
           color="secondary"
@@ -16,7 +23,9 @@
           class="col-6"
         />
       </template>
-      <template slot="top-right" slot-scope="props">
+      <template
+        slot="top-right"
+        slot-scope="props">
         <q-table-columns
           color="secondary"
           class="q-mr-sm"
@@ -24,114 +33,91 @@
           :columns="columns"
         />
       </template>
-      <q-tr slot="body" slot-scope="props" :props="props">
-        <template v-for="(key, value) in props.row">
-          <q-td :key="key" :props="props">{{ value }}</q-td>
-        </template>
-      </q-tr>
+      <template
+        slot="top-selection"
+        slot-scope="props">
+        <div class="col" />
+        <q-btn
+          color="negative"
+          flat
+          round
+          icon="group add"
+          @click="$router.push({name:'enrollment_class', params: {id: item[0].id}})" />
+        <q-btn
+          color="negative"
+          flat
+          round
+          icon="assignment"
+          @click="$router.push({name:'post_class', params: {class_id: item[0].id}})" />
+        <q-btn
+          color="negative"
+          flat
+          round
+          delete
+          icon="delete"
+          @click="remove" />
+      </template>
     </q-table>
-</q-page>
+    <q-page-sticky
+      position="bottom-right"
+      :offset="[18, 18]">
+      <q-btn
+        round
+        color="primary"
+        @click="$router.push({name:'class_form_admin', params:{major_category:'howcs', action:'new'}})"
+        icon="add" />
+    </q-page-sticky>
+  </q-page>
 </template>
 
 <script>
-/*
-const get_default_data = () => {
-  return {
-    loading: false,
-    columns: [
-      {'text': '선생님', 'value': 'teacher.name'},
-      {'text': '제목', 'value': 'title'},
-      {'text': '대분류', 'value': 'major_category'},
-      {'text': '분류', 'value': 'minor_category'},
-    ],
-    headers: [
-      {'text': '선생님'},
-      {'text': '제목'},
-      {'text': '대분류'},
-      {'text': '분류'},
-      {'text': ''},
-    ],
-    agit_columns: [
-      {'text': '분류', 'value': 'minor_category'},
-      {'text': '제목', 'value': 'title'},
-      {'text': '선생님', 'value': 'teacher.name'},
-      {'text': '요일', 'value': 'weekday'},
-      {'text': '시간', 'value': 'hour'},
-    ],
-    agit_headers: [
-      {'text': '분류'},
-      {'text': '제목', 'width':400},
-      {'text': '선생님'},
-      {'text': '요일'},
-      {'text': '시간'},
-      {'text': ''},
-    ],
-    howcs_teacher_columns: [
-      {'text': '분류', 'value': 'minor_category'},
-      {'text': '제목', 'value': 'title'},
-    ],
-    howcs_teacher_headers: [
-      {'text': '분류', 'width':200},
-      {'text': '제목', 'width':400},
-      {'text': '글/출석'},
-    ],
-    items: [],
-    filters: {},
-    search_name: '',
-    class_form_visible: false,
-    attendance_visible: false,
-    enrollment_visible: false,
-    edit_visible: false,
-    delete_visible: false,
-    enroll_visible: false,
-  }
-}
-*/
-
 export default {
   data () {
     return {
       table_data: [],
       columns: [
-        { name: 'teacher.name', label: '선생님', field: row => row.teacher.name, sortable: true, align: 'left' },
+        { name: 'teacher_name', label: '선생님', field: row => row.teacher.name, sortable: true, align: 'left' },
         { name: 'title', label: '제목', field: 'title', sortable: true, align: 'left' },
+        { name: 'major_category', label: '대분류', field: 'major_category', sortable: true, align: 'left' },
+        { name: 'minor_category', label: '분류', field: 'minor_category', sortable: true, align: 'left' }
       ],
       filter: '',
-      visible_columns: ['teacher.name', 'title'],
+      visible_columns: ['teacher_name', 'title', 'major_category', 'minor_category'],
+      item: []
     }
   },
   props: ['major_category', 'id'],
   methods: {
-    fetch_data() {
-      this.query = {}
+    fetch_data () {
+      let query = {}
       if (this.major_category) {
-        this.query['major_category'] = this.major_category
+        query['major_category'] = this.major_category
       }
       if (this.id) {
-        this.query['teacher_id'] = this.id
+        query['teacher_id'] = this.id
       }
-      this.$axios.get(`classes`, {params: this.query})
-      .then(({ data }) => {
-        this.table_data = data
-      })
+      this.$axios.get(`classes`, {params: query})
+        .then(({ data }) => {
+          this.table_data = data
+        })
     },
-    remove(item) {
-      this.$axios.delete(`classes/` + item.id)
-      .then(({ data }) => {
-        this.fetch_data()
-      })
+    remove () {
+      this.$axios.delete(`classes/` + this.item[0].id)
+        .then(({ data }) => {
+          this.fetch_data()
+        })
     },
-    enroll(item) {
+    enroll () {
       this.$axios.post(`enrollments`, {
-        'class_id': item.id,
+        'class_id': this.item.id
       }).then(({ data }) => {
         this.fetch_data()
       })
-    },
-/*
+    }
+    /*
     set_visibility() {
-      if (!!this.$route.params.id) {
-        this.filters['teacher_id'] = this.$route.params.id
+      if (this.id) {
+        this.filters['teacher_id'] = this.id
         this.columns = this.howcs_teacher_columns
         this.headers = this.howcs_teacher_headers
         this.class_form_visible = true
@@ -142,7 +128,7 @@ export default {
         this.delete_visible = false
         this.enroll_visible = false
       } else {
-        if (this.major_category == 'agit') {
+        if (this.major_category === 'agit') {
           this.columns = this.agit_columns
           this.headers = this.agit_headers
           this.class_form_visible = false
@@ -152,7 +138,7 @@ export default {
           this.edit_visible = false
           this.delete_visible = false
           this.enroll_visible = true
-        } else if (this.major_category == 'howcs') {
+        } else if (this.major_category === 'howcs') {
           this.class_form_visible = true
           this.post_visible = false
           this.attendance_visible = false
@@ -166,8 +152,19 @@ export default {
 */
   },
   created () {
-    //this.set_visibility()
+    // this.set_visibility()
     this.fetch_data()
   }
 }
 </script>
+
+/*
+    class_form_visible: false,
+    attendance_visible: false,
+    enrollment_visible: false,
+    edit_visible: false,
+    delete_visible: false,
+    enroll_visible: false,
+  }
+}
+*/

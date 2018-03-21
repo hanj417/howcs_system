@@ -1,27 +1,47 @@
 <template>
-  <v-content>
-    <v-container fluid fill-height>
-      <v-layout justify-center align-center>
-        <v-card>
-          <v-data-table :headers='columns' :items='items' :rows-per-page-items='[10, 20, {"text":"All", "value":-1}]'>
-            <template slot='items' scope='props'>
-              <tr>
-                <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
-                <td class="justify-center layout px-0">
-                  <v-btn icon class="mx-0" @click="remove(props.item)">
-                    <v-icon>delete</v-icon>
-                  </v-btn>
-                  <v-btn icon class="mx-0" @click="toggle_approval(props.item)">
-                    {{ props.item.approval }}
-                  </v-btn>
-                </td>
-              </tr>
-            </template>
-          </v-data-table>
-        </v-card>
-      </v-layout>
-    </v-container>
-  </v-content>
+  <q-page
+    padding
+    class="row justify-center">
+    <q-table
+      :data="table_data"
+      :columns="columns"
+      :filter="filter"
+      :visible-columns="visible_columns"
+      row-key="name"
+      color="secondary"
+    >
+      <template
+        slot="top-left"
+        slot-scope="props">
+        <q-search
+          hide-underline
+          color="secondary"
+          v-model="filter"
+          class="col-6"
+        />
+      </template>
+      <template
+        slot="top-right"
+        slot-scope="props">
+        <q-table-columns
+          color="secondary"
+          class="q-mr-sm"
+          v-model="visible_columns"
+          :columns="columns"
+        />
+      </template>
+      <q-tr
+        slot="body"
+        slot-scope="props"
+        :props="props">
+        <template v-for="(key, value) in props.row">
+          <q-td
+            :key="key"
+            :props="props">{{ value }}</q-td>
+        </template>
+      </q-tr>
+    </q-table>
+  </q-page>
 </template>
 
 <script>
@@ -31,52 +51,47 @@ const get_default_data = () => {
       {'text': '아이디', 'value': 'user.username'},
       {'text': '이름', 'value': 'user.name'},
       {'text': '이메일', 'value': 'user.email'},
-      {'text': '전화번호', 'value': 'user.phone'},
+      {'text': '전화번호', 'value': 'user.phone'}
     ],
     items: [],
-    filters: {},
+    filters: {}
   }
 }
 
 export default {
-  data: get_default_data,
+  data () {
+    return {
+      table_data: [],
+      columns: [
+        { name: 'teacher.name', label: '선생님', field: row => row.teacher.name, sortable: true, align: 'left' },
+        { name: 'title', label: '제목', field: 'title', sortable: true, align: 'left' }
+      ],
+      filter: '',
+      visible_columns: ['teacher.name', 'title']
+    }
+  },
+
   methods: {
-    fetch_data() {
-      this.$route.query.query = JSON.stringify(this.filters)
-      this.$axios.get(`agit_teacher_infos`, {params: this.$route.query})
-      .then(({ data }) => {
-        this.items = data
-      })
+    fetch_data () {
+      let query = {}
+      this.$axios.get(`agit_teacher_infos`, {params: query})
+        .then(({ data }) => {
+          this.table_data = data
+        })
     },
-    get_column_data(row, field) {
-      // process fields like `type.name`
-      let [l1, l2] = field.value.split('.')
-      let value = row[l1]
-      let tag = null
-      if (l2) {
-        value = row[l1] ? row[l1][l2] : null
-      }
-      if (field.type === 'image') {
-        tag = 'img'
-      }
-      if (tag) {
-        value = `<${tag} src="${value}" class="crud-grid-thumb" controls />`
-      }
-      return value
-    },
-    remove(item) {
+    remove (item) {
       this.$axios.delete(`agit_teacher_infos/` + item.id)
-      .then(({ data }) => {
-        this.fetch_data()
-      })
+        .then(({ data }) => {
+          this.fetch_data()
+        })
     },
-    toggle_approval(item) {
+    toggle_approval (item) {
       this.$axios.put(`agit_teacher_infos/` + item.id, {
-        'approval': !item.approval,
+        'approval': !item.approval
       }).then(({data}) => {
         this.fetch_data()
       })
-    },
+    }
   },
   created () {
     this.fetch_data()

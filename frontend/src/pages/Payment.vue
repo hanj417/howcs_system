@@ -1,36 +1,84 @@
 <template>
-  <v-content>
-    <v-container fluid fill-height>
-      <v-layout justify-center align-center>
-        <v-card>
-          <v-flex xs6 offset-xs1>
-            <v-text-field label="검색" single-line hide-details v-model="search_name"></v-text-field>
-          </v-flex>
-          <v-data-table :headers='columns' :items='items' :rows-per-page-items='[10, 20, {"text":"All", "value":-1}]' :search='search_name'>
-            <template slot='items' scope='props'>
-              <tr>
-                <td v-for='column in columns' v-html="get_column_data(props.item, column)"></td>
-                <td class="justify-center layout px-0">
-                  <v-btn icon class="mx-0" :to="{name: 'payment_form_admin', params: {action:'update', id:props.item.id}} ">
-                    <v-icon>edit</v-icon>
-                  </v-btn>
-                  <v-btn icon class="mx-0" @click="remove(props.item)">
-                    <v-icon>delete</v-icon>
-                  </v-btn>
-                </td>
-              </tr>
-            </template>
-          </v-data-table>
-        </v-card>
-      </v-layout>
-    </v-container>
+  <q-page
+    padding
+    class="row justify-center">
+    <q-table
+      :data="table_data"
+      :columns="columns"
+      :filter="filter"
+      :visible-columns="visible_columns"
+      row-key="name"
+      color="secondary"
+    >
+      <template
+        slot="top-left"
+        slot-scope="props">
+        <q-search
+          hide-underline
+          color="secondary"
+          v-model="filter"
+          class="col-6"
+        />
+      </template>
+      <template
+        slot="top-right"
+        slot-scope="props">
+        <q-table-columns
+          color="secondary"
+          class="q-mr-sm"
+          v-model="visible_columns"
+          :columns="columns"
+        />
+      </template>
+      <q-tr
+        slot="body"
+        slot-scope="props"
+        :props="props">
+        <template v-for="(key, value) in props.row">
+          <q-td
+            :key="key"
+            :props="props">{{ value }}</q-td>
+        </template>
+      </q-tr>
+    </q-table>
+  </q-page>
+<!--
     <v-btn fab bottom right color="pink" dark fixed :to="{name: 'payment_form', params: {action:'new'}}">
       <v-icon>add</v-icon>
     </v-btn>
-  </v-content>
+-->
 </template>
 
 <script>
+export default {
+  data () {
+    return {
+      table_data: [],
+      columns: [
+        { name: 'teacher.name', label: '선생님', field: row => row.teacher.name, sortable: true, align: 'left' },
+        { name: 'title', label: '제목', field: 'title', sortable: true, align: 'left' }
+      ],
+      filter: '',
+      visible_columns: ['teacher.name', 'title']
+    }
+  },
+  methods: {
+    fetch_data () {
+      let query = {}
+      this.$axios.get(`payments`, {params: query})
+        .then(({ data }) => { this.items = data })
+    },
+    remove (item) {
+      this.$axios.delete(`payments/` + item.id)
+        .then(({ data }) => { this.fetch_data() })
+    }
+  },
+  created () {
+    this.fetch_data()
+  }
+}
+</script>
+/*
 const get_default_data = () => {
   return {
     columns: [
@@ -46,31 +94,4 @@ const get_default_data = () => {
   }
 }
 
-export default {
-  data: get_default_data,
-  methods: {
-    get_column_data(row, field) {
-      // process fields like `type.name`
-      let [l1, l2] = field.value.split('.')
-      let value = row[l1]
-      let tag = null
-      if (l2) { value = row[l1] ? row[l1][l2] : null }
-      if (field.type === 'image') { tag = 'img' }
-      if (tag) { value = `<${tag} src="${value}" class="crud-grid-thumb" controls />` }
-      return value
-    },
-    fetch_data() {
-      this.$route.query.query = JSON.stringify(this.filters)
-      this.$axios.get(`payments`, {params: this.$route.query})
-      .then(({ data }) => { this.items = data })
-    },
-    remove(item) {
-      this.$axios.delete(`payments/` + item.id)
-      .then(({ data }) => { this.fetch_data() })
-    },
-  },
-  created () {
-    this.fetch_data()
-  }
-}
-</script>
+*/

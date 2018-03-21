@@ -1,4 +1,5 @@
 <template>
+<div/>
 </template>
 <script>
 import { LocalStorage } from 'quasar'
@@ -9,6 +10,6 @@ export default {
     LocalStorage.remove('user_')
     LocalStorage.remove('token_')
     this.$router.go(-1)
-  },    
+  }
 }
 </script>

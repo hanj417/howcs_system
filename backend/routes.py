@@ -38,10 +38,11 @@ def verify_token(username_or_token):
 
 @app.route('/api/login', methods=['GET'])
 @multi_auth.login_required
-def login():
+def login_get():
     user = g.user
     if not user:
         return False
+    user_info = g.user.as_dict()
     return jsonify({'user': user_info})
 
 @app.route('/api/login', methods=['POST'])
@@ -63,14 +64,12 @@ def auth_token_new():
 @app.route('/api/users', methods=['GET'])
 @multi_auth.login_required
 def user_all():
-    query = literal_eval(request.args.get('query'))
-
     users = User.query
-    if 'name' in query:
-        users = users.filter_by(name=query['name'])
-    if 'role' in query:
-        print(query['role'])
-        users = users.filter(User.role.contains(query['role']))
+    if 'name' in request.args:
+        users = users.filter_by(name=request.args['name'])
+    if 'role' in request.args:
+        print(request.args['role'])
+        users = users.filter(User.role.contains(request.args['role']))
     users = users.all()
     users_json = []
     for user in users:
@@ -307,7 +306,8 @@ def get_student_infos_all():
         users.append(student_info.user)
     users_json = []
     for user in users:
-        users_json.append(user.as_dict())
+        if user:
+            users_json.append(user.as_dict())
     return jsonify(users_json)
 
 @app.route('/api/student_infos', methods=['POST'])
@@ -378,7 +378,7 @@ def student_update(id):
     else:
         student_info = StudentInfo()
         student_info.user_id = user.id
-        user.role_new('agit_student')
+        user.role_new('howcs_student')
         user.student_info = student_info
 
     student_info.student_id = request.json.get('student_id')
@@ -401,7 +401,10 @@ def student_del(id):
     user = User.query.get(id)
     if not user:
         abort(404)
-    db.session.delete(user)
+    if not user.student_info:
+        abort(404)
+    student_info = user.student_info
+    db.session.delete(student_info)
     db.session.commit()
     return jsonify({'result': True})
 
@@ -409,24 +412,28 @@ def student_del(id):
 ##################################################
 # class
 ##################################################
-@app.route('/api/classes/major_categories')
+@app.route('/api/classes/categories')
 def get_classes_major_categories():
     categories = Class.major_categories()
     return jsonify(categories)
 
+@app.route('/api/classes/categories/<string:major_category>', methods=['GET'])
+def get_classes_minor_categories(major_category):
+    categories = Class.minor_categories()
+    return jsonify(categories[major_category])
+
+
 @app.route('/api/classes', methods=['GET'])
 def class_all():
     classes = Class.query
-    if 'query' in request.args:
-        query = literal_eval(request.args.get('query'))
-        if 'major_category' in query:
-            classes = classes.filter_by(major_category=query['major_category'])
-        if 'id' in query:
-            classes = classes.filter_by(id=query['id'])
-        if 'teacher_id' in query:
-            classes = classes.filter_by(teacher_id=query['teacher_id'])
-        if 'minor_category' in query:
-            classes = classes.filter_by(minor_category=query['minor_category'])
+    if 'major_category' in request.args:
+        classes = classes.filter_by(major_category=request.args['major_category'])
+    if 'id' in request.args:
+        classes = classes.filter_by(id=request.args['id'])
+    if 'teacher_id' in request.args:
+        classes = classes.filter_by(teacher_id=request.args['teacher_id'])
+    if 'minor_category' in request.args:
+        classes = classes.filter_by(minor_category=request.args['minor_category'])
     classes = classes.all()
     classes_json = []
     for class_ in classes:
@@ -455,13 +462,13 @@ def class_new():
     class_.title = request.json.get('title')
     class_.major_category = request.json.get('major_category')
     class_.minor_category = request.json.get('minor_category')
-    class_.year = int(request.json.get('year'))
-    class_.semester = int(request.json.get('semester'))
-    class_.time_slot = request.json.get('time_slot')
-    class_.google_calendar = request.json.get('google_calendar')
-    class_.audience = request.json.get('audience')
-    class_.background = request.json.get('background')
-    class_.content = request.json.get('content')
+    class_.year = int(request.json.get('year', '2018'))
+    class_.semester = int(request.json.get('semester', 0))
+    class_.time_slot = request.json.get('time_slot', '')
+    class_.google_calendar = request.json.get('google_calendar', '')
+    class_.audience = request.json.get('audience', '')
+    class_.background = request.json.get('background', '')
+    class_.content = request.json.get('content', '')
     class_.teacher = teacher
     db.session.add(class_)
     db.session.commit()
@@ -523,12 +530,11 @@ def class_del(id):
 @app.route('/api/enrollments', methods=['GET'])
 @multi_auth.login_required
 def enrollment_all():
-    query = literal_eval(request.args.get('query'))
     enrollments = Enrollment.query
-    if 'class_id' in query:
-        enrollments = enrollments.filter_by(class_id=query['class_id'])
-    if 'student_id' in query:
-        enrollments = enrollments.filter_by(student_id=query['student_id'])
+    if 'class_id' in request.args:
+        enrollments = enrollments.filter_by(class_id=request.args['class_id'])
+    if 'student_id' in request.args:
+        enrollments = enrollments.filter_by(student_id=request.args['student_id'])
     enrollments = enrollments.all()
     enrollments_json = []
     for enrollment in enrollments:
@@ -598,10 +604,15 @@ def enrollment_del(class_id, student_id):
 ##################################################
 # post 
 ##################################################
-@app.route('/api/posts/major_categories')
+@app.route('/api/posts/categories')
 def get_posts_major_categories():
     categories = Post.major_categories()
     return jsonify(categories)
+
+@app.route('/api/posts/categories/<string:major_category>', methods=['GET'])
+def get_posts_minor_categories(major_category):
+    categories = Post.minor_categories()
+    return jsonify(categories[major_category])
 
 @app.route('/api/posts/properties')
 def get_posts_properties():
@@ -611,14 +622,13 @@ def get_posts_properties():
 @app.route('/api/posts', methods=['GET'])
 @multi_auth.login_required
 def post_all():
-    query = literal_eval(request.args.get('query'))
     posts = Post.query
-    if 'major_category' in query:
-        posts = posts.filter_by(major_category=query['major_category'])
-    if 'minor_category' in query:
-        posts = posts.filter_by(minor_category=query['minor_category'])
-    if 'class_id' in query:
-        posts = posts.filter_by(class_id=query['class_id'])
+    if 'major_category' in request.args:
+        posts = posts.filter_by(major_category=request.args['major_category'])
+    if 'minor_category' in request.args:
+        posts = posts.filter_by(minor_category=request.args['minor_category'])
+    if 'class_id' in request.args:
+        posts = posts.filter_by(class_id=request.args['class_id'])
     posts = posts.all()
     posts_json = []
     for post in posts:
@@ -797,12 +807,11 @@ def attendance_del(id):
 @app.route('/api/payments', methods=['GET'])
 @multi_auth.login_required
 def payment_all():
-    query = literal_eval(request.args.get('query'))
     payments = Payment.query
-    if 'user_id' in query:
-        payments = payments.filter_by(class_id=query['user_id'])
-    if 'major_category' in query:
-        payments = payments.filter_by(student_id=query['major_category'])
+    if 'user_id' in request.args:
+        payments = payments.filter_by(class_id=request.args['user_id'])
+    if 'major_category' in request.args:
+        payments = payments.filter_by(student_id=request.args['major_category'])
     payments = payments.all()
     payments_json = []
     for payment in payments:
@@ -876,34 +885,37 @@ def get_menu():
         abort(404)
 
     menu = [
-        { 'href': '/hana/user_form/update', 'text': '회원정보', 'icon': 'account' },
-        { 'heading': '아지트' },
-        { 'href': '/hana/class', 'params': {'major_category':'agit'}, 'text': '수강신청', 'icon': 'plus' },
-        { 'href': '/hana/enrollment_student', 'params': {'major_category':'agit', 'id':user.id}, 'text': '수강과목', 'icon': 'pencil' },
+        { 'heading': '회원' },
+        { 'href': 'user_form', 'params': {'action':'update'}, 'text': '회원정보', 'icon': 'account' },
+        #{ 'heading': '아지트' },
+        #{ 'href': '/hana/class', 'params': {'major_category':'agit'}, 'text': '수강신청', 'icon': 'plus' },
+        #{ 'href': '/hana/enrollment_student', 'params': {'major_category':'agit', 'id':user.id}, 'text': '수강과목', 'icon': 'pencil' },
     ]
 
+    '''
     if 'agit_student' in user.role and 'agit_teacher' not in user.role and 'admin' not in user.role:
         menu.append({ 'href': '/hana/agit_teacher_application_form', 'params': {}, 'text': '교사 신청', 'icon': 'teach' })
     
     if 'agit_teacher' in user.role:
         menu.append({ 'href': '/hana/class_teacher', 'params': {'major_category':'agit', 'id':user.id}, 'text': '수업 관리', 'icon': 'clipboard-text' })
+    '''
     
     if 'howcs_student' in user.role:
         menu.append({ 'heading': '하우학교'})
-        menu.append({ 'href': '/hana/enrollment_student', 'params': {'major_category':'howcs', 'id':user.id}, 'text': '수강과목', 'icon': 'clipboard-text' })
+        menu.append({ 'href': 'enrollment_student', 'params': {'major_category':'howcs', 'id':user.id}, 'text': '수강과목', 'icon': 'class' })
     
     if 'howcs_teacher' in user.role:
         menu.append({ 'heading': '하우학교'})
-        menu.append({ 'href': '/hana/teaching_classes', 'params': {'major_category':'howcs', 'id':user.id}, 'text': '수업 관리', 'icon': 'clipboard-text' })
+        menu.append({ 'href': 'teaching_classes', 'params': {'major_category':'howcs', 'id':user.id}, 'text': '수업 관리', 'icon': 'class' })
     
     if 'admin' in user.role:
         menu.append({ 'heading': '관리자'})
-        menu.append({ 'href': '/hana/user', 'params': {}, 'text': '아지트 회원관리', 'icon': 'account-edit' })
-        menu.append({ 'href': '/hana/agit_teacher', 'params': {}, 'text': '아지트 교사관리', 'icon': 'account-plus' })
-        menu.append({ 'href': '/hana/payment', 'params': {}, 'text': '아지트 회비관리', 'icon': 'currency-krw' })
-        menu.append({ 'href': '/hana/student', 'params': {}, 'text': '하우학교 학생관리', 'icon': 'account-multiple' })
-        menu.append({ 'href': '/hana/howcs_teacher', 'params': {}, 'text': '하우학교 교사관리', 'icon': 'account-settings-variant' })
-        menu.append({ 'href': '/hana/class', 'params': {'major_category':'howcs'}, 'text': '하우학교 수업관리', 'icon': 'clipboard-text' })
+        menu.append({ 'href': 'user', 'params': {}, 'text': '아지트 회원관리', 'icon': 'account group' })
+        #menu.append({ 'href': '/hana/agit_teacher', 'params': {}, 'text': '아지트 교사관리', 'icon': 'account-plus' })
+        #menu.append({ 'href': '/hana/payment', 'params': {}, 'text': '아지트 회비관리', 'icon': 'currency-krw' })
+        menu.append({ 'href': 'student', 'params': {}, 'text': '하우학교 학생관리', 'icon': 'account group' })
+        menu.append({ 'href': 'howcs_teacher', 'params': {}, 'text': '하우학교 교사관리', 'icon': 'account group' })
+        menu.append({ 'href': 'class', 'params': {'major_category':'howcs'}, 'text': '하우학교 수업관리', 'icon': 'account group' })
     return jsonify(menu)
 
 @app.route('/', defaults={'path': ''})

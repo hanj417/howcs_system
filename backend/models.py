@@ -118,13 +118,13 @@ class StudentInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, ForeignKey('users.id'))
     student_id = db.Column(db.String(32))
-    gender = db.Column(db.String(32))
-    ssn = db.Column(db.String(32))
-    father_name = db.Column(db.String(32))
-    father_ssn = db.Column(db.String(32))
-    mother_name = db.Column(db.String(32))
-    mother_ssn = db.Column(db.String(32))
-    address = db.Column(db.String(128))
+    gender = db.Column(db.String(32), nullable=True)
+    rrn = db.Column(db.String(32), nullable=True)
+    father_name = db.Column(db.String(32), nullable=True)
+    father_rrn = db.Column(db.String(32), nullable=True)
+    mother_name = db.Column(db.String(32), nullable=True)
+    mother_rrn = db.Column(db.String(32), nullable=True)
+    address = db.Column(db.String(128), nullable=True)
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     user = relationship('User', back_populates='student_info')
@@ -215,7 +215,20 @@ class Post(db.Model):
         return dic
     @staticmethod
     def major_categories():
-        return [{'text':'홈페이지', 'value':'homepage'}, {'text':'아지트', 'value':'agit'}, {'text':'하우학교', 'value':'howcs'}]
+        return [{'label':'홈페이지', 'value':'homepage'}, {'label':'아지트', 'value':'agit'}, {'label':'하우학교', 'value':'howcs'}]
+    @staticmethod
+    def minor_categories():
+        return {'homepage': [
+                    {'label':'공지', 'value':'notice'},
+                    {'label':'하우하다', 'value':'story'},
+                    {'label':'하우포토', 'value':'photo'}],
+                'agit': [
+                    {'label':'청소년', 'value':'teenager'},
+                    {'label':'문학', 'value':'literature'},
+                    {'label':'성인', 'value':'adult'}],
+                'howcs': [
+                    {'label':'수업', 'value':'subject'},
+                    {'label':'학급', 'value':'class'}]}
     @staticmethod
     def properties_list():
         return [{'text':'공지', 'value':'notice'}]
@@ -242,14 +255,28 @@ class Class(db.Model):
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     def required_columns(self):
-        return ['teacher_id', 'title', 'major_category', 'minor_category', 'year', 'semester']
+        return ['teacher_id', 'title', 'major_category', 'minor_category']
     def as_dict(self):
         dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
-        dic['teacher'] = self.teacher.as_dict()
+        if self.teacher:
+            dic['teacher'] = self.teacher.as_dict()
         return dic
     @staticmethod
     def major_categories():
-        return [{'text':'홈페이지', 'value':'homepage'}, {'text':'아지트', 'value':'agit'}, {'text':'하우학교', 'value':'howcs'}]
+        return [{'label':'아지트', 'value':'agit'}, {'label':'하우학교', 'value':'howcs'}]
+    @staticmethod
+    def minor_categories():
+        return {'homepage': [
+                    {'label':'공지', 'value':'notice'},
+                    {'label':'하우하다', 'value':'story'},
+                    {'label':'하우포토', 'value':'photo'}],
+                'agit': [
+                    {'label':'청소년', 'value':'teenager'},
+                    {'label':'문학', 'value':'literature'},
+                    {'label':'성인', 'value':'adult'}],
+                'howcs': [
+                    {'label':'수업', 'value':'subject'},
+                    {'label':'학급', 'value':'class'}]}
 
 class Enrollment(db.Model):
     __tablename__ = 'enrollments'

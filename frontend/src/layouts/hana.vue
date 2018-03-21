@@ -1,5 +1,4 @@
 <template>
-  <div id="q-app">
   <q-layout view="hHh lpr fff">
     <q-scroll-observable @scroll="userHasScrolled" />
     <q-layout-header class="no-shadow">
@@ -136,15 +135,13 @@
       <router-view />
     </q-page-container>
   </q-layout>
-  </div>
 </template>
 
 <script>
 import { LocalStorage } from 'quasar'
 
 export default {
-  //name: 'LayoutDefault',
-  name: 'App'
+  name: 'LayoutDefault',
   props: ['leftDrawerOpen'],
   data () {
     return {
@@ -267,5 +264,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="stylus">
+.btn-fixed-width
+  padding 10px 25px
 </style>

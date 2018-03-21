@@ -4,8 +4,12 @@ module.exports = function (ctx) {
   return {
     // app plugins (/src/plugins)
     plugins: [
+      'vuelidate',
       'axios',
-      'bootstrap'
+      'bootstrap',
+      //'jquery',
+      //'lodash',
+      //'common',
     ],
     css: [
       'app.styl',
@@ -32,6 +36,14 @@ module.exports = function (ctx) {
       // extractCSS: false,
       // useNotifier: false,
       extendWebpack (cfg) {
+/*
+        cfg.module.rules.push({
+          enforce: 'pre',
+          test: /\.(js|vue)$/,
+          loader: 'eslint-loader',
+          exclude: /(node_modules|quasar)/
+        })
+*/
       }
     },
     devServer: {
@@ -43,13 +55,22 @@ module.exports = function (ctx) {
     // framework: 'all' --- includes everything; for dev only!
     framework: {
       components: [
-    'QTable',
-    'QTh',
-    'QTr',
-    'QTd',
-    'QTableColumns',
-    'QSearch',
-    'QCollapsible',
+    'QVideo',
+    'QModal',
+    'QPageSticky',
+    'QTabs',
+    'QTab',
+    'QTabPane',
+    'QRouteTab',
+        'QPopover',
+        'QEditor',
+        'QTable',
+        'QTh',
+        'QTr',
+        'QTd',
+        'QTableColumns',
+        'QSearch',
+        'QCollapsible',
         'QScrollObservable',
         'QOptionGroup',
         'QCard',

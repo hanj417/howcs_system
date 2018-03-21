@@ -1,29 +1,56 @@
 <template>
-<q-page padding class="row justify-center">
+  <div>
     <div class="page-intro">
-      <img src="~assets/img/login_background_image.png" class="section__background-image" />
+      <img
+        src="~assets/img/login_background_image.png"
+        class="section__background-image" >
 
       <div class="title--emphasized">
-		하우학교에 오신것을 환영합니다!
+        하우학교에 오신것을 환영합니다!
       </div>
-     
+
     </div>
 
-   <div class="container">
-      <div class="page-name">
-      로그인
+    <div class="row justify-center">
+      <div class="container col-xs-12">
+        <div class="page-name">
+          로그인
+        </div>
+        <hr class="page-name--bottom-border" >
       </div>
-      <hr class="page-name--bottom-border" />
-    </div> 
-<div style="width: 400px; max-width: 80vw;">
-    <q-input v-model="username" float-label="아이디" autofocus style="border-bottom: 1px solid;" />
-    <q-input v-model="password" float-label="비밀번호" type="password" style="border-bottom: 1px solid;" />
-<div class="row justify-end">
-  <q-btn @click="login" label="로그인" />
-</div>
-</div>
+      <div
+        class="docs-input"
+        style="width: 400px; max-width: 80vw;">
+        <q-field
+          label="아이디"
+          icon="account circle"
+          :label-width="3"
+        >
+          <q-input
+            v-model="username"
+            autofocus />
+        </q-field>
+        <q-field
+          label="비밀번호"
+          icon="lock"
+          :label-width="3"
+          :error="login_fail"
+          error-label="아이디 또는 비밀번호를 잘못 입력하였습니다."
+        >
+          <q-input
+            v-model="password"
+            type="password" />
+        </q-field>
+        <div class="row justify-end">
+          <q-btn
+            @click="login"
+            label="로그인"
+            class="q-mt-sm" />
+        </div>
+      </div>
+    </div>
 
-</q-page>
+  </div>
 </template>
 
 <script>
@@ -35,19 +62,19 @@ export default {
     return {
       username: '',
       password: '',
-      login_fail: false,
+      login_fail: false
     }
   },
   methods: {
-    fetch_menu() {
+    fetch_menu () {
       this.$axios.get('menu')
-      .then(({data}) => 
-        this.$store.commit('menu/UpdateMenu', data)
-      ).catch(function(data) {
-        console.log('error')
-      })    
+        .then(({data}) =>
+          this.$store.commit('menu/UpdateMenu', data)
+        ).catch(function (data) {
+          console.log('error')
+        })
     },
-    login() {
+    login () {
       this.$axios({
         method: 'post',
         url: 'login',
@@ -62,9 +89,9 @@ export default {
         this.$router.replace('/')
       }).catch(({data}) => {
         this.login_fail = true
-      });
-    },
-  },
+      })
+    }
+  }
 }
 /*
 import { mapState } from 'vuex'
@@ -84,16 +111,16 @@ export default {
   methods: {
     fetch_menu() {
       this.$axios.get('menu')
-      .then(({data}) => 
+      .then(({data}) =>
         this.$store.commit('menu/SetMenu', data)
       ).catch(function(data) {
         console.log('error')
-      })    
+      })
     },
     submit() {
       this.$axios({
         method: 'post',
-        url: 'http://howcs.kr:3000/api/login',
+        url: 'https://howcs.kr:3000/api/login',
         auth: {username: this.username, password: this.password},
         headers: { 'Content-type': 'application/json' }
       }).then(({data}) => {

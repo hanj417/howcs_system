@@ -1,4 +1,4 @@
 export default {
   user_: {},
-  token_: '',
+  token_: ''
 }

@@ -1,29 +1,37 @@
 {
   "name": "howcs",
   "version": "1.0.0",
-  "description": "A Quasar Framework app",
-  "productName": "Quasar App",
+  "description": "하우학교 홈페이지",
+  "productName": "하우학교",
   "cordovaId": "org.cordova.quasar.app",
   "author": "hanjoon <hanj417@gmail.com>",
   "private": true,
   "scripts": {
+    "lint": "eslint --ext .js,.vue src",
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
     "axios": "^0.17.1",
+    "bootstrap": "^4.0.0",
     "bootstrap-vue": "^2.0.0-rc.2",
-    "css-loader": "^0.28.10",
     "jquery": "^3.3.1",
     "localStorage": "^1.0.3",
-    "localstorage": "^0.1.0",
-    "node-localStorage": "0.0.1",
-    "npm": "^5.7.1",
-    "vue-style-loader": "^4.0.2"
+    "vuelidate": "^0.6.2"
   },
   "devDependencies": {
-    "eslint-config-prettier": "^2.9.0",
-    "eslint-plugin-prettier": "^2.6.0",
-    "quasar-cli": "^0.15.9"
+    "babel-eslint": "^8.2.1",
+    "css-loader": "^0.28.11",
+    "eslint": "^4.18.2",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-friendly-formatter": "^3.0.0",
+    "eslint-loader": "^2.0.0",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.7.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "eslint-plugin-vue": "^4.3.0",
+    "quasar-cli": "^0.15.9",
+    "style-loader": "^0.20.3"
   },
   "engines": {
     "node": ">= 8.9.0",
