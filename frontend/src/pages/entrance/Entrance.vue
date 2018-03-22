@@ -97,8 +97,8 @@
       <div class="space"/>
     </div>
     <div class="container notice__section">
-      <button class="enter__collapsible">하우학교는 어떤 학교인가요?</button>
-      <div class="enter__content">
+      <button class="enter__collapsible" @click="clickHqna1">하우학교는 어떤 학교인가요?</button>
+      <div class="enter__content" :class="{hidden: hqna1}">
         <p>하우학교는,<br><br>
 
           첫째, 하늘빛 품은 우리 아동․청소년이 하나님의 숨을 회복하고, 하나님이 주신 몫을 찾아, 예수님처럼 생각하고 말하며 살아가는 예수제자로 성장할 수 있도록 돕기 위해<br>
@@ -117,21 +117,21 @@
 
           이런 소망을 위해 여러분의 기도와 많은 관심을 부탁드립니다.</p>
       </div>
-      <button class="enter__collapsible">하우학교는 학력이 인정되는 학교인가요?</button>
-      <div class="enter__content">
+      <button class="enter__collapsible" @click="clickHqna2">하우학교는 학력이 인정되는 학교인가요?</button>
+      <div class="enter__content" :class="{hidden: hqna2}">
         <p>하우학교는 학력인정이 되지 않는 기독교대안학교입니다. 이는 하나님이 기뻐하시는 기독교학교의 원형을 위해 하우학교의 고유한 철학과 정체성을 지키기 위한 까닭에서입니다. 하지만 대안학교법의 개선을 통해 하우학교가 추구하는 철학과 가치가 훼손되지 않고도 학교를 운영할 수 있다고 판단되면 학력인정 학교로 전환할 수 있도록 준비할 계획도 있습니다. <br><br>
 
           학력인정을 위해 별도로 검정고시를 봐야 하지만 검정고시가 요구하는 학력수준보다 훨씬 높은, 탁월한 교육과정으로 운영되기 때문에 힉력을 인정받는 데에는 큰 어려움이 없습니다. 오히려 자유로운 교육과정과 학제를 통해 학생 개인의 발달과정이나 학업속도에 따른 효율적인 교육을 할 수 있는 장점이 있습니다.
         </p>
       </div>
-      <button class="enter__collapsible">하우학교는 어디에 있나요?</button>
-      <div class="enter__content">
+      <button class="enter__collapsible" @click="clickHqna3">하우학교는 어디에 있나요?</button>
+      <div class="enter__content" :class="{hidden: hqna3}">
         <p>하우학교는 경기도 화성시 동탄중심상가에 있는 하늘빛우리교회가 지원하는 학교로서 교회의 공간을 활용해 운영되는 기독교대안학교입니다. 이는 주일이나 그밖에 특정일, 특정시간에만 사용하는 교회공간을 학교와 공유함으로써 교회만을 위한 공간이 아니라 다음세대를 준비하고 교육하는 시대적 사명에 응답하기 위한 까닭입니다.<br><br>
 
           현재는 동탄중심상가를 활용할 계획이지만 <b>2020년에 동탄시내(동탄복합문화센터 기준)에서 6km 정도 떨어진 오산시 지곶동에 1,800평 규모로 건축해 이주할 계획</b>입니다.</p>
       </div>
-      <button class="enter__collapsible">하우학교의 학년 구성과 학급 당 인원은 몇 명인가요?</button>
-      <div class="enter__content">
+      <button class="enter__collapsible" @click="clickHqna4">하우학교의 학년 구성과 학급 당 인원은 몇 명인가요?</button>
+      <div class="enter__content" :class="{hidden: hqna4}">
         <p>하우학교는<br><br>
 
           예비초등학년(7세), 초등학교 5개 학년, 예비중등학년(공교육의 초등학교 6학년)<br>
@@ -143,8 +143,8 @@
           가정과 교회와 학교가 함께 하는 행복한 교육공동체를 꿈꿉니다.
         </p>
       </div>
-      <button class="enter__collapsible">하우학교의 학제는 일반학교와 어떻게 다른가요?</button>
-      <div class="enter__content">
+      <button class="enter__collapsible" @click="clickHqna5">하우학교의 학제는 일반학교와 어떻게 다른가요?</button>
+      <div class="enter__content" :class="{hidden: hqna5}">
         <p>첫째, 초등학교 취학 전 1년간의 예비초등학년(만6세)이 있습니다.<br>
 
           이는 유치원 교육이 목표하는 ‘유아의 일상생활에 필요한 기본 능력과 태도를 기르는데 중점’을 둘 뿐만 아니라 초등학교에 잘 적응할 수 있도록 도와 초등교육의 수용성을 높입니다. 아울러 이를 전담하는 유아교육의 전문성을 지닌 교사와 초등교사와의 협업을 통해 초등 저학년 시기에 유아 단계의 돌봄이 부족해 고학년에 이를 때까지 문제가 되는 학생을 효과적으로 돌볼 수 있는 장점이 있습니다.<br><br>
@@ -162,28 +162,28 @@
           그리고 11학년 여름에 고등학교 졸업자격 검정고시를 통과한 후 맞게 될 12학년에는 본격적인 소명주도 진학진로중심의 창업과정으로 이때 ‘창업’은 ‘사업을 처음으로 시작하다’는 일반적으로 사용하는 사전적인 의미가 아니라 ‘새로운 학업을 열어가다(시작하다)’는 의미로써, 학업을 마친다는 기존의 ‘졸업’이라는 용어를 사용하는 대신 하우학교의 철학과 지향에 적합한 ‘창업’이라 명칭하기로 합니다.
         </p>
       </div>
-      <button class="enter__collapsible">하우학교의 입학을 위해 학교발전기금이나 기부금이 있나요?</button>
-      <div class="enter__content">
+      <button class="enter__collapsible" @click="clickHqna6">하우학교의 입학을 위해 학교발전기금이나 기부금이 있나요?</button>
+      <div class="enter__content" :class="{hidden: hqna6}">
         <p>기독교학교교육의 철학과 가치를 지키기 위해 미인가로 운영하는 대부분의 기독대안학교가 그러하듯 하우학교는 교육청이나 정부의 지원을 받지 않고 학부모가 내는 수업료만으로 운영하는 학교입니다. 그런데 학부모가 감당해야 할 수업료나 기타 학비에 대한 부담이 학교를 지원하는데 걸림돌이 되어서는 안 된다는 기본 철학이 있습니다. 즉 학교의 문턱이 낮아야 합니다. 이를 실천하기 위해 학교공간이나 시설 사용에 대한 책임을 하늘빛우리교회가 전적으로 감당합니다.<br><br>
 
           따라서 하우학교는 별도로 내야 할 학교발전기금이나 기부금이 없습니다. </p>
       </div>
-      <button class="enter__collapsible">하우학교는 장애를 지닌 학생을 위한 통합지원 프로그램이 운영되고 있나요?</button>
-      <div class="enter__content">
+      <button class="enter__collapsible" @click="clickHqna7">하우학교는 장애를 지닌 학생을 위한 통합지원 프로그램이 운영되고 있나요?</button>
+      <div class="enter__content" :class="{hidden: hqna7}">
         <p>보건복지부 통계에 따르면 우리나라 등록 장애인 인구는 약 250만명이라고 합니다. 여기에다 미등록 장애인수를 포함하면 전체 인구가 약 10%가 장애인입니다. 10명 중에 1명이 장애인이기 때문에 이들을 위한 교육지원이 필요하다는 것에 공감합니다. 하지만 장애 학생을 위한 교육서비스를 위해서는 전문적인 통합지원 교육과정과 이를 담당할 통합지원전문교사가 필요한데, 하우학교는 이를 위한 여력과 준비를 갖추지 못했음을 정직하게 고백합니다.<br><br>
 
           하우학교는 장애를 지닌 학생을 위한 통합지원 교육프로그램이 없습니다. 또한 이를 담당하는 교사진도 준비되지 않았습니다.
         </p>
       </div>
-      <button class="enter__collapsible">하우학교는 학교부적응 학생이나 학업중단 학생을 위한 학교인가요?</button>
-      <div class="enter__content">
+      <button class="enter__collapsible" @click="clickHqna8">하우학교는 학교부적응 학생이나 학업중단 학생을 위한 학교인가요?</button>
+      <div class="enter__content" :class="{hidden: hqna8}">
         <p>하우학교는 학교부적응 및 학업중단 학생을 위한 프로그램이 특성화되거나 준비되어 있지 않습니다.<br><br>
 
           하우학교는 국가교육과정을 기독교세계관을 바탕으로 한 기독교 교육과정으로 재구성하여 영성과 인성과 실력을 통합한 행복한 예수 제자로서 하나님의 꿈을 함께 이루어가는 책임 있는 그리스도인을 길러내는 기독교학교입니다.
         </p>
       </div>
-      <button class="enter__collapsible">하우학교의 학비는 어느 정도인가요?</button>
-      <div class="enter__content">
+      <button class="enter__collapsible" @click="clickHqna9">하우학교의 학비는 어느 정도인가요?</button>
+      <div class="enter__content" :class="{hidden: hqna9}">
         <p>하우학교는 교육청이나 정부의 지원을 받지 않고 운영하는 기독교 대안학교로 학부모가 부담하는 교육비로 학교를 운영합니다. 그런데 탁월한 교사를 채용하고 미래형 교육과정을 운영하며 쾌적한 환경에서 교육하기 위해서는 적잖은 예산이 필요합니다. 특히 교육공간을 마련하고 학교시설을 유지하는 데 들어가는 비용이 많기 때문에 입학 시 학부모로부터 기부금이나 학교발전기금을 받아 이를 해결하고 있습니다. 하지만 하우학교는 교육공간이나 시설 유지 비용을 하늘빛우리교회에서 전적으로 지원하고 후원하기 때문에 의무적으로 내야할 기부금이나 학교발전기금은 없습니다.<br><br>
 
           <b>2018학년도 교육비</b><br><br>
@@ -203,16 +203,16 @@
           부모의 불안감을 해소하기 위한 목적에서나 운동선수들이 단기간에 성과를 내기 위해 맞는 근육강화제와 같은, 그런 독약과 같은 사교육에 쏟아 붓는 교육비와 비교하면 크게 부담이 가지 않는 범위에서, 하지만 다음세대를 위한 탁월하고 헌신된 기독교사들이 안정적으로 일할 수 있도록 어느 정도의 부담을 함께 나누고 각자의 역할을 다하는 동역의 관계로써 하우학교만의 이상적인 교육비가 어느 정도인지를 함께 고민해주시길 부탁드립니다.
         </p>
       </div>
-      <button class="enter__collapsible">하우학교에 형제나 자(남)매가 동시에 학교에 다닐 경우 학비 감면 혜택이 있나요?</button>
-      <div class="enter__content">
+      <button class="enter__collapsible" @click="clickHqna10">하우학교에 형제나 자(남)매가 동시에 학교에 다닐 경우 학비 감면 혜택이 있나요?</button>
+      <div class="enter__content" :class="{hidden: hqna10}">
         <p>감면제도가 있습니다.<br><br>
 
           하우학교에 형제나 자(남)매가 동시에 다닐 경우 둘째 자녀의 수업료 20%를 감면합니다. <br>
           셋째 자녀의 경우 수업료의 50%를, 넷째 자녀는 전액을 감면합니다.
         </p>
       </div>
-      <button class="enter__collapsible">하우학교 학생의 미디어 사용에 관한 방침은 무엇인가요?</button>
-      <div class="enter__content">
+      <button class="enter__collapsible" @click="clickHqna11">하우학교 학생의 미디어 사용에 관한 방침은 무엇인가요?</button>
+      <div class="enter__content" :class="{hidden: hqna11}">
         <p>하우학교 학생은 원칙적으로 11학년 때까지 미디어 사용을 규제합니다.<br><br>
 
           1. 개인 스마트 기기를 소지하거나 사용할 수 없습니다.<br>
@@ -224,8 +224,8 @@
           하지만 무엇보다 중요한 것은 가정에서 부모님이 먼저 미디어 사용의 본을 보이는 것입니다. 이를 위해 부모를 위한 미디어교육을 실시할 예정입니다.
         </p>
       </div>
-      <button class="enter__collapsible">하우학교는 사교육을 허용하나요?</button>
-      <div class="enter__content">
+      <button class="enter__collapsible" @click="clickHqna12">하우학교는 사교육을 허용하나요?</button>
+      <div class="enter__content" :class="{hidden: hqna12}">
         <p>하우학교는 원칙적으로 사교육을 허용하지 않습니다. <br><br>
 
           그 이유는 선행학습이나 입시중심의 경쟁을 부추기는 사교육의 근본에 깃든 문제점도 있지만 무엇보다 학교에서의 정상적인 수업을 통해 앎에 대한 호기심을 갖게 하고 협동학습 등을 통해 더불어 성장하는 기회를 빼앗기 때문입니다.<br><br>
@@ -236,15 +236,15 @@
           다만 예술교과를 전공할 학생에 한 해 학교장의 승인을 받아 전공 범위 내에서만 사교육을 할 수 있습니다.
         </p>
       </div>
-      <button class="enter__collapsible">학기제, 학사일정, 수업시간 등 ‘시간’에 대한 원칙이 있나요? </button>
-      <div class="enter__content">
+      <button class="enter__collapsible" @click="clickHqna13">학기제, 학사일정, 수업시간 등 ‘시간’에 대한 원칙이 있나요? </button>
+      <div class="enter__content" :class="{hidden: hqna13}">
         <p>초대교회부터 전통적으로 내려오는 기독교적 절기 및 예로부터 내려오는 전통적인 절기의 일부를 학사일정이나 교육과정에 반영해 운영할 것입니다. 이는 관습이나 형식에 따른 행위가 아니라 절기를 통한 교육적인 체험과 반복적인 활동을 통해 자연의 리듬에 동화되어가며, 본래 창조된 모습, 그 원형에 가까운 각자의 숨을 회복하게 하는 데 목적이 있습니다. 같은 이유로 일반학교와 같이 2학기가 아닌 하나님이 창조하신 아름다운 자연의 섭리에 따른 4학기제로 운영합니다. 그리고 보통 한 학기는 10주 단위로 운영되기 때문에 계획-실행-평가-적용을 연간 4회 반복하는 교육과정의 운영을 통해 효과면에서도 탁월한 교육 방법이기도 합니다. <br><br>
 
           그리고 한 시간 수업을 40분(초), 45분(중), 50분(고)으로 할지, 블록으로 할지, 토론 수업에 적절한 75분 정도로 할지, 주기집중 수업으로 묶을지 등을 고려하면서 교과 특성이나 학생들의 능력에 맞춰 최적화할 계획입니다. 또한 하루, 주, 달, 계절, 1년의 리듬이 인간의 삶을 생동감 있게 하기에 그런 흐름에 맞는 교육과정과 학사일정을 디자인함하며 초등학교나 중고등학교의 학교급을 단절시키지 않고 13년을 최대한 영속적이고 통합적인 교육과정으로 구성할 예정입니다.
         </p>
       </div>
-      <button class="enter__collapsible">2학기제가 아닌 4학기제로 운영할 때 각 학기마다 특별한 의미가 있나요?</button>
-      <div class="enter__content">
+      <button class="enter__collapsible" @click="clickHqna14">2학기제가 아닌 4학기제로 운영할 때 각 학기마다 특별한 의미가 있나요?</button>
+      <div class="enter__content" :class="{hidden: hqna14}">
         <p><b>봄학기; 바라보는 때(PLAN)</b><br><br>
 
           봄학기는, 아름다운 보물을 그 몸 안에 지니고 있는 봄의 어린 싹처럼, 하나님이 본래 주신 자신의 숨(SUM), 곧 영성Spirituality과 인성Humanity과 실력Merit을 가만히 바라보는 때입니다. 건강한 인격체로 성장하기 위해 싹을 틔우고 뿌리를 내리는 가장 중요한 시기로 무엇보다 ‘사랑’이 필요합니다. 그 사랑은 아무 조건 없이 거저 주시는 ‘하나님의 사랑’에 대해 깨닫고 바라보는 것입니다.<br><br>
@@ -264,30 +264,6 @@
           *1)힘에 겹게 간신히 (2)넉넉하지 못하게 기껏해야 (3)일정한 목표나 기준에 이르는 데 아슬아슬하게
         </p>
       </div>
-      <q-collapsible
-        class="enter__collapsible"
-        label="2학기제가 아닌 4학기제로 운영할 때 각 학기마다 특별한 의미가 있나요?">
-        <div class="enter__content">
-          <p><b>봄학기; 바라보는 때(PLAN)</b><br><br>
-
-            봄학기는, 아름다운 보물을 그 몸 안에 지니고 있는 봄의 어린 싹처럼, 하나님이 본래 주신 자신의 숨(SUM), 곧 영성Spirituality과 인성Humanity과 실력Merit을 가만히 바라보는 때입니다. 건강한 인격체로 성장하기 위해 싹을 틔우고 뿌리를 내리는 가장 중요한 시기로 무엇보다 ‘사랑’이 필요합니다. 그 사랑은 아무 조건 없이 거저 주시는 ‘하나님의 사랑’에 대해 깨닫고 바라보는 것입니다.<br><br>
-
-            <b>여름학기; 열매 맺을 때(DO)</b><br><br>
-
-            여름학기는, 줄기를 올리고 가지를 내며 그 가지 끝에 맺을 열매를 위해 한 여름의 뙤약볕을 견디는 것처럼 자신에게 주어진 고뇌를 받아들이고 직면하여 일상을 격동적으로 살아내는 때입니다. 그래서 생각지도 못한 실패와 시련을 맞을 때 자신을 성숙하게 하실 ‘하나님의 은혜’의 때임을 아는 지혜가 필요하고 넉넉히 이겨낼 때까지 ‘나’를 격려하고 기다려주어야 합니다. 또한 일정한 가치 기준과 목적의식이 뚜렷한 계획에 따라 충실하게 실천하고 행동하는 것이 필요합니다. 이런 과정이야말로 진정한 열매인 것이지요.<br><br>
-
-            <b>가을학기; 가을 거둘 때(CHECK)</b><br><br>
-
-            가을학기는, 추수를 통해 얻은 과실을 통해 기뻐하는 것처럼 매일 조금씩 천천히 실천해온 일상의 삶을 통해 변화되고 성장한 나의 열매를 거둘 때입니다. 이를 위해 ‘나’의 일상을 점검하고 확인하여 잘 한 부분은 강화하고 부족한 부분은 더욱 보충해야 합니다. 그리고 보다 나은 ‘나’의 성장을 위해서는 ‘동화同化’가 필요합니다. 하여 내가 ‘동화’할 수 있도록 돕거나 그 대상이 되어줄 멘토가 절실한 시기입니다. 그리고 누구보다 완전한 ‘하나님의 아들’ 예수 그리스도를 닮아가는 것이야말로 가장 중요한 가을걷이입니다.<br><br>
-
-            <b>겨울학기; 겨우* 사는 때(ACT)</b><br><br>
-
-            겨울학기는, 나무가 자랄 때마다 켜켜이 그려내는 나이테처럼 지난 한 해 동안 성장하기 위해 그려낸‘나’의 뼘을 재어보고 돌아보며 평가하여 더 깊은 숨(SUM); 영성Spirituality과 인성Humanity과 실력Merit을 쉬기 위해 겨우 살아내는 때입니다. 겨우내 살기 위해 제 몸에 잎을 떼어내고 최소한의 영양분으로 살아가는 나무와 같이 ‘나’에게 불필요한 요소를 내려놓고 의미 있는 일을 선택하고 집중해야 합니다. 따라서 지금 여기의 삶을 사는 것이 중요하며 가난한 마음으로‘하나님의 계획’에 ‘순응’해야 합니다.<br><br>
-
-            *1)힘에 겹게 간신히 (2)넉넉하지 못하게 기껏해야 (3)일정한 목표나 기준에 이르는 데 아슬아슬하게
-          </p>
-        </div>
-      </q-collapsible>
     </div>
     <div style="clear:both"/>
     <div class="hidden-xs">
@@ -299,5 +275,39 @@
 
 <script>
 export default {
+  data() {
+    return {
+      hqna1: true,
+      hqna2: true,
+      hqna3: true,
+      hqna4: true,
+      hqna5: true,
+      hqna6: true,
+      hqna7: true,
+      hqna8: true,
+      hqna9: true,
+      hqna10: true,
+      hqna11: true,
+      hqna12: true,
+      hqna13: true,
+      hqna14: true,
+    }
+  },
+  methods: {
+    clickHqna1() { this.hqna1 = !this.hqna1},
+    clickHqna2() { this.hqna2 = !this.hqna2},
+    clickHqna3() { this.hqna3 = !this.hqna3},
+    clickHqna4() { this.hqna4 = !this.hqna4},
+    clickHqna5() { this.hqna5 = !this.hqna5},
+    clickHqna6() { this.hqna6 = !this.hqna6},
+    clickHqna7() { this.hqna7 = !this.hqna7},
+    clickHqna8() { this.hqna8 = !this.hqna8},
+    clickHqna9() { this.hqna9 = !this.hqna9},
+    clickHqna10() { this.hqna10 = !this.hqna10},
+    clickHqna11() { this.hqna11 = !this.hqna11},
+    clickHqna12() { this.hqna12 = !this.hqna12},
+    clickHqna13() { this.hqna13 = !this.hqna13},
+    clickHqna14() { this.hqna14 = !this.hqna14},
+  },
 }
 </script>

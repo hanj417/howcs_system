@@ -314,15 +314,15 @@
 
             <a
               href="#"
-              class="col-sm-4 col-md-3 col-lg-3 man__item" >
-              <div class="man__image-container--desktop">
+              class="col-sm-4 col-md-3 col-lg-3 man__item" @mouseover="moRec1" @mouseleave="mlRec1">
+              <div class="man__image-container--desktop" :class="{hidden: hRec1}">
                 <div class="man__textl">한국교회와 이 땅을 위해<br>쓰임 받는 학교</div>
 
                 <div class="man__texts">분당우리교회 담임목사<br>이찬수</div>
                 <!-- <img src="~assets/img/man1.png" class="full-width" /> -->
               </div>
 
-              <div class="man__text-container--desktop  hidden manbg1">
+              <div class="man__text-container--desktop  manbg1" :class="{hidden: !hRec1}">
                 <div class="man__text--desktop">
 
                   교회 안의 인재만 아니라 교회 바깥에서도 통할 수 있는 인재의 요람으로 하늘빛우리학교가 한국교회와 이 땅을 위해 쓰임 받게 되기를 소망합니다.
@@ -333,15 +333,15 @@
 
             <a
               href="#"
-              class="col-sm-4 col-md-3 col-lg-3 man__item" >
-              <div class="man__image-container--desktop">
+              class="col-sm-4 col-md-3 col-lg-3 man__item"  @mouseover="moRec2" @mouseleave="mlRec2">
+              <div class="man__image-container--desktop" :class="{hidden: hRec2}">
                 <div class="man__textl">하나님이 하신 일<br>하나님이 하실 일</div>
 
                 <div class="man__texts">하늘빛우리교회 장로<br>양성초․중학교장<br>임규석</div>
                 <!-- <img src="~assets/img/man1.png" class="full-width" /> -->
               </div>
 
-              <div class="man__text-container--desktop  hidden manbg2">
+              <div class="man__text-container--desktop  manbg2" :class="{hidden: !hRec2}">
                 <div class="man__text--desktop">
                   모두가 한 마음으로 준비해온 기도의 응답이었고 하나님이 하신 일을 체험하는 순간이었습니다. 그래서 앞으로 하우학교을 통해 하나님이 하실 일들이 기대가 됩니다.
                 </div>
@@ -351,15 +351,15 @@
 
             <a
               href="#"
-              class="col-sm-4 col-md-3 col-lg-3 man__item" >
-              <div class="man__image-container--desktop">
+              class="col-sm-4 col-md-3 col-lg-3 man__item"  @mouseover="moRec3" @mouseleave="mlRec3">
+              <div class="man__image-container--desktop" :class="{hidden: hRec3}">
                 <div class="man__textl">인성과 영성과 실력을<br>통합하는 교육</div>
 
                 <div class="man__texts">하늘빛우리교회 장로<br>을지대학교 보건환경안전학과 교수<br>정명진</div>
                 <!-- <img src="~assets/img/man1.png" class="full-width" /> -->
               </div>
 
-              <div class="man__text-container--desktop  hidden manbg3">
+              <div class="man__text-container--desktop  manbg3" :class="{hidden: !hRec3}">
                 <div class="man__text--desktop">
                   신앙과 성품, 학업이 서로 분리되지 않고 연결되는 기독교 교육을 실천하기 위해 세워진 하우학교를 통해 건강한 하나님의 사람들이 배출되어 하나님 나라가 아름답게 확장되기를 기대합니다.
                 </div>
@@ -369,15 +369,15 @@
 
             <a
               href="#"
-              class="col-sm-4 col-md-3 col-lg-3 man__item" >
-              <div class="man__image-container--desktop">
+              class="col-sm-4 col-md-3 col-lg-3 man__item"  @mouseover="moRec4" @mouseleave="mlRec4">
+              <div class="man__image-container--desktop" :class="{hidden: hRec4}">
                 <div class="man__textl">이 시대의 어두움을 밝히는<br>빛이 되는 학교</div>
 
                 <div class="man__texts">별무리학교장<br>박현수</div>
                 <!-- <img src="~assets/img/man1.png" class="full-width" /> -->
               </div>
 
-              <div class="man__text-container--desktop  hidden manbg4">
+              <div class="man__text-container--desktop  manbg4" :class="{hidden: !hRec4}">
                 <div class="man__text--desktop">
                   하나님께서 주신 꿈을 품고 그 길을 기꺼이 가려고 하는 모든 교직원들의 열정에 더해 학부모님들과 후원자들이 동참하여 이 시대의 어두움을 밝히는 빛이 되는 학교가 되시기를 기도드립니다.
                 </div>
@@ -387,15 +387,15 @@
 
             <a
               href="#"
-              class="col-sm-4 col-md-3 col-lg-3 man__item" >
-              <div class="man__image-container--desktop">
+              class="col-sm-4 col-md-3 col-lg-3 man__item"  @mouseover="moRec5" @mouseleave="mlRec5">
+              <div class="man__image-container--desktop" :class="{hidden: hRec5}">
                 <div class="man__textl">‘하늘빛우리학교’의 첫걸음을 축하하며</div>
 
                 <div class="man__texts">좋은교사운동 공동대표<br>임종화</div>
                 <!-- <img src="~assets/img/man1.png" class="full-width" /> -->
               </div>
 
-              <div class="man__text-container--desktop  hidden manbg5">
+              <div class="man__text-container--desktop  manbg5" :class="{hidden: !hRec5}">
                 <div class="man__text--desktop">
                   하늘빛우리학교가 만들어가는 새로운 교육의 길을 많은 사람들이 따라가게 될 것입니다. 이를 위해 함께 동역하며 기도하겠습니다.
                 </div>
@@ -405,15 +405,15 @@
 
             <a
               href="#"
-              class="col-sm-4 col-md-3 col-lg-3 man__item" >
-              <div class="man__image-container--desktop">
+              class="col-sm-4 col-md-3 col-lg-3 man__item"  @mouseover="moRec6" @mouseleave="mlRec6">
+              <div class="man__image-container--desktop" :class="{hidden: hRec6}">
                 <div class="man__textl">새벽같이 영롱한 다음 세대가 양육되기를</div>
 
                 <div class="man__texts">두란노어머니학교 본부장<br>한은경</div>
                 <!-- <img src="~assets/img/man1.png" class="full-width" /> -->
               </div>
 
-              <div class="man__text-container--desktop  hidden manbg6">
+              <div class="man__text-container--desktop  manbg6" :class="{hidden: !hRec6}">
                 <div class="man__text--desktop">
                   황무한 이 시대에 여름 비 같이 해갈해 주는 학교로 우뚝 서길 한 마음으로 기도합니다.
                 </div>
@@ -423,15 +423,15 @@
 
             <a
               href="#"
-              class="col-sm-4 col-md-3 col-lg-3 man__item" >
-              <div class="man__image-container--desktop">
+              class="col-sm-4 col-md-3 col-lg-3 man__item"  @mouseover="moRec7" @mouseleave="mlRec7">
+              <div class="man__image-container--desktop" :class="{hidden: hRec7}">
                 <div class="man__textl">새하늘빛 우리 학교의 성장을 기대하며</div>
 
                 <div class="man__texts">교육정책디자인연구소장<br>혁신학교란 무엇인가 저자<br>김성천</div>
                 <!-- <img src="~assets/img/man1.png" class="full-width" /> -->
               </div>
 
-              <div class="man__text-container--desktop  hidden manbg7">
+              <div class="man__text-container--desktop  manbg7" :class="{hidden: !hRec7}">
                 <div class="man__text--desktop">
                   시대의 고통에 대답할 수 있는 기독교인을 길러내는 학교를, 공교육에 신선한 자극을 줄 수 있는 모델링 학교를, 아이들과 학생과 학부모가 행복한 학교를… 그 학교가 바로 하늘빛 우리학교이기를 기대하고 응원합니다.
                 </div>
@@ -464,21 +464,20 @@
       <div class="row">
 
         <a
-          href="#"
+          href="/story/notice"
           target="_blank"
           class="col-xs-12 col-sm-4 col-md-4 col-lg-4 how-story">
           <div class="how-story__summary">
             <img
-              src="~assets/img/how_notice.png"
+              :src="recent_notice.img"
               class="how-story__background-image" >
-            <span class="how-story__title">이야기/공지사항의 최근 글 제목이 이곳에 나옵니다.</span>
+            <span class="how-story__title">{{ recent_notice.title }}</span>
           </div>
           <div class="how-story__detail">
-            <div class="how-story__content">
-              공지사항 테스트 글입니다. 내용이 이곳에 나옵니다. 공지사항 테스트 글입니다. 내용이 이곳에 나옵니다. 공지사항 테스트 글입니다. 내용이 이곳에 나옵니다. 공지사항 테스트 글입니다. 내용이 이곳에 나옵니다.
+            <div class="how-story__content"><div v-html="recent_notice.ellipsis"></div>
             </div>
             <div class="how-story__created-at">
-              2018. 02. 02.
+{{ recent_notice.date }}
             </div>
             <div class="how-story__author">
               하우학교
@@ -487,21 +486,19 @@
         </a>
 
         <a
-          href="#"
+          href="/story/story"
           target="_blank"
           class="col-xs-12 col-sm-4 col-md-4 col-lg-4 how-story">
           <div class="how-story__summary">
             <img
-              src="~assets/img/how_story.png"
+              :src="recent_story.img"
               class="how-story__background-image" >
-            <span class="how-story__title">이야기/하우하다의 최근 글 제목이 이곳에 나옵니다.</span>
+            <span class="how-story__title">{{ recent_story.title }}</span>
           </div>
           <div class="how-story__detail">
-            <div class="how-story__content">
-              하우하다 테스트 글입니다. 내용이 이곳에 나옵니다. 하우하다 테스트 글입니다. 내용이 이곳에 나옵니다. 하우하다 테스트 글입니다. 내용이 이곳에 나옵니다. 하우하다 테스트 글입니다. 내용이 이곳에 나옵니다.
-            </div>
+            <div class="how-story__content"><div v-html="recent_story.ellipsis"/></div>
             <div class="how-story__created-at">
-              2018. 02. 02.
+{{ recent_story.date }}
             </div>
             <div class="how-story__author">
               하우학교
@@ -510,21 +507,21 @@
         </a>
 
         <a
-          href="#"
+          href="/story/photo"
           target="_blank"
           class="col-xs-12 col-sm-4 col-md-4 col-lg-4 how-story">
           <div class="how-story__summary">
             <img
-              src="~assets/img/how_photo.png"
+              :src="recent_photo.img"
               class="how-story__background-image" >
-            <span class="how-story__title">이야기/하우포토의 최근 글 제목이 이곳에 나옵니다.</span>
+            <span class="how-story__title">{{ recent_photo.title }}</span>
           </div>
           <div class="how-story__detail">
             <div class="how-story__content">
-              하우포토 테스트 글입니다. 내용이 이곳에 나옵니다. 하우포토 테스트 글입니다. 내용이 이곳에 나옵니다. 하우포토 테스트 글입니다. 내용이 이곳에 나옵니다. 하우포토 테스트 글입니다. 내용이 이곳에 나옵니다.
+<div v-html="recent_photo.ellipsis"/>
             </div>
             <div class="how-story__created-at">
-              2018. 02. 02.
+{{ recent_story.date }}
             </div>
             <div class="how-story__author">
               하우학교
@@ -578,5 +575,82 @@
 
 <script>
 export default {
+  data () {
+    return {
+      hRec1: false,
+      hRec2: false,
+      hRec3: false,
+      hRec4: false,
+      hRec5: false,
+      hRec6: false,
+      hRec7: false,
+      recent_notice: {},
+      recent_story: {},
+      recent_photo: {},
+    }
+  },
+  methods: {
+    fetch_data () {
+      let query = {}
+      query['minor_category'] = 'notice'
+      query['recent'] = '1'
+      this.$axios.get(`posts/homepage`, {params: query})
+        .then(({ data }) => {
+          this.recent_notice = data[0]
+          this.recent_notice['date'] = (new Date(this.recent_notice.created_at)).toISOString().substr(0, 10)
+          this.recent_notice['img'] = "/assets/img/how_notice.png"
+          let files = JSON.parse(this.recent_notice['files'])
+          if (files && files.length > 0) {
+            this.recent_notice['img'] = "/api/upload/" + files[0]
+          }
+        })
+
+      let query_story = {}
+      query_story['minor_category'] = 'story'
+      query_story['recent'] = '1'
+      this.$axios.get(`posts/homepage`, {params: query_story})
+        .then(({ data }) => {
+          this.recent_story = data[0]
+          this.recent_story['date'] = (new Date(this.recent_story.created_at)).toISOString().substr(0, 10)
+          this.recent_story['img'] = "/assets/img/how_story.png"
+          let files = JSON.parse(this.recent_story['files'])
+          if (files && files.length > 0) {
+            this.recent_story['img'] = "/api/upload/" + files[0]
+          }
+        })
+
+      let query_photo = {}
+      query_photo['minor_category'] = 'photo'
+      query_photo['recent'] = '1'
+      this.$axios.get(`posts/homepage`, {params: query_photo})
+        .then(({ data }) => {
+          this.recent_photo = data[0]
+          this.recent_photo['date'] = (new Date(this.recent_photo.created_at)).toISOString().substr(0, 10)
+          this.recent_photo['img'] = "/assets/img/how_photo.png"
+          let files = JSON.parse(this.recent_photo['files'])
+          if (files && files.length > 0) {
+            this.recent_photo['img'] = "/api/upload/" + files[0]
+          }
+        })
+
+    },
+    moRec1 () { this.hRec1 = true },
+    mlRec1 () { this.hRec1 = false },
+    moRec2 () { this.hRec2 = true },
+    mlRec2 () { this.hRec2 = false },
+    moRec3 () { this.hRec3 = true },
+    mlRec3 () { this.hRec3 = false },
+    moRec4 () { this.hRec4 = true },
+    mlRec4 () { this.hRec4 = false },
+    moRec5 () { this.hRec5 = true },
+    mlRec5 () { this.hRec5 = false },
+    moRec6 () { this.hRec6 = true },
+    mlRec6 () { this.hRec6 = false },
+    moRec7 () { this.hRec7 = true },
+    mlRec7 () { this.hRec7 = false },
+  },
+  created () {
+    this.fetch_data()
+  },
 }
 </script>

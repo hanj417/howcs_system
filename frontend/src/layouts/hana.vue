@@ -33,8 +33,8 @@
               </q-btn-dropdown>
               <q-btn
                 v-else
-                class="no-shadow"
-                @click="$router.push({name: item.href, params: item.params})"
+                class="no-shadow navbar__menu"
+                @click="$router.push({path: item.href})"
                 :label="item.label"
                 :no-ripple="true"/>
             </div>
@@ -150,33 +150,33 @@ export default {
       lightdimm: false,
       toolbar: [],
       toolbar_default: [
-        {'href': 'about', 'label': '학교소개'},
-        {'href': 'entrance', 'label': '입학안내'},
+        {'href': '/about', 'label': '학교소개'},
+        {'href': '/entrance', 'label': '입학안내'},
         {'label': '교육',
           'submenu': [
-            {'href': 'edu/edu1', 'label': '교육특징'},
-            {'href': 'edu/edu2', 'label': '교육과정'},
-            {'href': 'edu/edu3', 'label': '교육&학습과정편성'},
-            {'href': 'edu/edu4', 'label': '주요일정'},
-            {'href': 'edu/edu5', 'label': '하우의 하루'},
-            {'href': 'edu/edu6', 'label': '교사소개'}
+            {'href': '/edu/edu1', 'label': '교육특징'},
+            {'href': '/edu/edu2', 'label': '교육과정'},
+            {'href': '/edu/edu3', 'label': '교육&학습과정편성'},
+            {'href': '/edu/edu4', 'label': '주요일정'},
+            {'href': '/edu/edu5', 'label': '하우의 하루'},
+            {'href': '/edu/edu6', 'label': '교사소개'}
           ]},
         {'label': '이야기',
           'submenu': [
-            {'href': 'notice', 'label': '공지사항'},
-            {'href': 'story', 'label': '하우하다'},
-            {'href': 'photo', 'label': '하우포토'}
+            {'href': '/story/notice', 'label': '공지사항'},
+            {'href': '/story/story', 'label': '하우하다'},
+            {'href': '/story/photo', 'label': '하우포토'}
           ]},
-        {'href': 'agit', 'label': '아지트'},
-        {'href': 'community', 'label': '교육공동체'}
+        {'href': '/agit', 'label': '아지트'},
+        {'href': '/community', 'label': '교육공동체'}
       ],
       toolbar_loggedIn: [
-        {'href': 'hana', 'label': '하우하나'},
-        {'href': 'logout', 'label': '로그아웃'}
+        {'href': '/hana', 'label': '하우하나'},
+        {'href': '/logout', 'label': '로그아웃'}
       ],
       toolbar_logged_out: [
-        {'href': 'login', 'label': '로그인'},
-        {'href': 'register', 'label': '회원가입'}
+        {'href': '/login', 'label': '로그인'},
+        {'href': '/register', 'label': '회원가입'}
       ]
     }
   },
@@ -263,8 +263,3 @@ export default {
   }
 }
 </script>
-
-<style lang="stylus">
-.btn-fixed-width
-  padding 10px 25px
-</style>

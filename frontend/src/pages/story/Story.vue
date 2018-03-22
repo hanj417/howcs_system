@@ -50,55 +50,24 @@
             <div
               class="carousel-inner"
               role="listbox">
+<template v-for="post in posts">
               <a
                 href="#"
                 class="item story-story__carousel-item active">
                 <img
-                  src="~assets/img/howstoryP.jpg"
+                  :src="post.img"
                   class="full-width">
 
                 <div class="story-story__title">
-                  제목이 이곳에 나옵니다.
+{{ post.title }}
                 </div>
 
                 <div class="story-story__content">
-                  내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다.
+{{ post.ellipsis }}
                 </div>
 
               </a>
-              <a
-                href="#"
-                class="item story-story__carousel-item">
-                <img
-                  src="~assets/img/howstoryP.jpg"
-                  class="full-width">
-
-                <div class="story-story__title">
-                  제목이 이곳에 나옵니다.
-                </div>
-
-                <div class="story-story__content">
-                  내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다.
-                </div>
-
-              </a>
-              <a
-                href="#"
-                class="item story-story__carousel-item">
-
-                <img
-                  src="~assets/img/howstoryP.jpg"
-                  class="full-width">
-
-                <div class="story-story__title">
-                  제목이 이곳에 나옵니다.
-                </div>
-
-                <div class="story-story__content">
-                  내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다.
-                </div>
-
-              </a>
+</template>
 
             </div>
 
@@ -128,56 +97,24 @@
 
       <div class="hidden-xs">
         <div class="row story-story__row">
+<template v-for="post in posts">
           <a
             href="#"
             class="col-sm-4 col-md-4 col-lg-4 story-story__article">
             <img
-              src="~assets/img/howstoryP.jpg"
+              :src="post.img"
               class="story-story__image--black" >
 
             <div class="story-story__title">
-              제목이 이곳에 나옵니다.
+{{ post.title }}
             </div>
 
             <div class="story-story__content">
-              내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다.
+{{ post.ellipsis }}
             </div>
 
           </a>
-
-          <a
-            href="#k"
-            class="col-sm-4 col-md-4 col-lg-4 story-story__article">
-            <img
-              src="~assets/img/howstoryP.jpg"
-              class="story-story__image--black" >
-
-            <div class="story-story__title">
-              제목이 이곳에 나옵니다.
-            </div>
-
-            <div class="story-story__content">
-              내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다.
-            </div>
-
-          </a>
-
-          <a
-            href="#"
-            class="col-sm-4 col-md-4 col-lg-4 story-story__article">
-            <img
-              src="~assets/img/howstoryP.jpg"
-              class="story-story__image--black" >
-
-            <div class="story-story__title">
-              제목이 이곳에 나옵니다.
-            </div>
-
-            <div class="story-story__content">
-              내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다. 내용이 이곳에 나옵니다.
-            </div>
-
-          </a>
+</template>
         </div>
 
       </div>
@@ -192,5 +129,32 @@
 
 <script>
 export default {
+  data () {
+    return {
+      posts: [],
+    }
+  },
+  methods: {
+    fetch_data () {
+      let query = {}
+      query['minor_category'] = 'story'
+      query['recent'] = '3'
+      this.$axios.get(`posts/homepage`, {params: query})
+        .then(({ data }) => {
+          this.posts = data
+          for (let i = 0; i < this.posts.length; i++) {
+            this.posts[i]['img'] = "/assets/img/howstoryP.jpg"
+            let files = JSON.parse(this.posts[i]['files'])
+            if (files && files.length > 0) {
+              this.posts[i]['img'] = "/api/upload/" + files[0]
+            }
+            
+          }
+        })
+    }
+  },
+  created () {
+    this.fetch_data()
+  }
 }
 </script>

@@ -4,9 +4,12 @@ module.exports = function (ctx) {
   return {
     // app plugins (/src/plugins)
     plugins: [
+      'i18n',
       'vuelidate',
       'axios',
       'bootstrap',
+      'vueeditor',
+      //'vue-html5-editor',
       //'jquery',
       //'lodash',
       //'common',
@@ -54,7 +57,16 @@ module.exports = function (ctx) {
     },
     // framework: 'all' --- includes everything; for dev only!
     framework: {
+    i18n: 'ko-kr',
       components: [
+    //'PostCard',
+    'QCard',
+    'QCardTitle',
+    'QCardMain',
+    'QCardMedia',
+    'QCardSeparator',
+    'QCardActions',
+    'QUploader',
     'QVideo',
     'QModal',
     'QPageSticky',

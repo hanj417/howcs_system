@@ -6,12 +6,17 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask.json import JSONEncoder
 from datetime import datetime
+from flask import request, redirect, url_for
+from werkzeug.utils import secure_filename
 
 basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+UPLOAD_FOLDER = os.path.abspath(os.path.join(basedir, 'uploads'))
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 app = Flask(__name__,
             static_folder = basedir + "/dist/static",
             template_folder = basedir + "/dist")
 app.config.from_object(Config)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 app.config.update(dict(

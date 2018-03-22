@@ -1,4 +1,5 @@
 import math
+import os
 from flask import Flask, render_template, jsonify, abort, request, g, url_for
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth
 from flask_mail import Message
@@ -6,6 +7,9 @@ from backend import app
 from backend import mail
 from backend.models import *
 from flask import make_response
+from flask import redirect
+from flask import send_from_directory
+from werkzeug.utils import secure_filename
 
 basic_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth('Bearer')
@@ -57,6 +61,35 @@ def login():
 def auth_token_new():
     token = g.user.generate_auth_token(600)
     return jsonify({'token': token.decode('ascii'), 'duration': 600})
+
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/api/upload/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'],
+                               filename)
+
+@app.route('/api/upload', methods=['POST'])
+def upload_file():
+    # check if the post request has the file part
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+    file = request.files['file']
+    # if user does not select file, browser also
+    # submit a empty part without filename
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(request.url)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return redirect(url_for('uploaded_file',
+                                filename=filename))
 
 ##################################################
 # user 
@@ -629,6 +662,22 @@ def post_all():
         posts = posts.filter_by(minor_category=request.args['minor_category'])
     if 'class_id' in request.args:
         posts = posts.filter_by(class_id=request.args['class_id'])
+    if 'recent' in request.args:
+        posts = posts.order_by('updated_at desc').limit(int(request.args['recent']))
+    posts = posts.all()
+    posts_json = []
+    for post in posts:
+        posts_json.append(post.as_dict())
+    return jsonify(posts_json)
+
+@app.route('/api/posts/homepage', methods=['GET'])
+def post_homepage_all():
+    posts = Post.query
+    posts = posts.filter_by(major_category='homepage')
+    if 'minor_category' in request.args:
+        posts = posts.filter_by(minor_category=request.args['minor_category'])
+    if 'recent' in request.args:
+        posts = posts.order_by('created_at desc').limit(int(request.args['recent']))
     posts = posts.all()
     posts_json = []
     for post in posts:
@@ -660,6 +709,8 @@ def post_new():
         post.properties_new(prop)
     post.title = request.json.get('title')
     post.body = request.json.get('body')
+    print(post.body)
+    post.files = json.dumps(request.json.get('files', '[]'))
     class_id = request.json.get('class_id', None)
     if class_id:
         post.class_id = class_id
@@ -910,6 +961,7 @@ def get_menu():
     
     if 'admin' in user.role:
         menu.append({ 'heading': '관리자'})
+        menu.append({ 'href': 'post_admin', 'params': {}, 'text': '글쓰기', 'icon': 'currency-krw' })
         menu.append({ 'href': 'user', 'params': {}, 'text': '아지트 회원관리', 'icon': 'account group' })
         #menu.append({ 'href': '/hana/agit_teacher', 'params': {}, 'text': '아지트 교사관리', 'icon': 'account-plus' })
         #menu.append({ 'href': '/hana/payment', 'params': {}, 'text': '아지트 회비관리', 'icon': 'currency-krw' })

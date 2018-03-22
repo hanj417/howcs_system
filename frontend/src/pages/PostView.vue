@@ -3,6 +3,8 @@
     padding
     class="row justify-center">
     <div style="width: 500px; max-width: 80vw;">
+<p>{{ title }}</p>
+<!--
       <q-input
         v-model="title"
         float-label="제목" />
@@ -20,20 +22,13 @@
         inline
         disabled
         :options="minor_categories" />
-      <q-editor
-        readonly
-        :toolbar="[]"
-        v-model="body"
-        label="본문"
-        min-height="400px"
-        max-height="400px"/>
-        <!--
+-->
+      <div v-html="body" style="height: 400px;"/>
       <div class="row q-ma-md col-xs-12 justify-end">
       <div class="col-xs-2">
-  <q-btn @click="save" label="등록" />
+  <q-btn @click="$router.push({name:'post_form', params:{action:'update', id:'0'}})" label="수정" />
       </div>
       </div>
--->
     </div>
   </q-page>
 </template>

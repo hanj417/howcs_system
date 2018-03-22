@@ -23,61 +23,21 @@
     <div class="container">
       <div class="row">
 
+<template v-for="post in posts">
         <div class="col-sm-4 col-md-3 col-lg-3" >
 
           <div id="howphoto">
             <img
-              src="~assets/img/howstoryP.jpg"
+              :src="post.img"
               class="image"
               style="width:100%">
             <div class="middle">
-              <div class="text">제목이 여기에 나옵니다</div>
+              <div class="text">{{ post.title }}</div>
             </div>
           </div>
 
         </div>
-
-        <div class="col-sm-4 col-md-3 col-lg-3" >
-          <a href="#">
-            <div id="howphoto">
-              <img
-                src="~assets/img/howstoryP.jpg"
-                class="image"
-                style="width:100%">
-              <div class="middle">
-                <div class="text">제목이 여기에 나옵니다</div>
-              </div>
-            </div>
-          </a>
-        </div>
-
-        <div class="col-sm-4 col-md-3 col-lg-3" >
-          <a href="#">
-            <div id="howphoto">
-              <img
-                src="~assets/img/howstoryP.jpg"
-                class="image"
-                style="width:100%">
-              <div class="middle">
-                <div class="text">제목이 여기에 나옵니다</div>
-              </div>
-            </div>
-          </a>
-        </div>
-
-        <div class="col-sm-4 col-md-3 col-lg-3" >
-          <a href="#">
-            <div id="howphoto">
-              <img
-                src="~assets/img/howstoryP.jpg"
-                class="image"
-                style="width:100%">
-              <div class="middle">
-                <div class="text">제목이 여기에 나옵니다 나옵니다나옵니다</div>
-              </div>
-            </div>
-          </a>
-        </div>
+</template>
 
       </div>
 
@@ -93,5 +53,32 @@
 
 <script>
 export default {
+  data () {
+    return {
+      posts: [],
+    }
+  },
+  methods: {
+    fetch_data () {
+      let query = {}
+      query['minor_category'] = 'photo'
+      query['recent'] = '4'
+      this.$axios.get(`posts/homepage`, {params: query})
+        .then(({ data }) => {
+          this.posts = data
+          for (let i = 0; i < this.posts.length; i++) {
+            this.posts[i]['img'] = "/assets/img/howstoryP.jpg"
+            let files = JSON.parse(this.posts[i]['files'])
+            if (files && files.length > 0) {
+              this.posts[i]['img'] = "/api/upload/" + files[0]
+            }
+            
+          }
+        })
+    }
+  },
+  created () {
+    this.fetch_data()
+  }
 }
 </script>

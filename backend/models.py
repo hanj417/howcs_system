@@ -7,6 +7,7 @@ from itsdangerous import (TimedJSONWebSignatureSerializer
 from datetime import datetime, date
 from ast import literal_eval
 from backend import db, app
+from bs4 import BeautifulSoup
 
 def date_from_str(date_str):
     if date_str is None:
@@ -184,6 +185,7 @@ class Post(db.Model):
     properties = db.Column(db.String(256))
     title = db.Column(db.String(256))
     body = db.Column(db.UnicodeText())
+    files = db.Column(db.UnicodeText(), nullable=True)
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     author = relationship('User', back_populates='posts')
@@ -212,7 +214,16 @@ class Post(db.Model):
             dic['author'] = self.author.as_dict()
         if self.class_:
             dic['class'] = self.class_.as_dict()
+        soup = BeautifulSoup(dic['body']) 
+        for script in soup(["script", "style"]):
+            script.extract()    # rip it out
+        text = soup.get_text()
+        lines = (line.strip() for line in text.splitlines())
+        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+        text = '\n'.join(chunk for chunk in chunks if chunk)
+        dic['ellipsis'] = text[:100]
         return dic
+
     @staticmethod
     def major_categories():
         return [{'label':'홈페이지', 'value':'homepage'}, {'label':'아지트', 'value':'agit'}, {'label':'하우학교', 'value':'howcs'}]

@@ -14,8 +14,13 @@
     "axios": "^0.17.1",
     "bootstrap": "^4.0.0",
     "bootstrap-vue": "^2.0.0-rc.2",
+    "i18n": "^0.8.3",
     "jquery": "^3.3.1",
     "localStorage": "^1.0.3",
+    "vue-html-editor": "^0.2.1",
+    "vue-i18n": "^7.6.0",
+    "vue-quill-editor": "^3.0.5",
+    "vue2-quill-editor": "^2.0.26",
     "vuelidate": "^0.6.2"
   },
   "devDependencies": {
@@ -30,8 +35,11 @@
     "eslint-plugin-promise": "^3.7.0",
     "eslint-plugin-standard": "^3.0.1",
     "eslint-plugin-vue": "^4.3.0",
+    "node-sass": "^4.7.2",
     "quasar-cli": "^0.15.9",
-    "style-loader": "^0.20.3"
+    "sass-loader": "^6.0.7",
+    "style-loader": "^0.20.3",
+    "vue-html5-editor": "^1.1.1"
   },
   "engines": {
     "node": ">= 8.9.0",

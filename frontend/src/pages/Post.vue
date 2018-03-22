@@ -49,6 +49,13 @@
       position="bottom-right"
       :offset="[18, 18]">
       <q-btn
+        v-if="is_admin"
+        round
+        color="primary"
+        @click="$router.push({name:'post_form_admin', params:{action:'new'}})"
+        icon="add" />
+      <q-btn
+        v-if="!is_admin"
         round
         color="primary"
         @click="$router.push({name:'post_form', params:{action:'new', id:class_id}})"
@@ -75,6 +82,7 @@ export default {
       item: [],
 
       is_author: false,
+      is_admin: false,
       user: {}
     }
   },
@@ -96,6 +104,12 @@ export default {
     }
   },
   created () {
+    let user = LocalStorage.get.item('user_')
+    console.log(JSON.parse(user.role))
+    console.log(JSON.parse(user.role).includes('admin'))
+    if (JSON.parse(user.role).includes('admin')) {
+      this.is_admin = true
+    }
     if (this.class_id) {
       this.user = LocalStorage.get.item('user_')
 
