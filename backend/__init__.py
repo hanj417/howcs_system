@@ -17,6 +17,7 @@ app = Flask(__name__,
             template_folder = basedir + "/dist")
 app.config.from_object(Config)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 100*1024*1024
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 app.config.update(dict(
@@ -25,8 +26,6 @@ app.config.update(dict(
     MAIL_PORT = 587,
     MAIL_USE_TLS = True,
     MAIL_USE_SSL = False,
-    MAIL_USERNAME = 'hanj417@gmail.com',
-    MAIL_PASSWORD = 'dhsdb417',
 ))
 mail = Mail(app)
 

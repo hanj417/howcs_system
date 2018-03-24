@@ -52,7 +52,7 @@
               role="listbox">
 <template v-for="post in posts">
               <a
-                href="#"
+                :href="'/story/story_view/' + post.id"
                 class="item story-story__carousel-item active">
                 <img
                   :src="post.img"
@@ -99,7 +99,7 @@
         <div class="row story-story__row">
 <template v-for="post in posts">
           <a
-            href="#"
+            :href="'/story/story_view/' + post.id"
             class="col-sm-4 col-md-4 col-lg-4 story-story__article">
             <img
               :src="post.img"

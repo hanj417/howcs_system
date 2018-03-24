@@ -1,23 +1,18 @@
 <template>
   <q-page
     padding
-    class="row justify-center gutter-md">
+    class="row wrap justify-start">
     <template v-for='item in menu'>
       <template v-if='item.heading'>
-        <div class="col-xs-10">
+        <div class="col-xs-12 q-mt-lg q-subheading">
           {{ item.heading }}
+          <hr>
         </div>
       </template>
       <template v-else>
-        <div class="col-xs-4">
-          <q-btn
-            color="secondary"
-            @click.native="$router.push({name:item.href, params: item.params})"
-            class="no-shadow col-xs-4"
-            :label="item.label">
-            {{ item.label }}
-            <!--            <q-icon :name="item.icon" />-->
-          </q-btn>
+        <div class="col-auto justify-center">
+            <div @click="$router.push({name: item.href, params: item.params})"><q-icon :name="item.icon" size="150px"/></div>
+            <div class="text-center">{{ item.text }}</div>
         </div>
       </template>
     </template>

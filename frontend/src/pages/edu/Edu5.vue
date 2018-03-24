@@ -21,142 +21,30 @@
     <div class="container">
       <div class="row">
 
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 waglpedia__service">
+<template v-for="item in items">
+        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 waglpedia__service"
+          @mouseover="item.active = true" 
+          @mouseleave="item.active = false">
           <div
             class="waglpedia__service-summary--default"
-            style="background-image: url(assets/img/edu5_1m.jpg); background-size: cover; height:250px;opacity:0.6;">
-
+            :style="{'background-image': item.imgm}"
+            style="background-size: cover; height:250px;opacity:0.6;"
+            :class="{hidden: item.active}">
             <div class="edu__title3">
-              아침 돌봄
+              {{ item.title }} 
             </div>
+            <p v-if="item.stitle" class="edu__stitle3">
+              {{ item.stitle }}
+            </p> 
           </div>
           <div
-            class="waglpedia__service-summary--active hidden"
-            style="background-image: url(assets/img/edu5_1.jpg); background-size: cover; height:250px;opacity:1;"/>
+            class="waglpedia__service-summary--active"
+            :style="{'background-image': item.img}"
+            style="background-size: cover; height:250px;opacity:1;"
+            :class="{hidden: !item.active}"/>
         </div>
-
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 waglpedia__service">
-          <div
-            class="waglpedia__service-summary--default"
-            style="background-image: url(assets/img/edu5_2m.jpg); background-size: cover; height:250px;opacity:0.6;">
-
-            <div class="edu__title3">
-              등교
-
-            </div>
-          </div>
-          <div
-            class="waglpedia__service-summary--active hidden"
-            style="background-image: url(assets/img/edu5_2.jpg); background-size: cover; height:250px;opacity:1;"/>
-        </div>
-
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 waglpedia__service">
-          <div
-            class="waglpedia__service-summary--default"
-            style="background-image: url(assets/img/edu5_3m.jpg); background-size: cover; height:250px;opacity:0.6;">
-
-            <div class="edu__title3">
-              하나님 만나기
-            </div>
-          </div>
-          <div
-            class="waglpedia__service-summary--active hidden"
-            style="background-image: url(assets/img/edu5_3.jpg); background-size: cover; height:250px;opacity:1;"/>
-        </div>
-
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 waglpedia__service">
-          <div
-            class="waglpedia__service-summary--default"
-            style="background-image: url(assets/img/edu5_4m.jpg); background-size: cover; height:250px;opacity:0.6;">
-
-            <div class="edu__title3">
-              주기 집중
-            </div>
-          </div>
-          <div
-            class="waglpedia__service-summary--active hidden"
-            style="background-image: url(assets/img/edu5_4.jpg); background-size: cover; height:250px;opacity:1;"/>
-        </div>
-
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 waglpedia__service">
-          <div
-            class="waglpedia__service-summary--default"
-            style="background-image: url(assets/img/edu5_5m.jpg); background-size: cover; height:250px;opacity:0.6;">
-
-            <div class="edu__title3">
-              2~3교시
-            </div>
-          </div>
-          <div
-            class="waglpedia__service-summary--active hidden"
-            style="background-image: url(assets/img/edu5_5.jpg); background-size: cover; height:250px;opacity:1;"/>
-        </div>
-
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 waglpedia__service">
-          <div
-            class="waglpedia__service-summary--default"
-            style="background-image: url(assets/img/edu5_6m.jpg); background-size: cover; height:250px;opacity:0.6;">
-
-            <div class="edu__title3">
-              점심 식사
-            </div>
-          </div>
-          <div
-            class="waglpedia__service-summary--active hidden"
-            style="background-image: url(assets/img/edu5_6.jpg); background-size: cover; height:250px;opacity:1;"/>
-        </div>
-
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 waglpedia__service">
-          <div
-            class="waglpedia__service-summary--default"
-            style="background-image: url(assets/img/edu5_7m.jpg); background-size: cover; height:250px;opacity:0.6;">
-
-            <div class="edu__title3">
-              4교시</div>
-
-            <p class="edu__stitle3"> (예비초등 닫는말 후 아지트, 돌봄 6시까지)</p>
-
-          </div>
-          <div
-            class="waglpedia__service-summary--active hidden"
-            style="background-image: url(assets/img/edu5_7.jpg); background-size: cover; height:250px;opacity:1;"/>
-        </div>
-
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 waglpedia__service">
-          <div
-            class="waglpedia__service-summary--default"
-            style="background-image: url(assets/img/edu5_8m.jpg); background-size: cover; height:250px;opacity:0.6;">
-
-            <div class="edu__title3">
-              5교시 </div>
-            <p class="edu__stitle3"> (초등 닫는말 후 아지트, 돌봄 6시까지)</p>
-
-          </div>
-          <div
-            class="waglpedia__service-summary--active hidden"
-            style="background-image: url(assets/img/edu5_8.jpg); background-size: cover; height:250px;opacity:1;"/>
-        </div>
-
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 waglpedia__service">
-          <div
-            class="waglpedia__service-summary--default"
-            style="background-image: url(assets/img/edu5_9m.jpg); background-size: cover; height:250px;opacity:0.6;">
-
-            <div class="edu__title3">
-              아지트와 오후돌봄
-            </div>
-          </div>
-          <div
-            class="waglpedia__service-summary--active hidden"
-            style="background-image: url(assets/img/edu5_9.jpg); background-size: cover; height:250px;opacity:1;"/>
-        </div>
-
+</template>
       </div>
-    </div>
-
-    <div class="hidden-xs">
-      <div class="space"/>
-      <div class="space"/>
     </div>
 
   </div>
@@ -164,5 +52,49 @@
 
 <script>
 export default {
+  data() {
+    return {
+      items: [
+        {title: '아침 돌봄',
+         active: false,
+         imgm: 'url(assets/img/edu5_1m.jpg)', 
+         img: 'url(assets/img/edu5_1.jpg)'}, 
+        {title: '등교',
+         active: false,
+         imgm: 'url(assets/img/edu5_1m.jpg)', 
+         img: 'url(assets/img/edu5_1.jpg)'}, 
+        {title: '하나님 만나기',
+         active: false,
+         imgm: 'url(assets/img/edu5_1m.jpg)', 
+         img: 'url(assets/img/edu5_1.jpg)'}, 
+        {title: '주기 집중',
+         active: false,
+         imgm: 'url(assets/img/edu5_1m.jpg)', 
+         img: 'url(assets/img/edu5_1.jpg)'}, 
+        {title: '2~3교시',
+         active: false,
+         imgm: 'url(assets/img/edu5_1m.jpg)', 
+         img: 'url(assets/img/edu5_1.jpg)'}, 
+        {title: '점심 식사',
+         active: false,
+         imgm: 'url(assets/img/edu5_1m.jpg)', 
+         img: 'url(assets/img/edu5_1.jpg)'}, 
+        {title: '4교시',
+         stitle: '(예비초등 닫는말 후 아지트, 돌봄 6시까지)',
+         active: false,
+         imgm: 'url(assets/img/edu5_1m.jpg)', 
+         img: 'url(assets/img/edu5_1.jpg)'}, 
+        {title: '5교시',
+         stitle: '(초등 닫는말 후 아지트, 돌봄 6시까지)',
+         active: false,
+         imgm: 'url(assets/img/edu5_1m.jpg)', 
+         img: 'url(assets/img/edu5_1.jpg)'}, 
+        {title: '아지트와 오후돌봄',
+         active: false,
+         imgm: 'url(assets/img/edu5_1m.jpg)', 
+         img: 'url(assets/img/edu5_1.jpg)'}, 
+        ],
+    }
+  },
 }
 </script>

@@ -82,11 +82,15 @@ def upload_file():
     file = request.files['file']
     # if user does not select file, browser also
     # submit a empty part without filename
+    #print(file.filename)
     if file.filename == '':
         flash('No selected file')
         return redirect(request.url)
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
+        #filename = secure_filename(file.filename)
+        #FIXME: secure_filename does not support unicode
+        filename = file.filename
+        #print(filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return redirect(url_for('uploaded_file',
                                 filename=filename))
@@ -663,7 +667,8 @@ def post_all():
     if 'class_id' in request.args:
         posts = posts.filter_by(class_id=request.args['class_id'])
     if 'recent' in request.args:
-        posts = posts.order_by('updated_at desc').limit(int(request.args['recent']))
+        posts = posts.order_by('created_at desc').limit(int(request.args['recent']))
+    posts = posts.order_by('created_at desc')
     posts = posts.all()
     posts_json = []
     for post in posts:
@@ -725,6 +730,16 @@ def post_new():
 def post_get(id):
     post = Post.query.get(id)
     if not post:
+        abort(404)
+    postdict = post.as_dict()
+    return jsonify(postdict)
+
+@app.route('/api/posts/homepage/<int:id>', methods=['GET'])
+def post_homepage_get(id):
+    post = Post.query.get(id)
+    if not post:
+        abort(404)
+    if post.major_category != 'homepage':
         abort(404)
     postdict = post.as_dict()
     return jsonify(postdict)
@@ -937,7 +952,7 @@ def get_menu():
 
     menu = [
         { 'heading': '회원' },
-        { 'href': 'user_form', 'params': {'action':'update'}, 'text': '회원정보', 'icon': 'account' },
+        { 'href': 'user_form', 'params': {'action':'update'}, 'text': '회원정보', 'icon': 'account circle' },
         #{ 'heading': '아지트' },
         #{ 'href': '/hana/class', 'params': {'major_category':'agit'}, 'text': '수강신청', 'icon': 'plus' },
         #{ 'href': '/hana/enrollment_student', 'params': {'major_category':'agit', 'id':user.id}, 'text': '수강과목', 'icon': 'pencil' },
@@ -961,13 +976,13 @@ def get_menu():
     
     if 'admin' in user.role:
         menu.append({ 'heading': '관리자'})
-        menu.append({ 'href': 'post_admin', 'params': {}, 'text': '글쓰기', 'icon': 'currency-krw' })
-        menu.append({ 'href': 'user', 'params': {}, 'text': '아지트 회원관리', 'icon': 'account group' })
+        menu.append({ 'href': 'post_admin', 'params': {}, 'text': '글쓰기', 'icon': 'note add' })
+        menu.append({ 'href': 'user', 'params': {}, 'text': '아지트 회원관리', 'icon': 'people' })
         #menu.append({ 'href': '/hana/agit_teacher', 'params': {}, 'text': '아지트 교사관리', 'icon': 'account-plus' })
         #menu.append({ 'href': '/hana/payment', 'params': {}, 'text': '아지트 회비관리', 'icon': 'currency-krw' })
-        menu.append({ 'href': 'student', 'params': {}, 'text': '하우학교 학생관리', 'icon': 'account group' })
-        menu.append({ 'href': 'howcs_teacher', 'params': {}, 'text': '하우학교 교사관리', 'icon': 'account group' })
-        menu.append({ 'href': 'class', 'params': {'major_category':'howcs'}, 'text': '하우학교 수업관리', 'icon': 'account group' })
+        menu.append({ 'href': 'student', 'params': {}, 'text': '하우학교 학생관리', 'icon': 'people' })
+        menu.append({ 'href': 'howcs_teacher', 'params': {}, 'text': '하우학교 교사관리', 'icon': 'person' })
+        menu.append({ 'href': 'class', 'params': {'major_category':'howcs'}, 'text': '하우학교 수업관리', 'icon': 'school' })
     return jsonify(menu)
 
 @app.route('/', defaults={'path': ''})

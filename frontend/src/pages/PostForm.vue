@@ -83,7 +83,7 @@
       <quill-editor v-model='body'  style="height: 300px;"/>
       </div>
       <div class="col-xs-12 q-mt-xl q-pt-xl">
-      <q-uploader ref="uploader" url="/api/upload" @add="added" @uploaded="uploaded" />
+      <q-uploader ref="uploader" url="/api/upload" @add="add_file" @remove:cancel(file)="remove_file" @uploaded="uploaded" hide-upload-button auto-expand no-thumbnails clearable hide-upload-progress />
       </div>
       <div class="row q-ma-md col-xs-12 justify-end">
         <div class="col-xs-2">
@@ -133,6 +133,9 @@ export default {
       if (this.notice) {
         this.properties.push('notice')
       }
+
+      console.log(this.files)
+      this.$refs.uploader.upload()
       if (this.action === 'new') {
         this.$axios.post(`posts`, {
           'major_category': this.major_category,
@@ -158,15 +161,17 @@ export default {
         })
       }
     },
-added (files) {
-        console.log(files)
-this.files = []
-for (let i = 0; i < files.length; i++) {
-this.files.push(files[i].name)
-}
-        this.$refs.uploader.upload()
-      },
-uploaded (files) {
+    add_file (files) {
+      console.log(files)
+      for (let i = 0; i < files.length; i++) {
+        this.files.push(files[i].name)
+      }
+    },
+    remove_file (files) {
+      for (let i = 0; i < files.length; i++) {
+        const index = array.indexOf(files[i].name);
+        this.files.splice(index, 1);
+      }
     },
     
   },
@@ -189,7 +194,7 @@ uploaded (files) {
           this.minor_category = data.minor_category
           //this.category_disabled = true
           this.properties = data.properties
-          if (JSON.parse(data.properties).includes('notice')) {
+          if (data.properties && JSON.parse(data.properties).includes('notice')) {
             this.notice = true
           }
           this.title = data.title

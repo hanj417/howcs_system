@@ -121,12 +121,12 @@
     >
       <template v-for='item in menu'>
         <template v-if='item.heading'>
-          <q-list-header>{{ item.heading }}</q-list-header>
+          <q-list-header class="q-subheading">{{ item.heading }}</q-list-header>
         </template>
         <template v-else>
           <q-item :to="{name:item.href, params:item.params}">
-            <!--<q-item-side :icon='item.icon' />-->
-            <q-item-main :label='item.text' />
+            <q-item-side :icon='item.icon' />
+            <q-item-main :label='item.text' class="q-body-2"/>
           </q-item>
         </template>
       </template>
@@ -243,7 +243,6 @@ export default {
       }
     },
     userHasScrolled (scroll) {
-      console.log(scroll)
       if (scroll.position > 100) {
         this.header_transparency = false
       } else {

@@ -2,8 +2,9 @@
   <q-page
     padding
     class="row justify-center">
-    <div style="width: 600px; max-width: 90vw;">
-      <div class="col-xs-12 docs-input">
+    <div style="width: 600px; max-width: 90vw;" class="shadow-8">
+    <div class="col-xs-12 text-center q-title text-weight-bold q-pa-md">회원 정보</div>
+      <div class="col-xs-10 docs-input q-mx-xl">
         <q-field
           label="아이디"
           icon="account circle"
@@ -24,11 +25,10 @@
             v-model="password"
             type="password" />
         </q-field>
-      </div>
-      <div class="col-xs-12 q-pt-xl docs-input">
+        <hr>
         <q-field
           label="이름"
-          icon="create"
+          icon="format size"
           :label-width="3"
           :error="$v.name.$error"
           error-label="이름을 잘못 입력하였습니다."
@@ -37,7 +37,7 @@
         </q-field>
         <q-field
           label="이메일"
-          icon="create"
+          icon="email"
           :label-width="3"
           :error="$v.email.$error"
           error-label="이메일을 잘못 입력하였습니다."
@@ -48,7 +48,7 @@
         </q-field>
         <q-field
           label="전화번호"
-          icon="create"
+          icon="phone"
           :label-width="3"
           :error="$v.phone.$error"
           error-label="전화번호를 잘못 입력하였습니다."
@@ -57,7 +57,7 @@
         </q-field>
         <q-field
           label="출석교회"
-          icon="create"
+          icon="business"
           :label-width="3"
           :error="$v.church.$error"
           error-label="출석교회를 잘못 입력하였습니다."
@@ -66,7 +66,7 @@
         </q-field>
         <q-field
           label="소속학교"
-          icon="create"
+          icon="school"
           :label-width="3"
           :error="$v.school.$error"
           error-label="소속학교를 잘못 입력하였습니다."
@@ -75,7 +75,7 @@
         </q-field>
         <q-field
           label="생년월일"
-          icon="create"
+          icon="cake"
           :label-width="3"
           :error="$v.birthday.$error"
           error-label="생년월일을 잘못 입력하였습니다."
@@ -87,7 +87,8 @@
       </div>
       <div
         v-if="is_howcs_student"
-        class="col-xs-12 docs-input">
+        class="col-xs-10 docs-input q-mx-xl">
+        <hr>
         <q-field
           label="학번"
           icon="create"
@@ -99,7 +100,7 @@
         </q-field>
         <q-field
           label="성별"
-          icon="create"
+          icon="wc"
           :label-width="3"
         >
           <q-option-group
@@ -114,7 +115,7 @@
         </q-field>
         <q-field
           label="부 성명"
-          icon="create"
+          icon="face"
           :label-width="3"
           :error="$v.school.$error"
           error-label="소속학교를 잘못 입력하였습니다."
@@ -122,8 +123,8 @@
           <q-input v-model="father_name" />
         </q-field>
         <q-field
-          label="부 주민등록번호"
-          icon="create"
+          label="부 주민번호"
+          icon="featured play list"
           :label-width="3"
           :error="$v.school.$error"
           error-label="소속학교를 잘못 입력하였습니다."
@@ -132,7 +133,7 @@
         </q-field>
         <q-field
           label="모 성명"
-          icon="create"
+          icon="face"
           :label-width="3"
           :error="$v.school.$error"
           error-label="소속학교를 잘못 입력하였습니다."
@@ -140,8 +141,8 @@
           <q-input v-model="mother_name" />
         </q-field>
         <q-field
-          label="모 주민등록번호"
-          icon="create"
+          label="모 주민번호"
+          icon="featured play list"
           :label-width="3"
           :error="$v.school.$error"
           error-label="소속학교를 잘못 입력하였습니다."
@@ -150,7 +151,7 @@
         </q-field>
         <q-field
           label="주소"
-          icon="create"
+          icon="home"
           :label-width="3"
           :error="$v.school.$error"
           error-label="소속학교를 잘못 입력하였습니다."
@@ -165,7 +166,7 @@
             @click="convert_student"
             label="하우학교 학생 전환" />
         </div>
-        <div class="col-xs-2">
+        <div class="col-xs-2 q-ma-xl">
           <q-btn
             @click="store"
             label="수정" />

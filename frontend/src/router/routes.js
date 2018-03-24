@@ -45,7 +45,6 @@ export default [
   },
   {
     path: '/edu',
-    name: 'edu',
     component: () => import('layouts/hana'),
     props: {leftDrawerOpen: false},
     children: [
@@ -65,7 +64,9 @@ export default [
     children: [
       { path: 'story', name: 'story', component: () => import('pages/story/Story') },
       { path: 'notice', name: 'notice', component: () => import('pages/story/Notice') },
-      { path: 'photo', name: 'photo', component: () => import('pages/story/Photo') }
+      { path: 'photo', name: 'photo', component: () => import('pages/story/Photo') },
+      { path: 'story_view/:id', name: 'story_view', component: () => import('pages/story/StoryView'), props: true },
+      { path: 'photo_view/:id', name: 'photo_view', component: () => import('pages/story/PhotoView'), props: true },
     ]
   },
   {

@@ -1,8 +1,30 @@
 <template>
-  <q-page
-    padding
+  <div>
+<!--
+    <div class="page-intro">
+      <img
+        src="~assets/img/howstory_background_image.png"
+        class="section__background-image" >
+
+      <div class="title--emphasized">
+        오늘도 하우는 ( &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ) 하다
+
+      </div>
+
+    </div>
+-->
+
+    <div class="container">
+      <div class="page-name">
+        하우하다
+      </div>
+      <hr class="page-name--bottom-border" >
+    </div>
+
+
+  <div
     class="row justify-center">
-    <div style="width: 600px; max-width: 80vw;" class="q-pa-xl shadow-10">
+    <div style="width: 800px; max-width: 80vw;" class="q-pa-xl shadow-10">
     <div class="col-xs-12 text-center q-title text-weight-bold q-pa-md">{{ title }}</div>
     <div class="col-xs-12 text-right q-body-2 text-weight-bold q-px-md">{{ date }}</div>
     <div class="col-xs-12 text-right q-body-2 text-weight-bold q-px-md">{{ author_name }}</div>
@@ -21,7 +43,11 @@
       </div>
       </div>
     </div>
-  </q-page>
+  </div>
+
+
+
+  </div>
 </template>
 
 <script>
@@ -73,7 +99,7 @@ export default {
       .then(({ data }) => { this.major_categories = data })
     this.$axios.get(`posts/properties`)
       .then(({ data }) => {})
-    this.$axios.get(`posts/` + this.id)
+    this.$axios.get(`posts/homepage/` + this.id)
       .then(({ data }) => {
         this.major_category = data.major_category
         this.minor_category = data.minor_category
