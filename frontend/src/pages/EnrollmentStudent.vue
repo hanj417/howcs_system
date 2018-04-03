@@ -35,7 +35,7 @@
         slot="body"
         slot-scope="props"
         :props="props"
-        @click.native="$router.push({name:'post_class', params:{class_id:props.row.class.id}})"
+        @click.native="rowClick(props.row)"
         class="cursor-pointer">
         <q-td
           v-for="col in props.cols"
@@ -65,7 +65,21 @@ export default {
       minor_categories: []
     }
   },
-  props: ['id', 'major_category'],
+  watch: {
+    'id' (val) {
+      this.fetch_data()
+    },
+    'major_category' (val) {
+      this.fetch_data()
+    },
+    'minor_category' (val) {
+      this.fetch_data()
+    },
+    'action' (val) {
+      this.fetch_data()
+    },
+  },
+  props: ['id', 'major_category', 'minor_category', 'action'],
   methods: {
     fetch_data () {
       let query = {}
@@ -74,6 +88,9 @@ export default {
       }
       if (this.major_category) {
         query['major_category'] = this.major_category
+      }
+      if (this.minor_category) {
+        query['minor_category'] = this.minor_category
       }
       this.$axios.get(`enrollments`, {params: query})
         .then(({ data }) => {
@@ -86,6 +103,13 @@ export default {
         .then(({ data }) => {
           this.fetch_data()
         })
+    },
+    rowClick(row) {
+      if (this.action === 'post') {
+        this.$router.push({name:'post_class', params:{class_id:row.class.id}})
+      } else if (this.action === 'attendance') {
+        this.$router.push({name:'attendance_student', params:{student_id:row.student_id, class_id:row.class_id}})
+      }
     }
   },
   created () {

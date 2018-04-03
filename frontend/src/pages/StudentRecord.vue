@@ -1,335 +1,242 @@
 <template>
-  <v-content>
-    <v-container
-      fluid
-      fill-height>
-      <v-layout
-        justify-center
-        align-center>
-        <v-card>
-          <v-card-title
-            class="grey lighten-4 py-4 title"
-          >
-            회원 정보
-          </v-card-title>
-          <v-container
-            grid-list-sm
-            class="pa-4">
-            <v-form
-              v-model="valid"
-              ref="form"
-              lazy-validation>
-              <v-layout
-                row
-                wrap>
-                <v-flex
-                  xs12
-                  align-center>
-                  <v-layout align-center>
-                    <v-avatar
-                      size="40px"
-                      class="mr-3">
-                      <img
-                        src="//ssl.gstatic.com/s2/oz/images/sge/grey_silhouette.png"
-                        alt=""
-                      >
-                    </v-avatar>
-                    <v-text-field
-                      placeholder="아이디"
-                      v-model="username"
-                      :rules="nameRules"
-                      required
-                      :disabled="is_view"
-                    />
-                  </v-layout>
-                </v-flex>
-                <v-flex xs12>
-                  <v-text-field
-                    placeholder="이름"
-                    prepend-icon="chat"
-                    :rules="nameRules"
-                    v-model="name"
-                    :disabled="is_view"
-                    required
-                  />
-                </v-flex>
-                <v-flex xs12>
-                  <v-text-field
-                    placeholder="학번"
-                    prepend-icon="chat"
-                    v-model="student_id"
-                    :disabled="is_view"
-                    required
-                  />
-                </v-flex>
-                <v-flex xs6>
-                  <v-text-field
-                    type="password"
-                    prepend-icon="lock"
-                    placeholder="비밀번호"
-                    v-model="password"
-                    :disabled="is_view"
-                    min="4"
-                    counter
-                    hint="4글자 이상"
-                    autocomplete='on'
-                    required
-                  />
-                </v-flex>
-                <v-flex xs6>
-                  <v-text-field
-                    type="password"
-                    prepend-icon="lock"
-                    placeholder="비밀번호 확인"
-                    v-model="password_confirmation"
-                    :disabled="is_view"
-                    min="4"
-                    counter
-                    autocomplete='on'
-                    required
-                  />
-                </v-flex>
-                <v-flex xs6>
-                  <v-text-field
-                    prepend-icon="mail"
-                    placeholder="이메일"
-                    :rules="emailRules"
-                    v-model="email"
-                    :disabled="is_view"
-                    autocomplete='email'
-                    required
-                  />
-                </v-flex>
-                <v-flex xs6>
-                  <v-text-field
-                    prepend-icon="phone"
-                    placeholder="전화번호"
-                    v-model="phone"
-                    :disabled="is_view"
-                    autocomplete='tel'
-                    required
-                  />
-                </v-flex>
-                <v-flex xs6>
-                  <v-text-field
-                    prepend-icon="business"
-                    placeholder="출석 교회"
-                    v-model="church"
-                    :disabled="is_view"
-                  />
-                </v-flex>
-                <v-flex xs6>
-                  <v-text-field
-                    prepend-icon="business"
-                    placeholder="소속 학교"
-                    v-model="school"
-                    :disabled="is_view"
-                  />
-                </v-flex>
-                <v-flex xs12>
-                  <v-menu
-                    ref="date_menu"
-                    lazy
-                    :close-on-content-click="false"
-                    v-model="date_menu"
-                    :disabled="is_view"
-                    transition="scale-transition"
-                    offset-y
-                    full-width
-                    :nudge-right="40"
-                    min-width="290px"
-                  >
-                    <v-text-field
-                      slot="activator"
-                      label="Birthday date"
-                      v-model="date"
-                      :disabled="is_view"
-                      prepend-icon="event"
-                      readonly
-                    />
-                    <v-date-picker
-                      ref="picker"
-                      v-model="date"
-                      @change="date_save"
-                      min="1950-01-01"
-                      :max="new Date().toISOString().substr(0, 10)"
-                    />
-                  </v-menu>
-                </v-flex>
-
-                <v-flex xs6>
-                  <v-select
-                    :items="gender_items"
-                    v-model="gender"
-                    :disabled="is_view"
-                    label="성별"
-                    single-line
-                    bottom
-                  />
-                </v-flex>
-                <v-flex xs6>
-                  <v-text-field
-                    prepend-icon="business"
-                    placeholder="주민등록번호"
-                    v-model="ssn"
-                    :disabled="is_view"
-                  />
-                </v-flex>
-                <v-flex xs6>
-                  <v-text-field
-                    prepend-icon="business"
-                    placeholder="아버지 이름"
-                    v-model="father_name"
-                    :disabled="is_view"
-                  />
-                </v-flex>
-                <v-flex xs6>
-                  <v-text-field
-                    prepend-icon="business"
-                    placeholder="아버지 주민등록번호"
-                    v-model="father_ssn"
-                    :disabled="is_view"
-                  />
-                </v-flex>
-                <v-flex xs6>
-                  <v-text-field
-                    prepend-icon="business"
-                    placeholder="어머니 이름"
-                    v-model="mother_name"
-                    :disabled="is_view"
-                  />
-                </v-flex>
-                <v-flex xs6>
-                  <v-text-field
-                    prepend-icon="business"
-                    placeholder="어머니 주민등록번호"
-                    v-model="mother_ssn"
-                    :disabled="is_view"
-                  />
-                </v-flex>
-                <v-flex xs6>
-                  <v-text-field
-                    prepend-icon="business"
-                    placeholder="주소"
-                    v-model="address"
-                    :disabled="is_view"
-                  />
-                </v-flex>
-              </v-layout>
-            </v-form>
-          </v-container>
-          <v-card-actions v-if="!is_view">
-            <v-spacer/>
-            <v-btn
-              flat
-              color="primary"
-              @click="cancel">취소</v-btn>
-            <v-btn
-              flat
-              @click="save">{{ save_btn_text }}</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-layout>
-    </v-container>
-  </v-content>
+  <q-page
+    padding
+    class="row justify-center">
+    <div style="width: 600px; max-width: 90vw;" class="shadow-8">
+    <div class="col-xs-12 text-center q-title text-weight-bold q-pa-md">회원 정보</div>
+      <div class="col-xs-10 docs-input q-mx-xl">
+        <q-field
+          label="학번"
+          :label-width="3"
+          :error="$v.school.$error"
+          error-label="소속학교를 잘못 입력하였습니다."
+        >
+          <q-input v-model="student_id" />
+        </q-field>
+        <q-field
+          label="이름"
+          :label-width="3"
+          :error="$v.name.$error"
+          error-label="이름을 잘못 입력하였습니다."
+        >
+          <q-input v-model="name" />
+        </q-field>
+        <q-field
+          label="이메일"
+          :label-width="3"
+          :error="$v.email.$error"
+          error-label="이메일을 잘못 입력하였습니다."
+        >
+          <q-input
+            v-model="email"
+            type="email" />
+        </q-field>
+        <q-field
+          label="전화번호"
+          :label-width="3"
+          :error="$v.phone.$error"
+          error-label="전화번호를 잘못 입력하였습니다."
+        >
+          <q-input v-model="phone" />
+        </q-field>
+        <q-field
+          label="생년월일"
+          :label-width="3"
+          :error="$v.birthday.$error"
+          error-label="생년월일을 잘못 입력하였습니다."
+        >
+          <q-datetime
+            v-model="birthday"
+            type="date" />
+        </q-field>
+        <hr>
+        <q-field
+          label="성별"
+          :label-width="3"
+        >
+          <q-option-group
+            type="radio"
+            v-model="gender"
+            inline
+            :options="[
+              { label: '남학생', value: 'male' },
+              { label: '여학생', value: 'female' },
+            ]"
+          />
+        </q-field>
+        <q-field
+          label="부 성명"
+          :label-width="3"
+          :error="$v.school.$error"
+          error-label="소속학교를 잘못 입력하였습니다."
+        >
+          <q-input v-model="father_name" />
+        </q-field>
+        <q-field
+          label="부 주민번호"
+          :label-width="3"
+          :error="$v.school.$error"
+          error-label="소속학교를 잘못 입력하였습니다."
+        >
+          <q-input v-model="father_rrn" />
+        </q-field>
+        <q-field
+          label="모 성명"
+          :label-width="3"
+          :error="$v.school.$error"
+          error-label="소속학교를 잘못 입력하였습니다."
+        >
+          <q-input v-model="mother_name" />
+        </q-field>
+        <q-field
+          label="모 주민번호"
+          :label-width="3"
+          :error="$v.school.$error"
+          error-label="소속학교를 잘못 입력하였습니다."
+        >
+          <q-input v-model="mother_rrn" />
+        </q-field>
+        <q-field
+          label="주소"
+          :label-width="3"
+          :error="$v.school.$error"
+          error-label="소속학교를 잘못 입력하였습니다."
+        >
+          <q-input v-model="address" />
+        </q-field>
+      </div>
+      <div v-if="action == 'edit'" class="col-xs-12 row justify-end q-mt-lg">
+        <div class="col-xs-5 q-ma-xl">
+          <q-btn
+            @click="remove"
+            label="삭제" />
+          <q-btn
+            @click="store"
+            label="수정" />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  </q-page>
 </template>
 
 <script>
+import { LocalStorage } from 'quasar'
+import { required, email } from 'vuelidate/lib/validators'
+
 export default {
   data () {
     return {
-      save_btn_text: '등록',
       is_admin: false,
-      is_view: false,
+      user: {},
       user_id: '',
-      valid: true,
       username: '',
       password: '',
-      password_confirmation: '',
+      password_confirm: '',
       name: '',
       email: '',
       phone: '',
       school: '',
       church: '',
-      date: null,
-      date_menu: false,
+      birthday: null,
       student_id: '',
       gender: {},
-      gender_items: [{text: '남성', value: 'male'}, {text: '여성', value: 'female'}],
-      ssn: '',
+      rrn: '',
       father_name: '',
-      father_ssn: '',
+      father_rrn: '',
       mother_name: '',
-      mother_ssn: '',
+      mother_rrn: '',
       address: '',
-      user: {},
-      nameRules: [
-        v => v.length > 0 || 'Name is required'
+
+      health_table_data: [],
+      health_columns: [
+        { name: 'date', label: '날짜', field: row => (new Date(row.date)).toISOString().slice(0,10), sortable: true, align: 'left' },
+        { name: 'height', label: '신장', field: 'height', sortable: true, align: 'left' },
+        { name: 'weight', label: '체중', field: 'weight', sortable: true, align: 'left' },
+        { name: 'sight', label: '시력', field: 'sight', sortable: true, align: 'left' },
+        { name: 'cavity', label: '충치', field: 'cavity', sortable: true, align: 'left' },
       ],
-      emailRules: [
-        v => !!v || 'E-mail is required',
-        v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
-      ],
-      passwordRules: [
-        v => !!v || 'Password is required'
-      ],
-      passwordConfirmRules: [
-        v => !!v || 'Password is required',
-        v => this.password_confirmation === this.password || 'Does not match'
-      ]
     }
   },
-  watch: {
-    date_menu (val) {
-      val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
-    }
+  validations: {
+    username: { required },
+    password: { required },
+    name: { required },
+    email: { required, email },
+    phone: { required },
+    school: { required },
+    church: { required },
+    birthday: { required }
   },
-  computed: {
-    action () {
-      return this.$route.params.action
-    },
-    id () {
-      return this.$route.params.id
-    }
-  },
+  props: ['action', 'id'],
   methods: {
-    cancel () {
-      this.$router.go(-1)
+    remove () {
+      this.$axios.delete(`student_infos/` + this.id)
+        .then(({ data }) => { this.$router.go(-1) })
     },
-    save () {
-      if (this.action === 'update') {
-        this.$axios.put(`student_infos/` + this.user_id, {
-          'username': this.username,
-          'password': this.password,
-          'name': this.name,
-          'email': this.email,
-          'phone': this.phone,
-          'school': this.school,
-          'church': this.church,
-          'birthday': this.date,
-          'student_id': this.student_id,
-          'gender': this.gender,
-          'ssn': this.ssn,
-          'father_name': this.father_name,
-          'father_ssn': this.father_ssn,
-          'mother_name': this.mother_name,
-          'mother_ssn': this.mother_ssn,
-          'address': this.address
-        }).then(({data}) => {
-          this.$router.go(-1)
-        })
+    store () {
+      console.log('store')
+      console.log(this.id)
+      if (this.action === 'new') {
+          this.$axios.post(`student_infos`, {
+            'username': this.username,
+            'password': this.password,
+            'name': this.name,
+            'email': this.email,
+            'phone': this.phone,
+            'school': this.school,
+            'church': this.church,
+            'birthday': this.date,
+            'student_id': this.student_id,
+            'gender': this.gender,
+            'rrn': this.rrn,
+            'father_name': this.father_name,
+            'father_rrn': this.father_rrn,
+            'mother_name': this.mother_name,
+            'mother_rrn': this.mother_rrn,
+            'address': this.address
+          }).then(({data}) => {
+            this.$router.go(-1)
+          })
+      } else if (this.action === 'update') {
+          this.$axios.put(`student_infos/` + this.user_id, {
+            'username': this.username,
+            'password': this.password,
+            'name': this.name,
+            'email': this.email,
+            'phone': this.phone,
+            'school': this.school,
+            'church': this.church,
+            'birthday': this.date,
+            'student_id': this.student_id,
+            'gender': this.gender,
+            'rrn': this.rrn,
+            'father_name': this.father_name,
+            'father_rrn': this.father_rrn,
+            'mother_name': this.mother_name,
+            'mother_rrn': this.mother_rrn,
+            'address': this.address
+          }).then(({data}) => {
+            this.$router.go(-1)
+          })
       }
     },
-    date_save (date) {
-      this.$refs.date_menu.save(date)
-    }
   },
   created () {
-    if (this.$route.params.action === 'update') {
-      this.user_id = this.$route.params.id
-      this.$axios.get(`students/` + this.user_id
+    let loggedIn = LocalStorage.has('user_')
+    if (this.action === 'update' || this.action === 'view') {
+      if (this.id) {
+        this.is_admin = true
+        this.user_id = this.id
+      } else if (loggedIn) {
+        this.user = LocalStorage.get.item('user_')
+        this.user_id = this.user['id']
+      }
+      this.$axios.get(`users/` + this.user_id
       ).then(({ data }) => {
         console.log(data)
+        this.user = data
         this.username = data.username
         this.name = data.name
         this.email = data.email
@@ -338,14 +245,18 @@ export default {
         this.church = data.church
         var d = new Date(data.birthday)
         this.date = d.toISOString().substr(0, 10)
+        this.is_howcs_student = true
         this.student_id = data.student_info.student_id
         this.gender = data.student_info.gender
-        this.ssn = data.student_info.ssn
+        this.rrn = data.student_info.rrn
         this.father_name = data.student_info.father_name
-        this.father_ssn = data.student_info.father_ssn
+        this.father_rrn = data.student_info.father_rrn
         this.mother_name = data.student_info.mother_name
-        this.mother_ssn = data.student_info.mother_ssn
+        this.mother_rrn = data.student_info.mother_rrn
         this.address = data.student_info.address
+        if (data.student_info.student_record.student_health_records) {
+          this.health_table_data = data.student_info.student_record.student_health_records
+        }
       })
     }
   }

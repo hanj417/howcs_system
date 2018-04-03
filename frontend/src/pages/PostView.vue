@@ -81,7 +81,10 @@ export default {
         this.properties = data.properties
         this.date = (new Date(data.created_at)).toISOString().slice(0, 10)
         this.author_name = data.author.name
-        this.files = JSON.parse(data.files)
+        if (data.files)
+          this.files = JSON.parse(data.files)
+        if (this.files == "")
+          this.files = []
         
         /*
       if (JSON.parse(data.properties).includes('notice')) {

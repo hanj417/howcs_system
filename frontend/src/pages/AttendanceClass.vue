@@ -11,177 +11,108 @@
     <q-table
       :data="table_data"
       :columns="columns"
-      :filter="filter"
-      :visible-columns="visible_columns"
       row-key="name"
       color="secondary"
     >
-      <template
-        slot="top-left"
-        slot-scope="props">
-        <q-search
-          hide-underline
-          color="secondary"
-          v-model="filter"
-          class="col-6"
-        />
+      <q-tr slot="body" slot-scope="props" :props="props">
+      <template v-for="col in columns">
+        <q-td v-if="col.name == 'name'" :key="col.name" :props="props">{{ props.row.name }}</q-td>
+        <q-td v-else :key="col.name" :props="props">
+          <q-btn @click="toggle(props.row, col.name)" :label="props.row[col.name]['category']"/>
+        </q-td>
       </template>
-      <template
-        slot="top-right"
-        slot-scope="props">
-        <q-table-columns
-          color="secondary"
-          class="q-mr-sm"
-          v-model="visible_columns"
-          :columns="columns"
-        />
-      </template>
-      <q-tr
-        slot="body"
-        slot-scope="props"
-        :props="props">
-        <template v-for="(key, value) in props.row">
-          <q-td
-            :key="key"
-            :props="props">{{ value }}</q-td>
-        </template>
       </q-tr>
     </q-table>
   </q-page>
 </template>
 
 <script>
-const get_default_data = () => {
-  return {
-    columns: [],
-    filters: {},
-    enrollment_items: [],
-    attendance_items: [],
-    student_id_items: {},
-
-    date: null,
-    menu: false,
-    first_date: null,
-    last_date: null,
-
-    categories: []
-  }
-}
+import { date } from 'quasar'
 
 export default {
   data () {
     return {
       table_data: [],
       columns: [
-        { name: 'teacher.name', label: '선생님', field: row => row.teacher.name, sortable: true, align: 'left' },
-        { name: 'title', label: '제목', field: 'title', sortable: true, align: 'left' }
       ],
-      filter: '',
-      visible_columns: ['teacher.name', 'title'],
+      item: [],
+      columns_name: { name: 'name', label: '이름', field: 'name', sortable: true, align: 'left' },
 
       categories: [],
-      enrollment_items: [],
-      attendance_items: [],
-      student_id_items: {},
       date: null,
-      first_date: null,
-      last_date: null
+      days: 5,
     }
   },
-  props: ['id'],
   watch: {
-    date: function (val) {
-      console.log(val)
-      this.set_date(val)
+    '$route.name' (val) {
       this.fetch_data()
-    }
+    },
+    'date' (val) {
+      this.date = val
+      this.fetch_data()
+    },
   },
+  props: ['class_id'],
   methods: {
-    set_date (date) {
-      this.first_date = new Date(date)
-      this.last_date = new Date(date)
-      this.first_date.setDate(this.first_date.getDate() - this.first_date.getDay() + 1)
-      this.last_date.setDate(this.first_date.getDate() + 4)
-      console.log(this.first_date.toISOString())
-      console.log(this.last_date.toISOString())
-      this.fetch_data()
-    },
-    fetch_attendance_data () {
-      // set attendance to default data
-      this.attendance_items = []
-      for (var i = 0; i < this.enrollment_items.length; i++) {
-        this.student_id_items[this.enrollment_items[i].student_id] = i
-        var item = {}
-        item['id'] = this.enrollment_items[i].student_id
-        item['name'] = this.enrollment_items[i].student.name
-        for (var d = new Date(this.first_date.getTime()); d <= this.last_date; d.setDate(d.getDate() + 1)) {
-          item[d.toISOString().slice(0, 10)] = {'value': '출석', 'id': null}
-        }
-        this.attendance_items.push(item)
-      }
-
-      // fetch attendance data
-      for (var i = 0; i < this.enrollment_items.length; i++) {
-        var student_id = this.enrollment_items[i].student_id
-        for (var d = new Date(this.first_date.getTime()); d <= this.last_date; d.setDate(d.getDate() + 1)) {
-          this.$axios.get(`attendances`, {params: {
-            class_id: this.id, student_id: student_id, date: d.toISOString().slice(0, 10)}})
-            .then(({ data }) => {
-              if (data.length != 0) {
-                console.log(data[0])
-                var index = this.student_id_items[data[0].student_id]
-                console.log('index', index, data)
-                var dd = new Date(data[0].date)
-                this.attendance_items[index][dd.toISOString().slice(0, 10)]['value'] = data[0].category
-                this.attendance_items[index][dd.toISOString().slice(0, 10)]['id'] = data[0].id
-              }
-            })
-        }
-      }
-    },
     fetch_data () {
+      let d = new Date(this.date)
+      let days = this.days
+      this.columns = [this.columns_name]
+      while (days) {
+        if (date.getDayOfWeek(d) < 1 || date.getDayOfWeek(d) > 5) {
+          d = date.addToDate(d, {days: 1})
+          continue 
+        }
+        
+        let new_column = {
+          name: date.formatDate(d, 'YYYY-MM-DD'),
+          label: date.formatDate(d, 'YYYY-MM-DD'),
+          field: date.formatDate(d, 'YYYY-MM-DD'),
+          align: 'center',
+        }
+        this.columns.push(new_column)
+        d = date.addToDate(d, {days: 1})
+        days = days - 1
+      }
+    
       let query = {
-        'class_id': this.$route.params.id
+        'class_id': this.class_id,
+        'date': (new Date(this.date)).toISOString().slice(0,10),
+        'days': this.days,
       }
-      this.$axios.get(`enrollments`, {params: query}).then(({ data }) => {
+      this.$axios.get(`attendances`, {params: query})
+      .then(({ data }) => {
         console.log(data)
-        this.enrollment_items = data
-        this.fetch_attendance_data()
+        this.table_data = data
       })
-
-      // column setting
-      this.headers = [{'text': '이름', 'value': 'name'}]
-      this.columns = []
-      for (var d = new Date(this.first_date.getTime()); d <= this.last_date; d.setDate(d.getDate() + 1)) {
-        this.headers.push({'text': d.toISOString().slice(5, 10), 'value': d.toISOString().slice(0, 10)})
-        this.columns.push({'text': d.toISOString().slice(0, 10), 'value': d.toISOString().slice(0, 10)})
-      }
     },
     toggle (item, index) {
-      var i = this.categories.indexOf(item[index].value)
+      var i = this.categories.indexOf(item[index]['category'])
       i = (i + 1) % this.categories.length
-      item[index].value = this.categories[i]
+      item[index]['category'] = this.categories[i]
 
       if (i === 0) {
-        this.$axios.delete(`attendances/` + item[index].id
+        this.$axios.delete(`attendances/` + item[index]['id']
         ).then(({data}) => {
+          this.fetch_data()
         })
       } else if (i === 1) {
         this.$axios.post(`attendances`, {
-          'class_id': this.$route.params.id,
-          'student_id': item.id,
+          'class_id': this.class_id,
+          'student_id': item['id'],
           'date': index,
-          'category': item[index].value
+          'category': item[index]['category']
         }).then(({data}) => {
-          item[index].id = data.id
+          this.fetch_data()
         })
       } else {
-        this.$axios.put(`attendances/` + item[index].id, {
-          'class_id': this.$route.params.id,
-          'student_id': item.id,
+        this.$axios.put(`attendances/` + item[index]['id'], {
+          'class_id': this.class_id,
+          'student_id': item['id'],
           'date': index,
-          'category': item[index].value
+          'category': item[index]['category']
         }).then(({data}) => {
+          this.fetch_data()
         })
       }
     }

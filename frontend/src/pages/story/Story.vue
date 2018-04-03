@@ -138,7 +138,7 @@ export default {
     fetch_data () {
       let query = {}
       query['minor_category'] = 'story'
-      query['recent'] = '3'
+      //query['recent'] = '3'
       this.$axios.get(`posts/homepage`, {params: query})
         .then(({ data }) => {
           this.posts = data

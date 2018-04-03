@@ -42,7 +42,7 @@ export default {
             style="text-align:center">
             <!-- <img src="~assets/img/edu3.jpg" width="99%"> -->
             <a
-              onclick="window.open('assets/img/edu3.jpg','edu3','width=1100 height=700 scrollbars=yes toolbar=no')"><img
+              onclick="window.open('assets/img/howcurrimap_1024.jpg','edu3','width=1100 height=700 scrollbars=yes toolbar=no')"><img
                 src="assets/img/edu3.jpg"
                 alt="하우학교 세부교육과정"
                 width="99%"></a>

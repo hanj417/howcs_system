@@ -25,7 +25,7 @@
                   <template v-for="subitem in item.submenu">
                     <q-item :to="subitem.href">
                       <q-item-main>
-                        <q-item-tile label>{{ subitem.label }}</q-item-tile>
+                        <q-item-tile label class="q-body-2" style="color:#57a1d0;">{{ subitem.label }}</q-item-tile>
                       </q-item-main>
                     </q-item>
                   </template>
@@ -143,7 +143,7 @@ import { LocalStorage } from 'quasar'
 export default {
   name: 'LayoutDefault',
   props: ['leftDrawerOpen'],
-  data () {
+  data : function() {
     return {
       // leftDrawerOpen: this.$q.platform.is.desktop,
       header_transparency: true,

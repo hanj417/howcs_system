@@ -3,14 +3,18 @@
     padding
     class="row justify-center">
     <div style="width: 600px; max-width: 90vw;">
-      <div class="col-xs-12 docs-input">
+      <div v-if="role == 'admin'" class="col-xs-12 docs-input">
         <q-field
           label="선생님"
           icon="account circle"
           :label-width="3"
-          disabled
         >
-          <q-input v-model="teacher.name" />
+          <q-input v-model="teacher.name"  class="col-xs-8" disabled />
+          <q-btn
+            :disabled="$route.name == 'class_form_edit'"
+            class="col-xs-4 float-right"
+            @click="search"
+            label="교사 입력" />
         </q-field>
       </div>
       <div class="col-xs-12 q-pt-xl docs-input">
@@ -21,16 +25,6 @@
           :error="$v.title.$error"
           error-label="이름을 잘못 입력하였습니다.">
           <q-input v-model="title" />
-        </q-field>
-        <q-field
-          label="대분류"
-          icon="create"
-          :label-width="3">
-          <q-option-group
-            type="radio"
-            v-model="major_category"
-            inline
-            :options="major_categories" />
         </q-field>
         <q-field
           label="분류"
@@ -88,17 +82,13 @@
         </q-field>
       </div>
       <div class="col-xs-12 row justify-end q-mt-lg">
-        <div
-          v-if="teacher_select"
-          class="col-xs-4">
+        <div class="col-xs-4">
           <q-btn
-            @click="search"
-            label="선생님 검색" />
-        </div>
-        <div class="col-xs-2">
+            @click="$router.go(-1)"
+            label="취소" />
           <q-btn
             @click="save"
-            label="수정" />
+            :label="save_label" />
         </div>
       </div>
     </div>
@@ -110,8 +100,6 @@
         :columns="search_columns"
         :filter="search_filter"
         :visible-columns="search_visible_columns"
-        selection="single"
-        :selected.sync="search_item"
         row-key="id"
         color="secondary"
         class="col-xs-12 no-shadow"
@@ -136,27 +124,12 @@
             :columns="search_columns"
           />
         </template>
-        <template
-          slot="top-selection"
-          slot-scope="props">
-          <div class="col" />
-          <q-btn
-            color="negative"
-            flat
-            round
-            icon="add"
-            @click="search_select" />
-        </template>
+        <q-tr slot="body" slot-scope="props" :props="props" @click.native="search_select(props.row)" class="cursor-pointer">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+            {{ col.value }}
+          </q-td>
+        </q-tr>
       </q-table>
-      <div class="row q-ma-md col-xs-12 justify-end">
-        <div class="col-xs-2">
-          <q-btn
-            color="primary"
-            @click="search_modal = false"
-            label="닫기"
-          />
-        </div>
-      </div>
     </q-modal>
   </q-page>
 </template>
@@ -171,8 +144,6 @@ export default {
       teacher_select: false,
       teacher: {name: '' },
       title: '',
-      major_categories: [],
-      major_category: {},
       minor_categories: [],
       minor_category: '',
       year: '2018',
@@ -182,6 +153,7 @@ export default {
       audience: '',
       background: '',
       content: '',
+      save_label: '등록',
 
       search_modal: false,
       search_table_data: [],
@@ -203,30 +175,10 @@ export default {
     title: { required },
     year: { required }
   },
-  props: ['action', 'id'],
-  watch: {
-    'major_category' (val) {
-      this.$axios.get(`classes/categories/` + this.major_category
-      ).then(({ data }) => {
-        this.minor_categories = data
-      })
-    }
-  },
+  props: ['role', 'major_category', 'class_id'],
   methods: {
-    fetch_data () {
-      let query = {
-        class: this.id
-      }
-      this.$axios.get(`enrollments`, {params: query})
-        .then(({ data }) => {
-          this.items = data
-        })
-    },
-    cancel () {
-      this.$router.go(-1)
-    },
     save () {
-      if (this.action === 'new') {
+      if (this.$route.name === 'class_form_new') {
         this.$axios.post(`classes`, {
           'teacher_id': this.teacher.id,
           'title': this.title,
@@ -242,56 +194,56 @@ export default {
         }).then(({data}) => {
           this.$router.go(-1)
         })
-      } else if (this.action === 'update') {
-        if (this.id) {
-          this.$axios.put(`classes/` + this.id, {
-            'teacher_id': this.teacher.id,
-            'title': this.title,
-            'major_category': this.major_category,
-            'minor_category': this.minor_category,
-            'year': this.year,
-            'semester': this.semester,
-            'time_slot': this.time_slot,
-            'google_calendar': this.google_calendar,
-            'audience': this.audience,
-            'background': this.background,
-            'content': this.content
-          }).then(({data}) => {
-            this.$router.go(-1)
-          })
-        }
+      } else if (this.$route.name === 'class_form_edit') {
+        this.$axios.put(`classes/` + this.class_id, {
+          'teacher_id': this.teacher.id,
+          'title': this.title,
+          'major_category': this.major_category,
+          'minor_category': this.minor_category,
+          'year': this.year,
+          'semester': this.semester,
+          'time_slot': this.time_slot,
+          'google_calendar': this.google_calendar,
+          'audience': this.audience,
+          'background': this.background,
+           'content': this.content
+        }).then(({data}) => {
+          this.$router.go(-1)
+        })
       }
     },
     search () {
       let query = {}
       this.$axios.get(`howcs_teacher_infos`, {params: query})
-        .then(({ data }) => {
-          this.search_table_data = data
-        })
+      .then(({ data }) => {
+        this.search_table_data = data
+      })
       this.search_modal = true
     },
-    search_select () {
-      this.teacher = this.search_item[0].user
+    search_select (row) {
+      this.teacher = row.user
       this.search_modal = false
     }
   },
   created () {
     let user = LocalStorage.get.item('user_')
-    console.log(JSON.parse(user.role))
-    console.log(JSON.parse(user.role).includes('admin'))
-    if (JSON.parse(user.role).includes('admin')) {
+    if (this.role === 'admin') {
       this.teacher_select = true
-    } else {
+    } else if (this.role === 'teacher') {
       this.teacher = user
+    } else {
+      this.$router.go(-1)
     }
 
-    this.$axios.get(`classes/categories`
+    this.$axios.get(`classes/categories/` + this.major_category
     ).then(({ data }) => {
-      this.major_categories = data
+      this.minor_categories = data
     })
-
-    if (this.action === 'update') {
-      this.$axios.get(`classes/` + this.id
+    if (this.$route.name === 'class_form_new') {
+      this.save_label = '등록'
+    } else if (this.$route.name === 'class_form_edit') {
+      this.save_label = '수정'
+      this.$axios.get(`classes/` + this.class_id
       ).then(({ data }) => {
         console.log(data)
         this.teacher = data.teacher
@@ -307,6 +259,8 @@ export default {
         this.background = data.background
         this.content = data.content
       })
+    } else {
+      this.$router.go(-1)
     }
   }
 }

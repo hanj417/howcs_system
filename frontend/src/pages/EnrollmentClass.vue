@@ -9,7 +9,7 @@
       :visible-columns="visible_columns"
       selection="single"
       :selected.sync="item"
-      row-key="id"
+      row-key="name"
       color="secondary"
       class="col-xs-11"
     >
@@ -64,9 +64,7 @@
         :columns="search_columns"
         :filter="search_filter"
         :visible-columns="search_visible_columns"
-        selection="single"
-        :selected.sync="search_item"
-        row-key="id"
+        row-key="name"
         color="secondary"
         class="col-xs-12 no-shadow"
       >
@@ -90,27 +88,12 @@
             :columns="search_columns"
           />
         </template>
-        <template
-          slot="top-selection"
-          slot-scope="props">
-          <div class="col" />
-          <q-btn
-            color="negative"
-            flat
-            round
-            icon="add"
-            @click="search_select" />
-        </template>
+        <q-tr slot="body" slot-scope="props" :props="props" @click.native="search_select(props.row)" class="cursor-pointer">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+            {{ col.value }}
+          </q-td>
+        </q-tr>
       </q-table>
-      <div class="row q-ma-md col-xs-12 justify-end">
-        <div class="col-xs-2">
-          <q-btn
-            color="primary"
-            @click="search_modal = false"
-            label="닫기"
-          />
-        </div>
-      </div>
     </q-modal>
   </q-page>
 </template>
@@ -150,10 +133,15 @@ export default {
       search_item: []
     }
   },
-  props: ['id'],
+  watch: {
+    '$route.name' (val) {
+      this.fetch_data()
+    },
+  },
+  props: ['class_id'],
   methods: {
     fetch_data () {
-      let query = {'class_id': this.id}
+      let query = {'class_id': this.class_id}
       this.$axios.get(`enrollments`, {params: query})
         .then(({ data }) => {
           this.table_data = data
@@ -173,10 +161,10 @@ export default {
         })
       this.search_modal = true
     },
-    search_select () {
+    search_select (row) {
       this.$axios.post(`enrollments`, {
-        'class_id': this.id,
-        'student_id': this.search_item[0].id
+        'class_id': this.class_id,
+        'student_id': row.id
       }).then(({data}) => {
         this.search_modal = false
         this.fetch_data()
@@ -188,49 +176,3 @@ export default {
   }
 }
 </script>
-/*
-const get_default_data = () => { return {
-    loading: false,
-    filters: {},
-    columns: [
-      {
-        'text': 'Name',
-        'value': 'student.name'
-      },
-      {
-        'text': 'Email',
-        'value': 'student.email'
-      },
-      {
-        'text': 'Phone',
-        'value': 'student.phone'
-      },
-      {
-        'text': 'School',
-        'value': 'student.school'
-      },
-      {
-        'text': 'Birthday',
-        'value': 'student.birthday'
-      },
-    ],
-    columns: [
-      {'text': '아이디', 'value': 'student.username'},
-      {'text': '이름', 'value': 'student.name'},
-      {'text': '이메일', 'value': 'student.email'},
-      {'text': '전화번호', 'value': 'student.phone'},
-    ],
-    items: [],
-    search_enrollment: '',
-    search_dialog: false,
-    search_name: '',
-    search_items: [],
-    search_columns: [
-      {'text': '아이디', 'value': 'username'},
-      {'text': '이름', 'value': 'name'},
-      {'text': '이메일', 'value': 'email'},
-      {'text': '전화번호', 'value': 'phone'},
-    ],
-  }
-}
-*/

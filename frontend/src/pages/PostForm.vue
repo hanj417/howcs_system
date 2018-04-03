@@ -20,73 +20,29 @@
         inline
         v-if="!category_disabled"
         :options="minor_categories" />
-<!--
-      <q-editor v-model="body"
-        :toolbar="[
-        ['bold', 'italic', 'strike', 'underline', 'subscript', 'superscript'],
-        ['token', 'hr', 'link', 'custom_btn'],
-        ['print', 'fullscreen'],
-        [
-          {
-            label: $q.i18n.editor.formatting,
-            icon: $q.icon.editor.formatting,
-            list: 'no-icons',
-            options: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'code']
-          },
-          {
-            label: $q.i18n.editor.fontSize,
-            icon: $q.icon.editor.fontSize,
-            fixedLabel: true,
-            fixedIcon: true,
-            list: 'no-icons',
-            options: ['size-1', 'size-2', 'size-3', 'size-4', 'size-5', 'size-6', 'size-7']
-          },
-          {
-            label: $q.i18n.editor.defaultFont,
-            icon: $q.icon.editor.font,
-            fixedIcon: true,
-            list: 'no-icons',
-            options: ['default_font', 'arial', 'arial_black', 'comic_sans', 'courier_new', 'impact', 'lucida_grande', 'times_new_roman', 'verdana']
-          },
-          'removeFormat'
-        ],
-        ['quote', 'unordered', 'ordered', 'outdent', 'indent'],
-        [
-          {
-            label: $q.i18n.editor.align,
-            icon: $q.icon.editor.align,
-            fixedLabel: true,
-            list: 'only-icons',
-            options: ['left', 'center', 'right', 'justify']
-          },
-          {
-            label: $q.i18n.editor.align,
-            icon: $q.icon.editor.align,
-            fixedLabel: true,
-            options: ['left', 'center', 'right', 'justify']
-          }
-        ],
-        ['undo', 'redo']
-      ]"
-      :fonts="{
-        arial: 'Arial',
-        arial_black: 'Arial Black',
-        comic_sans: 'Comic Sans MS',
-        courier_new: 'Courier New',
-        impact: 'Impact',
-        lucida_grande: 'Lucida Grande',
-        times_new_roman: 'Times New Roman',
-        verdana: 'Verdana'
-      }"/>
--->
+      <q-field
+        label="작성날짜"
+      >
+       <q-datetime
+          v-model="created_at"
+          type="date" />
+      </q-field>
       <div>
       <quill-editor v-model='body'  style="height: 300px;"/>
       </div>
       <div class="col-xs-12 q-mt-xl q-pt-xl">
-      <q-uploader ref="uploader" url="/api/upload" @add="add_file" @remove:cancel(file)="remove_file" @uploaded="uploaded" hide-upload-button auto-expand no-thumbnails clearable hide-upload-progress />
+      <q-uploader ref="uploader" url="/api/upload" @add="add_file" @remove:done(file)="remove_file" hide-upload-button auto-expand no-thumbnails clearable hide-upload-progress />
       </div>
+<div v-if="files" class="col-xs-12 text-left q-body-1">
+    <template v-for="file in files">
+<a :href="'/api/upload/' + file">{{ file }}</a><br>
+    </template>
+</div>
       <div class="row q-ma-md col-xs-12 justify-end">
-        <div class="col-xs-2">
+        <div class="col-xs-4">
+          <q-btn
+            @click="remove_files"
+            label="첨부파일삭제" />
           <q-btn
             @click="save"
             label="등록" />
@@ -111,8 +67,9 @@ export default {
       properties: '',
       notice: false,
       title: '',
+      created_at: '',
       body: '',
-      files: '',
+      files: [],
     }
   },
   props: ['action', 'id'],
@@ -135,7 +92,6 @@ export default {
       }
 
       console.log(this.files)
-      this.$refs.uploader.upload()
       if (this.action === 'new') {
         this.$axios.post(`posts`, {
           'major_category': this.major_category,
@@ -144,7 +100,8 @@ export default {
           'title': this.title,
           'body': this.body,
           'files': this.files,
-          'class_id': this.id
+          'class_id': this.id,
+          'created_at': (new Date(this.created_at)).toISOString(),
         }).then(({data}) => {
           this.$router.go(-1)
         })
@@ -156,6 +113,7 @@ export default {
           'title': this.title,
           'body': this.body,
           'files': this.files,
+          'created_at': (new Date(this.created_at)).toISOString(),
         }).then(({data}) => {
           this.$router.go(-1)
         })
@@ -166,12 +124,16 @@ export default {
       for (let i = 0; i < files.length; i++) {
         this.files.push(files[i].name)
       }
+      this.$refs.uploader.upload()
     },
     remove_file (files) {
       for (let i = 0; i < files.length; i++) {
         const index = array.indexOf(files[i].name);
         this.files.splice(index, 1);
       }
+    },
+    remove_files () {
+      this.files = []
     },
     
   },
@@ -182,6 +144,7 @@ export default {
     if (JSON.parse(user.role).includes('admin')) {
       this.category_disabled = false
     }
+    this.created_at = Date.now()
 
     this.$axios.get(`posts/categories`)
       .then(({ data }) => { this.major_categories = data })
@@ -199,8 +162,12 @@ export default {
           }
           this.title = data.title
           this.body = data.body
-          this.files = data.files
+          if (data.files)
+            this.files = JSON.parse(data.files)
+          if (this.files == "")
+            this.files = []
           this.class_id = data.class_id
+          this.created_at = data.created_at
         })
     } else if (this.action === 'new') {
       if (this.id) {

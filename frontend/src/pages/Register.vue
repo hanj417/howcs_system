@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="row justify-center">
     <div class="page-intro">
       <img
         src="~assets/img/login_background_image.png"
@@ -10,17 +10,15 @@
       </div>
 
     </div>
-
-    <div class="row justify-center">
       <div class="container col-xs-12">
         <div class="page-name">
           회원가입
         </div>
         <hr class="page-name--bottom-border" >
       </div>
+    <div style="width: 600px; max-width: 90vw;" class="no-shadow q-mb-xl q-pb-xl">
 
-      <div style="width: 600px; max-width: 90vw;">
-        <div class="col-xs-12 docs-input">
+        <div class="col-xs-10 docs-input q-mx-xl">
           <q-field
             label="아이디"
             icon="account circle"
@@ -41,11 +39,10 @@
               v-model="password"
               type="password" />
           </q-field>
-        </div>
-        <div class="col-xs-12 q-pt-xl docs-input">
+          <hr>
           <q-field
             label="이름"
-            icon="create"
+            icon="format size"
             :label-width="3"
             :error="$v.name.$error"
             error-label="이름을 잘못 입력하였습니다."
@@ -54,7 +51,7 @@
           </q-field>
           <q-field
             label="이메일"
-            icon="create"
+            icon="email"
             :label-width="3"
             :error="$v.email.$error"
             error-label="이메일을 잘못 입력하였습니다."
@@ -65,7 +62,7 @@
           </q-field>
           <q-field
             label="전화번호"
-            icon="create"
+            icon="phone"
             :label-width="3"
             :error="$v.phone.$error"
             error-label="전화번호를 잘못 입력하였습니다."
@@ -74,7 +71,7 @@
           </q-field>
           <q-field
             label="출석교회"
-            icon="create"
+            icon="business"
             :label-width="3"
             :error="$v.church.$error"
             error-label="출석교회를 잘못 입력하였습니다."
@@ -83,7 +80,7 @@
           </q-field>
           <q-field
             label="소속학교"
-            icon="create"
+            icon="school"
             :label-width="3"
             :error="$v.school.$error"
             error-label="소속학교를 잘못 입력하였습니다."
@@ -92,7 +89,7 @@
           </q-field>
           <q-field
             label="생년월일"
-            icon="create"
+            icon="cake"
             :label-width="3"
             :error="$v.birthday.$error"
             error-label="생년월일을 잘못 입력하였습니다."
@@ -103,7 +100,7 @@
           </q-field>
         </div>
         <div class="col-xs-12 row justify-end">
-          <div class="col-xs-2">
+          <div class="col-xs-4">
             <q-btn
               @click="store"
               label="회원가입"
@@ -148,7 +145,19 @@ export default {
   },
   methods: {
     store () {
-    }
+          this.$axios.post(`users`, {
+            'username': this.username,
+            'password': this.password,
+            'name': this.name,
+            'email': this.email,
+            'phone': this.phone,
+            'school': this.school,
+            'church': this.church,
+            'birthday': this.date
+          }).then(({data}) => {
+            this.$router.go(-1)
+          })
+    },
   }
 }
 </script>

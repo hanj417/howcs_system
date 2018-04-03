@@ -64,8 +64,6 @@
         :columns="search_columns"
         :filter="search_filter"
         :visible-columns="search_visible_columns"
-        selection="single"
-        :selected.sync="search_item"
         row-key="id"
         color="secondary"
         class="col-xs-12 no-shadow"
@@ -90,27 +88,12 @@
             :columns="search_columns"
           />
         </template>
-        <template
-          slot="top-selection"
-          slot-scope="props">
-          <div class="col" />
-          <q-btn
-            color="negative"
-            flat
-            round
-            icon="add"
-            @click="search_select" />
-        </template>
+        <q-tr slot="body" slot-scope="props" :props="props" @click.native="search_select(props.row)" class="cursor-pointer">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+            {{ col.value }}
+          </q-td>
+        </q-tr>
       </q-table>
-      <div class="row q-ma-md col-xs-12 justify-end">
-        <div class="col-xs-2">
-          <q-btn
-            color="primary"
-            @click="search_modal = false"
-            label="닫기"
-          />
-        </div>
-      </div>
     </q-modal>
   </q-page>
 </template>
@@ -163,9 +146,9 @@ export default {
           this.fetch_data()
         })
     },
-    howcs_teacher_new () {
+    howcs_teacher_new (row) {
       this.$axios.post(`howcs_teacher_infos`, {
-        'user_id': this.search_item[0].id
+        'user_id': row.id
       }).then(({ data }) => {
         this.fetch_data()
       })
@@ -178,8 +161,9 @@ export default {
         })
       this.search_modal = true
     },
-    search_select () {
-      this.howcs_teacher_new()
+    search_select (row) {
+      this.howcs_teacher_new(row)
+      this.search_modal = false
     }
   },
   created () {

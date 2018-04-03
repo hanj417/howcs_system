@@ -7,8 +7,6 @@
       :columns="columns"
       :filter="filter"
       :visible-columns="visible_columns"
-      selection="single"
-      :selected.sync="item"
       row-key="id"
       color="secondary"
       class="col-xs-11"
@@ -33,24 +31,11 @@
           :columns="columns"
         />
       </template>
-      <template
-        slot="top-selection"
-        slot-scope="props">
-        <div class="col" />
-        <q-btn
-          color="negative"
-          flat
-          round
-          icon="edit"
-          @click="$router.push({name: 'user_form_admin', params: {action:'update', id:item[0].id}})" />
-        <q-btn
-          color="negative"
-          flat
-          round
-          delete
-          icon="delete"
-          @click="remove" />
-      </template>
+      <q-tr slot="body" slot-scope="props" :props="props" @click.native="rowClick(props.row)" class="cursor-pointer">
+        <q-td v-for="col in props.cols" :key="col.name" :props="props">
+          {{ col.value }}
+        </q-td>
+      </q-tr>
     </q-table>
     <q-page-sticky
       position="bottom-right"
@@ -85,6 +70,7 @@ export default {
       item: []
     }
   },
+  props: ['action'],
   methods: {
     fetch_data () {
       let query = {}
@@ -94,7 +80,14 @@ export default {
     remove () {
       this.$axios.delete(`student_infos/` + this.item[0].id)
         .then(({ data }) => { this.fetch_data() })
-    }
+    },
+    rowClick(row) {
+      if (this.action === 'student_record') {
+        this.$router.push({name: 'student_record', params: {action:'update', id:row.id}})
+      } else if (this.action === 'student_health_record') {
+        this.$router.push({name: 'student_health_record', params: {action:'edit', id:row.id}})
+      }
+    },
   },
   created () {
     this.fetch_data()

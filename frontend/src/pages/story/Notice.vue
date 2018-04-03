@@ -73,20 +73,20 @@ export default {
     fetch_data () {
       let query = {}
       query['minor_category'] = 'notice'
-      query['recent'] = '10'
+      //query['recent'] = '10'
       this.$axios.get(`posts/homepage`, {params: query})
         .then(({ data }) => {
-          for (let i = 0; i < 3; i++) {
+          for (let i = 0; i < 3 && i < data.length; i++) {
             this.recents.push(data[i]) 
           }
           for (let i = 3; i < data.length; i++) {
             this.recents2.push(data[i]) 
           }
           for (let i = 0; i < this.recents2.length; i++) {
-            this.recents2[i]['hidden'] = false 
+            this.$set(this.recents2[i], 'hidden', true)
           }
         })
-    }
+    },
   },
   created () {
     this.fetch_data()

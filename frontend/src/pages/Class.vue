@@ -7,8 +7,6 @@
       :columns="columns"
       :filter="filter"
       :visible-columns="visible_columns"
-      selection="single"
-      :selected.sync="item"
       row-key="id"
       color="secondary"
       class="col-xs-11"
@@ -33,30 +31,11 @@
           :columns="columns"
         />
       </template>
-      <template
-        slot="top-selection"
-        slot-scope="props">
-        <div class="col" />
-        <q-btn
-          color="negative"
-          flat
-          round
-          icon="group add"
-          @click="$router.push({name:'enrollment_class', params: {id: item[0].id}})" />
-        <q-btn
-          color="negative"
-          flat
-          round
-          icon="assignment"
-          @click="$router.push({name:'post_class', params: {class_id: item[0].id}})" />
-        <q-btn
-          color="negative"
-          flat
-          round
-          delete
-          icon="delete"
-          @click="remove" />
-      </template>
+      <q-tr slot="body" slot-scope="props" :props="props" @click.native="rowClick(props.row)" class="cursor-pointer">
+        <q-td v-for="col in props.cols" :key="col.name" :props="props">
+          {{ col.value }}
+        </q-td>
+      </q-tr>
     </q-table>
     <q-page-sticky
       position="bottom-right"
@@ -64,7 +43,7 @@
       <q-btn
         round
         color="primary"
-        @click="$router.push({name:'class_form_admin', params:{major_category:'howcs', action:'new'}})"
+        @click="$router.push({name:'class_form_new', params:{major_category:'howcs', role:'admin'}})"
         icon="add" />
     </q-page-sticky>
   </q-page>
@@ -83,29 +62,53 @@ export default {
       ],
       filter: '',
       visible_columns: ['teacher_name', 'title', 'major_category', 'minor_category'],
-      item: []
+      selection: 'none',
+      item: [],
     }
   },
-  props: ['major_category', 'id'],
+  watch: {
+    '$route.name' (val) {
+      this.fetch_data()
+    },
+  },
+  watch: {
+    'major_category' (val) {
+      this.fetch_data()
+    },
+    'minor_category' (val) {
+      this.fetch_data()
+    },
+    'action' (val) {
+      this.fetch_data()
+    },
+    'teacher_id' (val) {
+      this.fetch_data()
+    },
+  },
+  props: ['major_category', 'minor_category', 'action', 'teacher_id'],
   methods: {
     fetch_data () {
       let query = {}
-      if (this.major_category) {
+      if (this.$route.name === 'class_all') {
         query['major_category'] = this.major_category
-      }
-      if (this.id) {
-        query['teacher_id'] = this.id
+      } else if (this.$route.name === 'howcs_class_teacher') {
+        query['major_category'] = this.major_category
+        query['minor_category'] = this.minor_category
+        query['teacher_id'] = this.teacher_id
+      } else if (this.$route.name === 'class_teacher') {
+        query['major_category'] = this.major_category
+        query['teacher_id'] = this.teacher_id
       }
       this.$axios.get(`classes`, {params: query})
-        .then(({ data }) => {
+      .then(({ data }) => {
           this.table_data = data
-        })
+      })
     },
     remove () {
       this.$axios.delete(`classes/` + this.item[0].id)
-        .then(({ data }) => {
-          this.fetch_data()
-        })
+      .then(({ data }) => {
+        this.fetch_data()
+      })
     },
     enroll () {
       this.$axios.post(`enrollments`, {
@@ -113,58 +116,29 @@ export default {
       }).then(({ data }) => {
         this.fetch_data()
       })
-    }
-    /*
-    set_visibility() {
-      if (this.id) {
-        this.filters['teacher_id'] = this.id
-        this.columns = this.howcs_teacher_columns
-        this.headers = this.howcs_teacher_headers
-        this.class_form_visible = true
-        this.post_visible = true
-        this.attendance_visible = true
-        this.enrollment_visible = false
-        this.edit_visible = false
-        this.delete_visible = false
-        this.enroll_visible = false
-      } else {
-        if (this.major_category === 'agit') {
-          this.columns = this.agit_columns
-          this.headers = this.agit_headers
-          this.class_form_visible = false
-          this.post_visible = false
-          this.attendance_visible = false
-          this.enrollment_visible = false
-          this.edit_visible = false
-          this.delete_visible = false
-          this.enroll_visible = true
-        } else if (this.major_category === 'howcs') {
-          this.class_form_visible = true
-          this.post_visible = false
-          this.attendance_visible = false
-          this.enrollment_visible = true
-          this.edit_visible = true
-          this.delete_visible = true
-          this.enroll_visible = false
+    },
+    rowClick (row) {
+      if (this.action === 'enrollment') {
+        this.$router.push({name:'enrollment_class', params: {class_id: row.id}})
+      } else if (this.action === 'attendance') {
+        this.$router.push({name:'attendance_class', params: {class_id: row.id}})
+      } else if (this.action === 'post') {
+        this.$router.push({name:'post_class', params: {class_id: row.id}})
+      } else if (this.action === 'edit') {
+        if (this.$route.name === 'class_all') {
+          this.$router.push({name:'class_form_edit', params: {role: 'admin', class_id: row.id, action:'edit'}})
+        } else if (this.$route.name === 'class_teacher') {
+          this.$router.push({name:'class_form_edit', params: {role: 'teacher', class_id: row.id, action:'edit'}})
         }
       }
-    }
-*/
+    }, 
   },
   created () {
-    // this.set_visibility()
+    if (this.$route.name === 'class_all') {
+    } else if (this.$route.name === 'class_teacher') {
+    }
     this.fetch_data()
   }
 }
 </script>
 
-/*
-    class_form_visible: false,
-    attendance_visible: false,
-    enrollment_visible: false,
-    edit_visible: false,
-    delete_visible: false,
-    enroll_visible: false,
-  }
-}
-*/
