@@ -15,20 +15,21 @@
 
 <script>
 export default {
-  data () {
+  data: function() {
     return {
       career: ''
     }
   },
   methods: {
-    cancel () {
+    cancel: function () {
       this.$router.go(-1)
     },
-    save () {
-      this.$axios.post(`agit_teacher_infos`, {
-        'career': this.career
-      }).then(({data}) => {
-        this.$router.go(-1)
+    save: function () {
+      var self = self
+      self.$axios.post('agit_teacher_infos', {
+        'career': self.career
+      }).then(function(response) { let data = response.data
+        self.$router.go(-1)
       })
     }
   }

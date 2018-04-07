@@ -10,7 +10,7 @@
 import { date } from 'quasar'
 
 export default {
-  data () {
+  data: function() {
     return {
 events: [],
       table_data: [],
@@ -35,19 +35,20 @@ events: [],
   },
   props: ['class_id', 'student_id'],
   methods: {
-    fetch_data () {
+    fetch_data: function() {
       let query = {
         'student_id': this.student_id,
         'class_id': this.class_id,
         'date': this.date,
         'days': this.days,
       }
-      this.$axios.get(`attendances`, {params: query})
-      .then(({ data }) => {
+      var self = this
+      self.$axios.get('attendances', {params: query})
+      .then(function(response) { let data = response.data
         console.log(data)
-        this.table_data = data
+        self.table_data = data
         var attendance
-        this.events = []
+        self.events = []
         for (let i = 0; i < data.length; i ++) {
           let event = {
     title     :  data[i].category,
@@ -55,15 +56,16 @@ events: [],
     cssClass  : 'family',
     YOUR_DATA : {}
           }
-          this.events.push(event)
+          self.events.push(event)
         }
       })
     },
   },
-  created () {
-    this.$axios.get(`attendances/categories`)
-      .then(({ data }) => {
-        this.categories = data
+  created: function () {
+    var self = this
+    self.$axios.get('attendances/categories')
+      .then(function(response) { let data = response.data
+        self.categories = data
       })
 
     var today = new Date()

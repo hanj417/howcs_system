@@ -50,7 +50,7 @@
 
 <script>
 export default {
-  data () {
+  data: function() {
     return {
       table_data: [],
       columns: [
@@ -81,7 +81,7 @@ export default {
   },
   props: ['id', 'major_category', 'minor_category', 'action'],
   methods: {
-    fetch_data () {
+    fetch_data: function() {
       let query = {}
       if (this.id) {
         query['student_id'] = this.id
@@ -92,19 +92,21 @@ export default {
       if (this.minor_category) {
         query['minor_category'] = this.minor_category
       }
-      this.$axios.get(`enrollments`, {params: query})
-        .then(({ data }) => {
-          this.table_data = data
+      var self = this
+      self.$axios.get('enrollments', {params: query})
+        .then(function(response) { let data = response.data
+          self.table_data = data
         })
     },
-    remove () {
-      this.$axios.delete(`enrollments/` +
-        this.item[0].class_id + `/` + this.item[0].student_id)
-        .then(({ data }) => {
-          this.fetch_data()
+    remove: function () {
+      var self = this
+      self.$axios.delete('enrollments/' +
+        self.item[0].class_id + '/' + self.item[0].student_id)
+        .then(function(response) { let data = response.data
+          self.fetch_data()
         })
     },
-    rowClick(row) {
+    rowClick: function (row) {
       if (this.action === 'post') {
         this.$router.push({name:'post_class', params:{class_id:row.class.id}})
       } else if (this.action === 'attendance') {
@@ -112,16 +114,17 @@ export default {
       }
     }
   },
-  created () {
-    this.$axios.get(`classes/categories`
-    ).then(({ data }) => {
-      this.major_categories = data
+  created: function () {
+    var self = this
+    self.$axios.get('classes/categories'
+    ).then(function(response) { let data = response.data
+      self.major_categories = data
     })
 
-    this.$axios.get(`classes/categories/` + this.major_category
-    ).then(({ data }) => {
-      this.minor_categories = data[this.major_category]
-      this.fetch_data()
+    self.$axios.get('classes/categories/' + self.major_category
+    ).then(function(response) { let data = response.data
+      self.minor_categories = data[self.major_category]
+      self.fetch_data()
     })
   }
 }

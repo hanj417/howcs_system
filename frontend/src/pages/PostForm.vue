@@ -56,7 +56,7 @@
 import { LocalStorage } from 'quasar'
 
 export default {
-  data () {
+  data: function() {
     return {
       class_id: '',
       major_categories: [],
@@ -74,70 +74,72 @@ export default {
   },
   props: ['action', 'id'],
   watch: {
-    'major_category' (val) {
-      this.$axios.get(`classes/categories/` + this.major_category
-      ).then(({ data }) => {
-        this.minor_categories = data
+    'major_category': function (val) {
+      var self = this
+      self.$axios.get('classes/categories/' + self.major_category
+      ).then(function(response) { let data = response.data
+        self.minor_categories = data
       })
     }
   },
   methods: {
-    cancel () {
+    cancel: function () {
       this.$router.go(-1)
     },
-    save () {
+    save: function () {
       this.properties = []
       if (this.notice) {
         this.properties.push('notice')
       }
 
       console.log(this.files)
+      var self = this
       if (this.action === 'new') {
-        this.$axios.post(`posts`, {
-          'major_category': this.major_category,
-          'minor_category': this.minor_category,
-          'properties': this.properties,
-          'title': this.title,
-          'body': this.body,
-          'files': this.files,
-          'class_id': this.id,
-          'created_at': (new Date(this.created_at)).toISOString(),
-        }).then(({data}) => {
-          this.$router.go(-1)
+        self.$axios.post('posts', {
+          'major_category': self.major_category,
+          'minor_category': self.minor_category,
+          'properties': self.properties,
+          'title': self.title,
+          'body': self.body,
+          'files': self.files,
+          'class_id': self.id,
+          'created_at': (new Date(self.created_at)).toISOString(),
+        }).then(function(response) { let data = response.data
+          self.$router.go(-1)
         })
-      } else if (this.action === 'update') {
-        this.$axios.put(`posts/` + this.id, {
-          'major_category': this.major_category,
-          'minor_category': this.minor_category,
-          'properties': this.properties,
-          'title': this.title,
-          'body': this.body,
-          'files': this.files,
-          'created_at': (new Date(this.created_at)).toISOString(),
-        }).then(({data}) => {
-          this.$router.go(-1)
+      } else if (self.action === 'update') {
+        self.$axios.put('posts/' + self.id, {
+          'major_category': self.major_category,
+          'minor_category': self.minor_category,
+          'properties': self.properties,
+          'title': self.title,
+          'body': self.body,
+          'files': self.files,
+          'created_at': (new Date(self.created_at)).toISOString(),
+        }).then(function(response) { let data = response.data
+          self.$router.go(-1)
         })
       }
     },
-    add_file (files) {
+    add_file: function (files) {
       console.log(files)
       for (let i = 0; i < files.length; i++) {
         this.files.push(files[i].name)
       }
       this.$refs.uploader.upload()
     },
-    remove_file (files) {
+    remove_file: function (files) {
       for (let i = 0; i < files.length; i++) {
         const index = array.indexOf(files[i].name);
         this.files.splice(index, 1);
       }
     },
-    remove_files () {
+    remove_files: function () {
       this.files = []
     },
     
   },
-  created () {
+  created: function () {
     let user = LocalStorage.get.item('user_')
     console.log(JSON.parse(user.role))
     console.log(JSON.parse(user.role).includes('admin'))
@@ -146,36 +148,38 @@ export default {
     }
     this.created_at = Date.now()
 
-    this.$axios.get(`posts/categories`)
-      .then(({ data }) => { this.major_categories = data })
-    this.$axios.get(`posts/properties`)
-      .then(({ data }) => {})
-    if (this.action === 'update') {
-      this.$axios.get(`posts/` + this.id)
-        .then(({ data }) => {
-          this.major_category = data.major_category
-          this.minor_category = data.minor_category
-          //this.category_disabled = true
-          this.properties = data.properties
+    var self = this
+    self.$axios.get('posts/categories')
+      .then(function(response) { let data = response.data 
+        self.major_categories = data })
+    self.$axios.get('posts/properties')
+      .then(function(response) { let data = response.data})
+    if (self.action === 'update') {
+      self.$axios.get('posts/' + self.id)
+        .then(function(response) { let data = response.data
+          self.major_category = data.major_category
+          self.minor_category = data.minor_category
+          //self.category_disabled = true
+          self.properties = data.properties
           if (data.properties && JSON.parse(data.properties).includes('notice')) {
-            this.notice = true
+            self.notice = true
           }
-          this.title = data.title
-          this.body = data.body
+          self.title = data.title
+          self.body = data.body
           if (data.files)
-            this.files = JSON.parse(data.files)
-          if (this.files == "")
-            this.files = []
-          this.class_id = data.class_id
-          this.created_at = data.created_at
+            self.files = JSON.parse(data.files)
+          if (self.files == "")
+            self.files = []
+          self.class_id = data.class_id
+          self.created_at = data.created_at
         })
-    } else if (this.action === 'new') {
-      if (this.id) {
-        this.$axios.get(`classes/` + this.id)
-          .then(({ data }) => {
-            this.major_category = data.major_category
-            this.minor_category = data.minor_category
-            this.category_disabled = true
+    } else if (self.action === 'new') {
+      if (self.id) {
+        self.$axios.get('classes/' + self.id)
+          .then(function(response) { let data = response.data
+            self.major_category = data.major_category
+            self.minor_category = data.minor_category
+            self.category_disabled = true
           })
       }
     }

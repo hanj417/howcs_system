@@ -55,7 +55,7 @@
         @click="$router.push({name:'post_form_admin', params:{action:'new'}})"
         icon="add" />
       <q-btn
-        v-if="!is_admin"
+        v-if="!is_admin && is_author"
         round
         color="primary"
         @click="$router.push({name:'post_form', params:{action:'new', id:class_id}})"
@@ -68,7 +68,7 @@
 import { LocalStorage } from 'quasar'
 
 export default {
-  data () {
+  data: function() {
     return {
       table_data: [],
       columns: [
@@ -88,7 +88,7 @@ export default {
   },
   props: ['class_id', 'major_category', 'minor_category'],
   methods: {
-    fetch_data () {
+    fetch_data: function() {
       let query = {}
       if (this.minor_category) {
         query['major_category'] = this.major_category
@@ -97,13 +97,14 @@ export default {
       if (this.class_id) {
         query['class_id'] = this.class_id
       }
-      this.$axios.get(`posts`, {params: query})
-        .then(({ data }) => {
-          this.table_data = data
+      var self = this
+      self.$axios.get('posts', {params: query})
+        .then(function(response) { let data = response.data
+          self.table_data = data
         })
     }
   },
-  created () {
+  created: function () {
     let user = LocalStorage.get.item('user_')
     console.log(JSON.parse(user.role))
     console.log(JSON.parse(user.role).includes('admin'))
@@ -113,11 +114,12 @@ export default {
     if (this.class_id) {
       this.user = LocalStorage.get.item('user_')
 
-      this.$axios.get(`classes/` + this.class_id)
-        .then(({ data }) => {
-          console.log(this.user)
-          if (data.teacher_id === this.user.id) {
-            this.is_author = true
+      var self = this
+      self.$axios.get('classes/' + self.class_id)
+        .then(function(response) { let data = response.data
+          console.log(self.user)
+          if (data.teacher_id === self.user.id) {
+            self.is_author = true
           }
         })
     }
@@ -125,26 +127,3 @@ export default {
   }
 }
 </script>
-/*
-const get_default_data = () => {
-  return {
-    class_id: '',
-    is_author: false,
-    columns: [
-      {'text': '번호', 'value': 'id'},
-      {'text': '제목', 'value': 'title', 'width': 400},
-      {'text': '글쓴이', 'value': 'author.name'},
-      {'text': '작성일', 'value': 'date'},
-    ],
-    headers: [
-      {'text': '번호', 'value': 'id'},
-      {'text': '제목', 'value': 'title', 'width': 400},
-      {'text': '글쓴이', 'value': 'author.name'},
-      {'text': '작성일', 'value': 'date'},
-    ],
-    filters: {},
-    items: [],
-    search_name: '',
-  }
-}
-*/

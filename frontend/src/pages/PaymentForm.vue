@@ -177,7 +177,7 @@
 
 <script>
 export default {
-  data () {
+  data: function() {
     return {
       save_btn_text: '등록',
       valid: true,
@@ -246,16 +246,16 @@ export default {
     'pagination.page' (val) {
       this.fetch_data()
     },
-    'pagination.sortBy' (val) {
+    'pagination.sortBy': function (val) {
       this.fetch_data()
     },
-    'pagination.descending' (val) {
+    'pagination.descending': function (val) {
       this.fetch_data()
     }
   },
   methods: {
-    get_column_data (row, field) {
-      // process fields like `type.name`
+    get_column_data: function (row, field) {
+      // process fields like 'type.name'
       let [l1, l2] = field.value.split('.')
       let value = row[l1]
       let tag = null
@@ -266,11 +266,11 @@ export default {
         tag = 'img'
       }
       if (tag) {
-        value = `<${tag} src="${value}" class="crud-grid-thumb" controls />`
+        value = '<${tag} src="${value}" class="crud-grid-thumb" controls />'
       }
       return value
     },
-    fetch_data () {
+    fetch_data: function() {
       let sort = this.pagination.sortBy
       if (this.pagination.descending) {
         sort = '-' + sort
@@ -280,62 +280,62 @@ export default {
       this.$route.query.perPage = this.pagination.rowsPerPage
       this.$route.query.page = this.pagination.page
 
-      this.$axios.get(`enrollments`, {params: {class: this.$route.params.id}}).then(({ data }) => {
+      this.$axios.get('enrollments', {params: {class: this.$route.params.id}}).then(function(response) { let data = response.data
         this.items = data.data
         this.pagination.totalItems = data.total
       })
     },
-    cancel () {
+    cancel: function () {
       this.$router.go(-1)
     },
-    save () {
+    save: function () {
       if (this.action === 'new') {
-        this.$axios.post(`payments`, {
+        this.$axios.post('payments', {
           'user_id': this.user_id,
           'major_category': this.major_category,
           'year': this.year,
           'semester': this.semester,
           'cost': this.cost,
           'date': this.date
-        }).then(({data}) => {
+        }).then(function(response) { let data = response.data
           this.$router.go(-1)
         })
       } else if (this.action === 'update') {
-        this.$axios.put(`payments/` + this.$route.params.id, {
+        this.$axios.put('payments/' + this.$route.params.id, {
           'user_id': this.user_id,
           'major_category': this.major_category,
           'year': this.year,
           'semester': this.semester,
           'cost': this.cost,
           'date': this.date
-        }).then(({data}) => {
+        }).then(function(response) { let data = response.data
           this.$router.go(-1)
         })
       }
     },
-    search () {
+    search: function () {
       // this.$route.query.query = JSON.stringify(this.filters.model)
-      this.$axios.get(`users`, {params: {name: this.search_name}}).then(({ data }) => {
+      this.$axios.get('users', {params: {name: this.search_name}}).then(function(response) { let data = response.data
         this.search_items = data.data
       })
     },
-    search_select (item) {
-      this.$axios.get(`users/` + item.id
-      ).then(({data}) => {
+    search_select: function (item) {
+      this.$axios.get('users/' + item.id
+      ).then(function(response) { let data = response.data
         this.user = data
         this.user_id = data.id
         this.search_dialog = false
       })
     }
   },
-  created () {
-    this.$axios.get(`classes/major_categories`
-    ).then(({ data }) => {
+  created: function () {
+    this.$axios.get('classes/major_categories'
+    ).then(function(response) { let data = response.data
       this.major_categories = data
     })
     if (this.$route.params.action === 'update') {
-      this.$axios.get(`payments/` + this.$route.params.id
-      ).then(({ data }) => {
+      this.$axios.get('payments/' + this.$route.params.id
+      ).then(function(response) { let data = response.data
         console.log(data)
         this.major_category = data.major_category
         this.year = data.year

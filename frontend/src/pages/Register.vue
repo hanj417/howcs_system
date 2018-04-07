@@ -116,7 +116,7 @@
 import { required, email } from 'vuelidate/lib/validators'
 
 export default {
-  data () {
+  data: function() {
     return {
       username: '',
       password: '',
@@ -128,7 +128,7 @@ export default {
       church: '',
       birthday: null,
       conditions: false,
-      content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc.`,
+      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc.',
       terms: false,
       terms_check: false
     }
@@ -144,18 +144,19 @@ export default {
     birthday: { required }
   },
   methods: {
-    store () {
-          this.$axios.post(`users`, {
-            'username': this.username,
-            'password': this.password,
-            'name': this.name,
-            'email': this.email,
-            'phone': this.phone,
-            'school': this.school,
-            'church': this.church,
-            'birthday': this.date
-          }).then(({data}) => {
-            this.$router.go(-1)
+    store: function () {
+          let self = this
+          self.$axios.post('users', {
+            'username': self.username,
+            'password': self.password,
+            'name': self.name,
+            'email': self.email,
+            'phone': self.phone,
+            'school': self.school,
+            'church': self.church,
+            'birthday': self.date
+          }).then(function(response) { let data = response.data
+            self.$router.go(-1)
           })
     },
   }

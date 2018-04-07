@@ -56,7 +56,7 @@
 
 <script>
 export default {
-  data () {
+  data: function() {
     return {
       date: '',
       internal_medicine: '',
@@ -74,62 +74,64 @@ export default {
   },
   props: ['id'],
   methods: {
-    cancel () {
+    cancel: function () {
       this.$router.go(-1)
     },
-    save () {
+    save: function () {
+      let self = this
       if (this.$route.name === 'student_health_record_new') {
-        this.$axios.post(`student_health_records`, {
-          'student_record_id': this.id,
-          'date': (new Date(this.date)).toISOString(),
-          'internal_medicine': this.internal_medicine,
-          'dental_clinic': this.dental_clinic,
-          'fluorine_coating': this.fluorine_coating,
-          'height': this.height,
-          'weight': this.weight,
-          'sight': this.sight,
-          'internal_medicine_content': this.internal_medicine_content,
-          'cavity': this.cavity,
-          'dental_clinic_content': this.dental_clinic_content,
-          'content': this.content,
-        }).then(({data}) => {
-          this.$router.go(-1)
+        self.$axios.post('student_health_records', {
+          'student_record_id': self.id,
+          'date': (new Date(self.date)).toISOString(),
+          'internal_medicine': self.internal_medicine,
+          'dental_clinic': self.dental_clinic,
+          'fluorine_coating': self.fluorine_coating,
+          'height': self.height,
+          'weight': self.weight,
+          'sight': self.sight,
+          'internal_medicine_content': self.internal_medicine_content,
+          'cavity': self.cavity,
+          'dental_clinic_content': self.dental_clinic_content,
+          'content': self.content,
+        }).then(function(response) { let data = response.data
+          self.$router.go(-1)
         })
-      } else if (this.$route.name === 'student_health_record_edit') {
-        this.$axios.put(`student_health_records/` + this.id, {
-          'date': (new Date(this.date)).toISOString(),
-          'internal_medicine': this.internal_medicine,
-          'dental_clinic': this.dental_clinic,
-          'fluorine_coating': this.fluorine_coating,
-          'height': this.height,
-          'weight': this.weight,
-          'sight': this.sight,
-          'internal_medicine_content': this.internal_medicine_content,
-          'cavity': this.cavity,
-          'dental_clinic_content': this.dental_clinic_content,
-          'content': this.content,
-        }).then(({data}) => {
-          this.$router.go(-1)
+      } else if (self.$route.name === 'student_health_record_edit') {
+        self.$axios.put('student_health_records/' + self.id, {
+          'date': (new Date(self.date)).toISOString(),
+          'internal_medicine': self.internal_medicine,
+          'dental_clinic': self.dental_clinic,
+          'fluorine_coating': self.fluorine_coating,
+          'height': self.height,
+          'weight': self.weight,
+          'sight': self.sight,
+          'internal_medicine_content': self.internal_medicine_content,
+          'cavity': self.cavity,
+          'dental_clinic_content': self.dental_clinic_content,
+          'content': self.content,
+        }).then(function(response) { let data = response.data
+          self.$router.go(-1)
         })
       }
     },
   },
-  created () {
+  created: function () {
+    var self = this
     if (this.$route.name === 'student_health_record_edit') {
-      this.$axios.get(`student_health_records/` + this.id)
-        .then(({ data }) => {
-          this.student_record_id = data.student_record_id
-          this.date = data.date
-          this.internal_medicine = data.internal_medicine
-          this.dental_clinic = data.dental_clinic
-          this.fluorine_coating = data.fluorine_coating
-          this.height = data.height
-          this.weight = data.weight
-          this.sight = data.sight
-          this.internal_medicine_content = data.internal_medicine_content
-          this.cavity = data.cavity
-          this.dental_clinic_content = data.dental_clinic_content
-          this.content = data.content
+      self.$axios.get('student_health_records/' + self.id)
+        .then(function(response) { let data = response.data
+          self.student_record_id = data.student_record_id
+          self.date = data.date
+          self.internal_medicine = data.internal_medicine
+          self.dental_clinic = data.dental_clinic
+          self.fluorine_coating = data.fluorine_coating
+          self.height = data.height
+          self.weight = data.weight
+          self.sight = data.sight
+          self.internal_medicine_content = data.internal_medicine_content
+          self.cavity = data.cavity
+          self.dental_clinic_content = data.dental_clinic_content
+          self.content = data.content
         })
     } else if (this.$route.name=== 'student_health_record_new') {
     }

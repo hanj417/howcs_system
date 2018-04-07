@@ -2,7 +2,7 @@
   <q-page
     padding
     class="row justify-center">
-    <div style="width: 600px; max-width: 80vw;" class="q-pa-xl shadow-10">
+    <div style="width: 600px; max-width: 80vw;" class="q-pa-xl no-shadow">
     <div class="col-xs-12 text-center q-title text-weight-bold q-pa-md">{{ title }}</div>
     <div class="col-xs-12 text-right q-body-2 text-weight-bold q-px-md">{{ date }}</div>
     <div class="col-xs-12 text-right q-body-2 text-weight-bold q-px-md">{{ author_name }}</div>
@@ -28,7 +28,7 @@
 import { LocalStorage } from 'quasar'
 
 export default {
-  data () {
+  data: function() {
     return {
       class_id: '',
       major_categories: [],
@@ -51,51 +51,56 @@ export default {
   props: ['id'],
   watch: {
     'major_category' (val) {
-      this.$axios.get(`classes/categories/` + this.major_category
-      ).then(({ data }) => {
-        this.minor_categories = data
+      var self = this
+      self.$axios.get('classes/categories/' + self.major_category
+      ).then(function(response) { let data = response.data
+        self.minor_categories = data
       })
     }
   },
   methods: {
-    cancel () {
+    cancel: function () {
       this.$router.go(-1)
     },
-    remove () {
-      this.$axios.delete(`posts/` + this.id)
-        .then(({ data }) => { this.$router.go(-1) })
+    remove: function () {
+      var self = this
+      self.$axios.delete('posts/' + self.id)
+        .then(function(response) { let data = response.data 
+        self.$router.go(-1) })
     }
   },
-  created () {
+  created: function () {
     this.user = LocalStorage.get.item('user_')
 
-    this.$axios.get(`posts/categories`)
-      .then(({ data }) => { this.major_categories = data })
-    this.$axios.get(`posts/properties`)
-      .then(({ data }) => {})
-    this.$axios.get(`posts/` + this.id)
-      .then(({ data }) => {
-        this.major_category = data.major_category
-        this.minor_category = data.minor_category
-        this.category_disabled = true
-        this.properties = data.properties
-        this.date = (new Date(data.created_at)).toISOString().slice(0, 10)
-        this.author_name = data.author.name
+    var self = this
+    self.$axios.get('posts/categories')
+      .then(function(response) { let data = response.data 
+        self.major_categories = data })
+    self.$axios.get('posts/properties')
+      .then(function(response) { let data = response.data})
+    self.$axios.get('posts/' + self.id)
+      .then(function(response) { let data = response.data
+        self.major_category = data.major_category
+        self.minor_category = data.minor_category
+        self.category_disabled = true
+        self.properties = data.properties
+        self.date = (new Date(data.created_at)).toISOString().slice(0, 10)
+        self.author_name = data.author.name
         if (data.files)
-          this.files = JSON.parse(data.files)
-        if (this.files == "")
-          this.files = []
+          self.files = JSON.parse(data.files)
+        if (self.files == "")
+          self.files = []
         
         /*
       if (JSON.parse(data.properties).includes('notice')) {
-        this.notice = true
+        self.notice = true
       }
 */
-        this.title = data.title
-        this.body = data.body
-        this.class_id = data.class_id
-        if (this.user.id === data.author_id) {
-          this.is_author = true
+        self.title = data.title
+        self.body = data.body
+        self.class_id = data.class_id
+        if (self.user.id === data.author_id) {
+          self.is_author = true
         }
       })
   }

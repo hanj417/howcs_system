@@ -9,7 +9,6 @@
       :visible-columns="visible_columns"
       selection="single"
       :selected.sync="item"
-      row-key="name"
       color="secondary"
       class="col-xs-11"
     >
@@ -45,6 +44,14 @@
           icon="delete"
           @click="remove" />
       </template>
+      <q-tr slot="body" slot-scope="props" :props="props" @click.native="rowClick(props.row)" class="cursor-pointer">
+       <q-td auto-width>
+        <q-checkbox color="primary" v-model="props.selected" />
+       </q-td>
+        <q-td v-for="col in props.cols" :key="col.name" :props="props">
+          {{ col.value }}
+        </q-td>
+      </q-tr>
     </q-table>
     <q-page-sticky
       position="bottom-right"
@@ -101,11 +108,11 @@
 <script>
 
 export default {
-  data () {
+  data: function() {
     return {
       table_data: [],
       columns: [
-        { name: 'studentname', label: '아이디', field: row => row.student.studentname, sortable: true, align: 'left' },
+        { name: 'username', label: '아이디', field: row => row.student.username, sortable: true, align: 'left' },
         { name: 'name', label: '이름', field: row => row.student.name, sortable: true, align: 'left' },
         { name: 'email', label: '이메일', field: row => row.student.email, sortable: true, align: 'left' },
         { name: 'phone', label: '전화번호', field: row => row.student.phone, sortable: true, align: 'left' },
@@ -134,44 +141,54 @@ export default {
     }
   },
   watch: {
-    '$route.name' (val) {
+    '$route.name': function (val) {
       this.fetch_data()
     },
   },
-  props: ['class_id'],
+  props: ['action', 'class_id'],
   methods: {
-    fetch_data () {
+    fetch_data: function() {
       let query = {'class_id': this.class_id}
-      this.$axios.get(`enrollments`, {params: query})
-        .then(({ data }) => {
-          this.table_data = data
+      var self = this
+      self.$axios.get('enrollments', {params: query})
+        .then(function(response) { let data = response.data
+          self.table_data = data
         })
     },
-    remove () {
-      this.$axios.delete(`enrollments/` + this.item[0].class_id + `/` + this.item[0].student_id)
-        .then(({ data }) => {
-          this.fetch_data()
+    remove: function () {
+      var self = this
+      self.$axios.delete('enrollments/' + self.item[0].class_id + '/' + self.item[0].student_id)
+        .then(function(response) { let data = response.data
+          self.fetch_data()
         })
     },
-    search () {
+    search: function () {
       let query = {}
-      this.$axios.get(`student_infos`, {params: this.query})
-        .then(({ data }) => {
-          this.search_table_data = data
+      var self = this
+      self.$axios.get('student_infos', {params: self.query})
+        .then(function(response) { let data = response.data
+          self.search_table_data = data
         })
-      this.search_modal = true
+      self.search_modal = true
     },
-    search_select (row) {
-      this.$axios.post(`enrollments`, {
-        'class_id': this.class_id,
+    search_select: function (row) {
+      var self = this
+      self.$axios.post('enrollments', {
+        'class_id': self.class_id,
         'student_id': row.id
-      }).then(({data}) => {
-        this.search_modal = false
-        this.fetch_data()
+      }).then(function(response) { let data = response.data
+        self.search_modal = false
+        self.fetch_data()
       })
-    }
+    },
+    rowClick: function (row) {
+      console.log(this.action)
+      if (this.action === 'student_health_record') {
+        this.$router.push({name:'student_health_record', params: {id: row.student.id, action: 'edit'}})
+      }
+    },
   },
-  created () {
+  created: function () {
     this.fetch_data()
   }
 }

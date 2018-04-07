@@ -129,31 +129,33 @@
 
 <script>
 export default {
-  data () {
+  data: function () {
     return {
       posts: [],
     }
   },
   methods: {
-    fetch_data () {
+    fetch_data: function () {
       let query = {}
       query['minor_category'] = 'story'
       //query['recent'] = '3'
-      this.$axios.get(`posts/homepage`, {params: query})
-        .then(({ data }) => {
-          this.posts = data
-          for (let i = 0; i < this.posts.length; i++) {
-            this.posts[i]['img'] = "/assets/img/howstoryP.jpg"
-            let files = JSON.parse(this.posts[i]['files'])
+      var self = this
+      self.$axios.get('posts/homepage', {params: query})
+        .then(function (response) {
+          let data = response.data
+          self.posts = data
+          for (let i = 0; i < self.posts.length; i++) {
+            self.posts[i]['img'] = "/assets/img/howstoryP.jpg"
+            let files = JSON.parse(self.posts[i]['files'])
             if (files && files.length > 0) {
-              this.posts[i]['img'] = "/api/upload/" + files[0]
+              self.posts[i]['img'] = "/api/upload/" + files[0]
             }
             
           }
         })
     }
   },
-  created () {
+  created: function () {
     this.fetch_data()
   }
 }

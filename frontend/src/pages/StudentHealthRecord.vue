@@ -46,7 +46,7 @@ import { LocalStorage } from 'quasar'
 import { required, email } from 'vuelidate/lib/validators'
 
 export default {
-  data () {
+  data: function() {
     return {
       user: {},
       user_id: '',
@@ -64,13 +64,14 @@ export default {
   props: ['action', 'id'],
   methods: {
   },
-  created () {
-      this.$axios.get(`users/` + this.id
-      ).then(({ data }) => {
+  created: function () {
+      var self = this
+      self.$axios.get('users/' + self.id
+      ).then(function(response) { let data = response.data
         console.log(data)
-        this.user = data
+        self.user = data
         if (data.student_info.student_record.student_health_records) {
-          this.health_table_data = data.student_info.student_record.student_health_records
+          self.health_table_data = data.student_info.student_record.student_health_records
         }
       })
   }

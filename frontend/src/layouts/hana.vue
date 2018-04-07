@@ -181,42 +181,42 @@ export default {
     }
   },
   watch: {
-    user (new_user, old_user) {
+    user: function (new_user, old_user) {
       console.log(new_user)
       this.update_toolbar()
     }
   },
   computed: {
     menu: {
-      get () {
+      get: function () {
         return this.$store.state.menu.menu_
       },
-      set (val) {
+      set: function (val) {
         this.$store.commit('menu/UpdateMenu', val)
       }
     },
     user: {
-      get () {
+      get: function () {
         return this.$store.state.auth.user_
       },
-      set (val) {
+      set: function (val) {
         this.$store.commit('auth/SetAuth', val)
       }
     }
   },
   methods: {
-    login () {
+    login: function () {
       let loggedIn = LocalStorage.has('user_')
       let _token = LocalStorage.has('user_')
       if (loggedIn) {
         let _user = LocalStorage.get.item('user_')
         let _token = LocalStorage.get.item('token_')
-        this.$store.commit('auth/SetAuth', {_user, _token})
+        this.$store.commit('auth/SetAuth', {user:_user, token:_token})
         this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + _token
         this.$axios.get('login')
-          .then(({data}) => {
+          .then(function(data) {
             this.fetch_menu()
-          }).catch(({data}) => {
+          }).catch(function(error) {
             this.$store.commit('auth/SetAuth', {user: {}, token: ''})
             LocalStorage.remove('user_')
             LocalStorage.remove('token_')
@@ -225,15 +225,15 @@ export default {
         this.$store.commit('auth/SetAuth', {user: {}, token: ''})
       }
     },
-    fetch_menu () {
+    fetch_menu: function () {
       this.$axios.get('menu')
-        .then(({data}) =>
+        .then(function (data) {
           this.$store.commit('menu/UpdateMenu', data)
-        ).catch(function (data) {
+        }).catch(function (error) {
           console.log('error')
         })
     },
-    update_toolbar () {
+    update_toolbar: function () {
       // let loggedIn = this.$q.localstorage.has('user_')
       let loggedIn = LocalStorage.has('user_')
       if (loggedIn) {
@@ -242,7 +242,7 @@ export default {
         this.toolbar = this.toolbar_default.concat(this.toolbar_logged_out)
       }
     },
-    userHasScrolled (scroll) {
+    userHasScrolled: function (scroll) {
       if (scroll.position > 100) {
         this.header_transparency = false
       } else {
@@ -256,7 +256,7 @@ export default {
       // }
     }
   },
-  created () {
+  created: function () {
     this.login()
     this.update_toolbar()
   }

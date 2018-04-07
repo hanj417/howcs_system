@@ -51,7 +51,7 @@
 
 <script>
 export default {
-  data () {
+  data: function() {
     return {
       table_data: [],
       columns: [
@@ -63,17 +63,19 @@ export default {
     }
   },
   methods: {
-    fetch_data () {
+    fetch_data: function() {
       let query = {}
-      this.$axios.get(`payments`, {params: query})
-        .then(({ data }) => { this.items = data })
+      var self = this
+      self.$axios.get('payments', {params: query})
+        .then(function(response) { let data = response.data self.items = data })
     },
-    remove (item) {
-      this.$axios.delete(`payments/` + item.id)
-        .then(({ data }) => { this.fetch_data() })
+    remove: function (item) {
+      var self = this
+      self.$axios.delete('payments/' + item.id)
+        .then(function(response) { let data = response.data self.fetch_data() })
     }
   },
-  created () {
+  created: function () {
     this.fetch_data()
   }
 }

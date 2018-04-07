@@ -82,7 +82,7 @@
 import { LocalStorage } from 'quasar'
 
 export default {
-  data () {
+  data: function() {
     return {
       table_data: [],
       columns: [
@@ -107,53 +107,57 @@ export default {
     }
   },
   watch: {
-    'minor_category' (value) {
+    'minor_category': function (value) {
       this.fetch_data()
     },
   },
   props: ['major_category', 'minor_category'],
   methods: {
-    fetch_data () {
+    fetch_data: function() {
       let query = {}
       query['major_category'] = this.major_category
       query['minor_category'] = this.minor_category
-      this.$axios.get(`posts`, {params: query})
-        .then(({ data }) => {
-          this.table_data = data
+      var self = this
+      self.$axios.get('posts', {params: query})
+        .then(function(response) { let data = response.data
+          self.table_data = data
         })
     },
-    add_file (files) {
+    add_file: function (files) {
       console.log(files)
       for (let i = 0; i < files.length; i++) {
         this.files.push(files[i].name)
       }
       this.$refs.uploader.upload()
     },
-    remove_file (files) {
+    remove_file: function (files) {
       for (let i = 0; i < files.length; i++) {
         const index = array.indexOf(files[i].name);
         this.files.splice(index, 1);
       }
     },
-    save () {
-        this.$axios.post(`posts`, {
-          'major_category': this.major_category,
-          'minor_category': this.minor_category,
+    save: function () {
+      var self = this
+        self.$axios.post('posts', {
+          'major_category': self.major_category,
+          'minor_category': self.minor_category,
           'properties': '[]',
-          'title': this.resource_name,
+          'title': self.resource_name,
           'body': '',
-          'files': this.files,
-        }).then(({data}) => {
-          this.fetch_data()
+          'files': self.files,
+        }).then(function(response) { let data = response.data
+          self.fetch_data()
         })
         this.add_modal = false
     },
-    remove () {
-      this.$axios.delete(`posts/` + this.item[0].id)
-        .then(({ data }) => { this.fetch_data() })
+    remove: function () {
+      var self = this
+      self.$axios.delete('posts/' + self.item[0].id)
+        .then(function(response) { let data = response.data 
+        self.fetch_data() })
     }
   },
-  created () {
+  created: function () {
     let user = LocalStorage.get.item('user_')
     console.log(JSON.parse(user.role))
     console.log(JSON.parse(user.role).includes('admin'))

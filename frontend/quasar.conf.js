@@ -9,6 +9,7 @@ module.exports = function (ctx) {
       'axios',
       'bootstrap',
       'vueeditor',
+      'full-calendar',
       //'vue-html5-editor',
       //'jquery',
       //'lodash',
@@ -26,7 +27,7 @@ module.exports = function (ctx) {
       // 'mdi',
       // 'fontawesome'
     ],
-    supportIE: false,
+    supportIE: true,
     vendor: {
       add: [],
       remove: []
@@ -60,12 +61,9 @@ module.exports = function (ctx) {
     i18n: 'ko-kr',
       components: [
     //'PostCard',
-    'QCard',
-    'QCardTitle',
-    'QCardMain',
-    'QCardMedia',
-    'QCardSeparator',
-    'QCardActions',
+    'QChip',
+    'QCheckbox',
+    'QToggle',
     'QUploader',
     'QVideo',
     'QModal',

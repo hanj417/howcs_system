@@ -11,7 +11,6 @@
         >
           <q-input v-model="teacher.name"  class="col-xs-8" disabled />
           <q-btn
-            :disabled="$route.name == 'class_form_edit'"
             class="col-xs-4 float-right"
             @click="search"
             label="교사 입력" />
@@ -82,6 +81,11 @@
         </q-field>
       </div>
       <div class="col-xs-12 row justify-end q-mt-lg">
+        <div v-if="$route.name == 'class_form_edit'" class="col-xs-2">
+          <q-btn
+            @click="remove"
+            label="삭제" />
+        </div>
         <div class="col-xs-4">
           <q-btn
             @click="$router.go(-1)"
@@ -139,7 +143,7 @@ import { LocalStorage } from 'quasar'
 import { required, email } from 'vuelidate/lib/validators'
 
 export default {
-  data () {
+  data: function() {
     return {
       teacher_select: false,
       teacher: {name: '' },
@@ -177,55 +181,64 @@ export default {
   },
   props: ['role', 'major_category', 'class_id'],
   methods: {
-    save () {
+    save: function () {
+      var self = this
       if (this.$route.name === 'class_form_new') {
-        this.$axios.post(`classes`, {
-          'teacher_id': this.teacher.id,
-          'title': this.title,
-          'major_category': this.major_category,
-          'minor_category': this.minor_category,
-          'year': this.year,
-          'semester': this.semester,
-          'time_slot': this.time_slot,
-          'google_calendar': this.google_calendar,
-          'audience': this.audience,
-          'background': this.background,
-          'content': this.content
-        }).then(({data}) => {
-          this.$router.go(-1)
+        self.$axios.post('classes', {
+          'teacher_id': self.teacher.id,
+          'title': self.title,
+          'major_category': self.major_category,
+          'minor_category': self.minor_category,
+          'year': self.year,
+          'semester': self.semester,
+          'time_slot': self.time_slot,
+          'google_calendar': self.google_calendar,
+          'audience': self.audience,
+          'background': self.background,
+          'content': self.content
+        }).then(function(response) { let data = response.data
+          self.$router.go(-1)
         })
-      } else if (this.$route.name === 'class_form_edit') {
-        this.$axios.put(`classes/` + this.class_id, {
-          'teacher_id': this.teacher.id,
-          'title': this.title,
-          'major_category': this.major_category,
-          'minor_category': this.minor_category,
-          'year': this.year,
-          'semester': this.semester,
-          'time_slot': this.time_slot,
-          'google_calendar': this.google_calendar,
-          'audience': this.audience,
-          'background': this.background,
-           'content': this.content
-        }).then(({data}) => {
-          this.$router.go(-1)
+      } else if (self.$route.name === 'class_form_edit') {
+        self.$axios.put('classes/' + self.class_id, {
+          'teacher_id': self.teacher.id,
+          'title': self.title,
+          'major_category': self.major_category,
+          'minor_category': self.minor_category,
+          'year': self.year,
+          'semester': self.semester,
+          'time_slot': self.time_slot,
+          'google_calendar': self.google_calendar,
+          'audience': self.audience,
+          'background': self.background,
+           'content': self.content
+        }).then(function(response) { let data = response.data
+          self.$router.go(-1)
         })
       }
     },
-    search () {
-      let query = {}
-      this.$axios.get(`howcs_teacher_infos`, {params: query})
-      .then(({ data }) => {
-        this.search_table_data = data
+    remove: function () {
+      var self = this
+      self.$axios.delete('classes/' + self.class_id)
+      .then(function(response) { let data = response.data
+        self.$router.go(-1)
       })
-      this.search_modal = true
     },
-    search_select (row) {
+    search: function () {
+      let query = {}
+      var self = this
+      self.$axios.get('howcs_teacher_infos', {params: query})
+      .then(function(response) { let data = response.data
+        self.search_table_data = data
+      })
+      self.search_modal = true
+    },
+    search_select: function (row) {
       this.teacher = row.user
       this.search_modal = false
     }
   },
-  created () {
+  created: function () {
     let user = LocalStorage.get.item('user_')
     if (this.role === 'admin') {
       this.teacher_select = true
@@ -235,32 +248,33 @@ export default {
       this.$router.go(-1)
     }
 
-    this.$axios.get(`classes/categories/` + this.major_category
-    ).then(({ data }) => {
-      this.minor_categories = data
+    var self = this
+    self.$axios.get('classes/categories/' + self.major_category
+    ).then(function(response) { let data = response.data
+      self.minor_categories = data
     })
-    if (this.$route.name === 'class_form_new') {
-      this.save_label = '등록'
-    } else if (this.$route.name === 'class_form_edit') {
-      this.save_label = '수정'
-      this.$axios.get(`classes/` + this.class_id
-      ).then(({ data }) => {
+    if (self.$route.name === 'class_form_new') {
+      self.save_label = '등록'
+    } else if (self.$route.name === 'class_form_edit') {
+      self.save_label = '수정'
+      self.$axios.get('classes/' + self.class_id
+      ).then(function(response) { let data = response.data
         console.log(data)
-        this.teacher = data.teacher
-        this.teacher_select = false
-        this.title = data.title
-        this.major_category = data.major_category
-        this.minor_category = data.minor_category
-        this.year = data.year
-        this.semester = data.semester
-        this.time_slot = data.time_slot
-        this.google_calendar = data.google_calendar
-        this.audience = data.audience
-        this.background = data.background
-        this.content = data.content
+        self.teacher = data.teacher
+        self.teacher_select = false
+        self.title = data.title
+        self.major_category = data.major_category
+        self.minor_category = data.minor_category
+        self.year = data.year
+        self.semester = data.semester
+        self.time_slot = data.time_slot
+        self.google_calendar = data.google_calendar
+        self.audience = data.audience
+        self.background = data.background
+        self.content = data.content
       })
     } else {
-      this.$router.go(-1)
+      self.$router.go(-1)
     }
   }
 }

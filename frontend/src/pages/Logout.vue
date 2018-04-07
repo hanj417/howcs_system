@@ -5,7 +5,7 @@
 import { LocalStorage } from 'quasar'
 
 export default {
-  created () {
+  created: function () {
     this.$store.commit('auth/SetAuth', {user: {}, token: ''})
     LocalStorage.remove('user_')
     LocalStorage.remove('token_')

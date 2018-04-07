@@ -10,6 +10,8 @@ from flask import make_response
 from flask import redirect
 from flask import send_from_directory
 from werkzeug.utils import secure_filename
+from ast import literal_eval
+from datetime import datetime, date, timedelta
 
 basic_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth('Bearer')
@@ -52,7 +54,7 @@ def login_get():
 @app.route('/api/login', methods=['POST'])
 @multi_auth.login_required
 def login():
-    token = g.user.generate_auth_token(600)
+    token = g.user.generate_auth_token(3600)
     user_info = g.user.as_dict()
     return jsonify({'user': user_info, 'token': token.decode('ascii')})
 
@@ -86,6 +88,7 @@ def upload_file():
     if file.filename == '':
         flash('No selected file')
         return redirect(request.url)
+    '''
     if file and allowed_file(file.filename):
         #filename = secure_filename(file.filename)
         #FIXME: secure_filename does not support unicode
@@ -94,6 +97,10 @@ def upload_file():
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return redirect(url_for('uploaded_file',
                                 filename=filename))
+    '''
+    filename = file.filename
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    return redirect(url_for('uploaded_file', filename=filename))
 
 ##################################################
 # user 
@@ -105,7 +112,6 @@ def user_all():
     if 'name' in request.args:
         users = users.filter_by(name=request.args['name'])
     if 'role' in request.args:
-        print(request.args['role'])
         users = users.filter(User.role.contains(request.args['role']))
     users = users.all()
     users_json = []
@@ -174,6 +180,181 @@ def user_del(id):
     if not user:
         abort(404)
     db.session.delete(user)
+    db.session.commit()
+    return jsonify({'result': True})
+
+##################################################
+# privileges
+##################################################
+@app.route('/api/privileges', methods=['GET'])
+@multi_auth.login_required
+def privilege_all():
+    user = g.user
+    if not user:
+        abort(400)
+
+    if not request.json or 'priv' not in request.json:
+        # admin
+        if 'admin' not in user.role:
+            abort(400)
+        privileges = Privilege.query
+        privileges = privileges.all()
+        privileges_json = []
+        for privilege in privileges:
+            privileges_json.append(privilege.as_dict())
+        return jsonify(privileges_json)
+
+    # user
+    roles = literal_eval(user.role)
+    has_priv = False
+    query_priv = request.json.get('priv')
+    for role in roles:
+        privilege = Privilege.query.filter_by(name=role).first()
+        if privilege is None:
+            print("unknown role %s" % role)
+            continue
+        if getattr(privilege, query_priv):
+            has_priv = True
+    return jsonify(has_priv)
+
+@app.route('/api/privileges', methods=['POST'])
+@multi_auth.login_required
+def privilege_new():
+    user = g.user
+    if not user:
+        abort(400)
+    if 'admin' not in user.role:
+        abort(400)
+
+    if not request.json or 'name' not in request.json or 'label' not in request.json:
+        abort(400)
+
+    privilege = Privilege()
+    privilege.name = request.json.get('name')
+    privilege.label = request.json.get('label')
+    if privilege.name == '' or Privilege.exist(privilege.name):
+        abort(400)
+    if privilege.label == '' or Privilege.exist(privilege.label):
+        abort(400)
+    '''
+    privilege.user = request.json.get('user')
+    privilege.user_new = request.json.get('user_new')
+    privilege.user_update = request.json.get('user_update')
+    privilege.user_del = request.json.get('user_del')
+    privilege.student = request.json.get('student')
+    privilege.student_new = request.json.get('student_new')
+    privilege.student_update = request.json.get('student_update')
+    privilege.student_del = request.json.get('student_del')
+    privilege.howcs_teacher = request.json.get('howcs_teacher')
+    privilege.howcs_teacher_new = request.json.get('howcs_teacher_new')
+    privilege.howcs_teacher_update = request.json.get('howcs_teacher_update')
+    privilege.howcs_teacher_del = request.json.get('howcs_teacher_del')
+    privilege.howcs_class = request.json.get('howcs_class')
+    privilege.howcs_class_new = request.json.get('howcs_class_new')
+    privilege.howcs_class_update = request.json.get('howcs_class_update')
+    privilege.howcs_class_del = request.json.get('howcs_class_del')
+    privilege.howcs_enrollment = request.json.get('howcs_enrollment')
+    privilege.howcs_enrollment_new = request.json.get('howcs_enrollment_new')
+    privilege.howcs_enrollment_update = request.json.get('howcs_enrollment_update')
+    privilege.howcs_enrollment_del = request.json.get('howcs_enrollment_del')
+    privilege.howcs_attendance = request.json.get('howcs_attendance')
+    privilege.howcs_attendance_new = request.json.get('howcs_attendance_new')
+    privilege.howcs_attendance_update = request.json.get('howcs_attendance_update')
+    privilege.howcs_attendance_del = request.json.get('howcs_attendance_del')
+    privilege.howcs_post = request.json.get('howcs_post')
+    privilege.howcs_post_new = request.json.get('howcs_post_new')
+    privilege.howcs_post_update = request.json.get('howcs_post_update')
+    privilege.howcs_post_del = request.json.get('howcs_post_del')
+    privilege.homepage_post = request.json.get('homepage_post')
+    privilege.homepage_post_new = request.json.get('homepage_post_new')
+    privilege.homepage_post_update = request.json.get('homepage_post_update')
+    privilege.homepage_post_del = request.json.get('homepage_post_del')
+    '''
+    db.session.add(privilege)
+    db.session.commit()
+    return jsonify({'privilege': privilege.as_dict()}), 201
+
+@app.route('/api/privileges/<int:id>', methods=['GET'])
+@multi_auth.login_required
+def privilege_get(id):
+    user = g.user
+    if not user:
+        abort(400)
+    if 'admin' not in user.role:
+        abort(400)
+
+    privilege = Privilege.query.get(id)
+    if not privilege:
+        abort(404)
+
+    return jsonify(privilege.as_dict())
+
+@app.route('/api/privileges/<int:id>', methods=['PUT'])
+@multi_auth.login_required
+def privilege_update(id):
+    user = g.user
+    if not user:
+        abort(400)
+    if 'admin' not in user.role:
+        abort(400)
+
+    if not request.json:
+        abort(400)
+    privilege = Privilege.query.get(id)
+    if not privilege:
+        abort(404)
+
+    privilege.name = request.json.get('name')
+    privilege.label = request.json.get('label')
+    privilege.user = request.json.get('user', privilege.user)
+    privilege.user_new = request.json.get('user_new', privilege.user)
+    privilege.user_update = request.json.get('user_update', privilege.user)
+    privilege.user_del = request.json.get('user_del', privilege.user)
+    privilege.student = request.json.get('student', privilege.student)
+    privilege.student_new = request.json.get('student_new', privilege.student_new)
+    privilege.student_update = request.json.get('student_update', privilege.student_update)
+    privilege.student_del = request.json.get('student_del', privilege.student_del)
+    privilege.howcs_teacher = request.json.get('howcs_teacher', privilege.howcs_teacher)
+    privilege.howcs_teacher_new = request.json.get('howcs_teacher_new', privilege.howcs_teacher_new)
+    privilege.howcs_teacher_update = request.json.get('howcs_teacher_update', privilege.howcs_teacher_update)
+    privilege.howcs_teacher_del = request.json.get('howcs_teacher_del', privilege.howcs_teacher_del)
+    privilege.howcs_class = request.json.get('howcs_class', privilege.howcs_class)
+    privilege.howcs_class_new = request.json.get('howcs_class_new', privilege.howcs_class_new)
+    privilege.howcs_class_update = request.json.get('howcs_class_update', privilege.howcs_class_update)
+    privilege.howcs_class_del = request.json.get('howcs_class_del', privilege.howcs_class_del)
+    privilege.howcs_enrollment = request.json.get('howcs_enrollment', privilege.howcs_enrollment)
+    privilege.howcs_enrollment_new = request.json.get('howcs_enrollment_new', privilege.howcs_enrollment_new)
+    privilege.howcs_enrollment_update = request.json.get('howcs_enrollment_update', privilege.howcs_enrollment_update)
+    privilege.howcs_enrollment_del = request.json.get('howcs_enrollment_del', privilege.howcs_enrollment_del)
+    privilege.howcs_attendance = request.json.get('howcs_attendance', privilege.howcs_attendance)
+    privilege.howcs_attendance_new = request.json.get('howcs_attendance_new', privilege.howcs_attendance_new)
+    privilege.howcs_attendance_update = request.json.get('howcs_attendance_update', privilege.howcs_attendance_update)
+    privilege.howcs_attendance_del = request.json.get('howcs_attendance_del', privilege.howcs_attendance_del)
+    privilege.howcs_post = request.json.get('howcs_post', privilege.howcs_post)
+    privilege.howcs_post_new = request.json.get('howcs_post_new', privilege.howcs_post_new)
+    privilege.howcs_post_update = request.json.get('howcs_post_update', privilege.howcs_post_update)
+    privilege.howcs_post_del = request.json.get('howcs_post_del', privilege.howcs_post_del)
+    privilege.homepage_post = request.json.get('homepage_post', privilege.homepage_post)
+    privilege.homepage_post_new = request.json.get('homepage_post_new', privilege.homepage_post_new)
+    privilege.homepage_post_update = request.json.get('homepage_post_update', privilege.homepage_post_update)
+    privilege.homepage_post_del = request.json.get('homepage_post_del', privilege.homepage_post_del)
+    db.session.add(privilege)
+    db.session.commit()
+    return jsonify({'privilege': privilege.as_dict()})
+
+@app.route('/api/privileges/<int:id>', methods=['DELETE'])
+@multi_auth.login_required
+def privilege_del(id):
+    user = g.user
+    if not user:
+        abort(400)
+    if 'admin' not in user.role:
+        abort(400)
+
+    privilege = Privilege.query.get(id)
+    if not privilege:
+        abort(404)
+    db.session.delete(privilege)
     db.session.commit()
     return jsonify({'result': True})
 
@@ -357,9 +538,10 @@ def student_new():
         abort(400)
 
     username = request.json.get('username')
+    student_id = request.json.get('student_id')
     if User.exist(username):
         abort(400)    # existing user
-    if Student.query.filter_by(username=username).first() is not None:
+    if StudentInfo.query.filter_by(student_id=student_id).first() is not None:
         abort(400)    # existing user
 
     user = User(username=username)
@@ -377,16 +559,21 @@ def student_new():
     student.user_id = user.id
     student.student_id = request.json.get('student_id')
     student.gender = request.json.get('gender')
-    student.ssn = request.json.get('ssn')
+    student.rrn = request.json.get('rrn')
     student.father_name = request.json.get('father_name')
-    student.father_ssn = request.json.get('father_ssn')
+    student.father_rrn = request.json.get('father_rrn')
     student.mother_name = request.json.get('mother_name')
-    student.mother_ssn = request.json.get('mother_ssn')
+    student.mother_rrn = request.json.get('mother_rrn')
     student.address = request.json.get('address')
     
     user.student_info = student
+
+    student_record = StudentRecord()
+    student.student_record = student_record
+    
     db.session.add(user)
     db.session.add(student)
+    db.session.add(student_record)
     db.session.commit()
     return jsonify({'user': user.as_dict()}), 201
 
@@ -420,15 +607,19 @@ def student_update(id):
 
     student_info.student_id = request.json.get('student_id')
     student_info.gender = request.json.get('gender')
-    student_info.ssn = request.json.get('ssn')
+    student_info.rrn = request.json.get('rrn')
     student_info.father_name = request.json.get('father_name')
-    student_info.father_ssn = request.json.get('father_ssn')
+    student_info.father_rrn = request.json.get('father_rrn')
     student_info.mother_name = request.json.get('mother_name')
-    student_info.mother_ssn = request.json.get('mother_ssn')
+    student_info.mother_rrn = request.json.get('mother_rrn')
     student_info.address = request.json.get('address')
 
+    student_record = StudentRecord()
+    student_info.student_record = student_record
+    
     db.session.add(user)
     db.session.add(student_info)
+    db.session.add(student_record)
     db.session.commit()
     return jsonify({'user': user.as_dict()})
 
@@ -484,7 +675,6 @@ def class_new():
         abort(400)
 
     class_ = Class()
-    print(class_.required_columns())
     for column in class_.required_columns():
         if column not in request.json:
             abort(400)
@@ -500,7 +690,8 @@ def class_new():
     class_.major_category = request.json.get('major_category')
     class_.minor_category = request.json.get('minor_category')
     class_.year = int(request.json.get('year', '2018'))
-    class_.semester = int(request.json.get('semester', 0))
+    if 'semester' in request.json and request.json.get('semester'):
+        class_.semester = int(request.json.get('semester'))
     class_.time_slot = request.json.get('time_slot', '')
     class_.google_calendar = request.json.get('google_calendar', '')
     class_.audience = request.json.get('audience', '')
@@ -529,8 +720,8 @@ def class_update(id):
     if not class_:
         abort(404)
 
-    teacher_username = request.json.get('teacher', class_.teacher.username)
-    teacher = User.query.filter_by(username=teacher_username).first()
+    teacher_id = request.json.get('teacher_id', class_.teacher_id)
+    teacher = User.query.filter_by(id=teacher_id).first()
     if not teacher:
         abort(404)
     
@@ -575,6 +766,10 @@ def enrollment_all():
     enrollments = enrollments.all()
     enrollments_json = []
     for enrollment in enrollments:
+        if 'major_category' in request.args and enrollment.class_.major_category != request.args.get('major_category'):
+            continue
+        if 'minor_category' in request.args and enrollment.class_.minor_category != request.args.get('minor_category'):
+            continue
         enrollments_json.append(enrollment.as_dict())
     return jsonify(enrollments_json)
         
@@ -667,8 +862,8 @@ def post_all():
     if 'class_id' in request.args:
         posts = posts.filter_by(class_id=request.args['class_id'])
     if 'recent' in request.args:
-        posts = posts.order_by('created_at desc').limit(int(request.args['recent']))
-    posts = posts.order_by('created_at desc')
+        posts = posts.order_by('id desc').order_by('created_at desc').limit(int(request.args['recent']))
+    posts = posts.order_by('id desc').order_by('created_at desc')
     posts = posts.all()
     posts_json = []
     for post in posts:
@@ -682,7 +877,9 @@ def post_homepage_all():
     if 'minor_category' in request.args:
         posts = posts.filter_by(minor_category=request.args['minor_category'])
     if 'recent' in request.args:
-        posts = posts.order_by('created_at desc').limit(int(request.args['recent']))
+        posts = posts.order_by('id desc').order_by('created_at desc').limit(int(request.args['recent']))
+    else:
+        posts = posts.order_by('id desc').order_by('created_at desc')
     posts = posts.all()
     posts_json = []
     for post in posts:
@@ -696,7 +893,6 @@ def post_new():
         abort(400)
 
     post = Post()
-    print(post.required_columns())
     for column in post.required_columns():
         if column not in request.json:
             abort(400)
@@ -713,8 +909,9 @@ def post_new():
     for prop in properties:
         post.properties_new(prop)
     post.title = request.json.get('title')
+    if 'created_at' in request.json:
+        post.created_at_is(request.json.get('created_at'))
     post.body = request.json.get('body')
-    print(post.body)
     post.files = json.dumps(request.json.get('files', '[]'))
     class_id = request.json.get('class_id', None)
     if class_id:
@@ -757,7 +954,10 @@ def post_update(id):
     post.minor_category = request.json.get('minor_category', post.minor_category)
     post.properties = json.dumps(request.json.get('properties', post.properties))
     post.title = request.json.get('title', post.title)
+    if 'created_at' in request.json:
+        post.created_at_is(request.json.get('created_at', post.created_at))
     post.body = request.json.get('body', post.body)
+    post.files = json.dumps(request.json.get('files', post.files))
 
     properties = request.json.get('properties', post.properties)
     post.properties = '[]'
@@ -799,8 +999,52 @@ def attendance_all():
     if 'student_id' in request.args:
         attendances = attendances.filter_by(student_id=request.args['student_id'])
     if 'date' in request.args:
-        attendances = attendances.filter_by(date=date_from_str(request.args['date']))
+        if 'days' in request.args:
+            date_from = date_from_str(request.args['date'])
+            days = int(request.args['days'])
+            date_to = date_from
+            while days > 0:
+                date_to = date_to + timedelta(days=1)
+                if date_to.weekday() < 1 or date_to.weekday() > 5:
+                    continue
+                days -= 1
+            attendances = attendances.filter(Attendance.date.between(date_from, date_to))
+        else:
+            attendances = attendances.filter_by(date=date_from_str(request.args['date']))
     attendances = attendances.all()
+
+    # class attendances
+    if 'class_id' in request.args and 'student_id' not in request.args and 'date' in request.args and 'days' in request.args:
+        class_ = Class.query.filter_by(id=request.args['class_id']).first()
+        students = class_.students
+        date_from = date_from_str(request.args['date'])
+        days = int(request.args['days'])
+        date_to = date_from
+        while days > 0:
+            date_to = date_to + timedelta(days=1)
+            if date_to.weekday() < 1 or date_to.weekday() > 5:
+                continue
+            days -= 1
+        attendances_json = {}
+        name_dic = {}
+        for student in students:
+            attendances_json[student.student.name] = {}
+            name_dic[student.student.name] = student.student.id
+            
+            for single_date in daterange(date_from, date_to):
+                date_str = single_date.strftime("%Y-%m-%d")
+                attendances_json[student.student.name][date_str] = {'category':Attendance.categories()[0], 'id':0}
+
+        for attendance in attendances:
+            attendances_json[attendance.student.name][attendance.date.strftime("%Y-%m-%d")] = {'category':attendance.category, 'id':attendance.id}
+        attendances_json_list = []
+        for attendance_name in attendances_json:
+            attendance_row = {'id':name_dic[attendance_name], 'name': attendance_name}
+            for attendance_date in attendances_json[attendance_name]:
+                attendance_row[attendance_date] = attendances_json[attendance_name][attendance_date]
+            attendances_json_list.append(attendance_row)
+        return jsonify(attendances_json_list)
+
     attendances_json = []
     for attendance in attendances:
         attendances_json.append(attendance.as_dict())
@@ -813,7 +1057,6 @@ def attendance_new():
         abort(400)
 
     attendance = Attendance()
-    print(attendance.required_columns())
     for column in attendance.required_columns():
         if column not in request.json:
             abort(400)
@@ -896,7 +1139,6 @@ def payment_new():
         abort(400)
 
     payment = Payment()
-    print(payment.required_columns())
     for column in payment.required_columns():
         if column not in request.json:
             abort(400)
@@ -942,6 +1184,159 @@ def payment_del(id):
     db.session.commit()
     return jsonify({'result': True})
 
+##################################################
+# student_record 
+##################################################
+@app.route('/api/student_records', methods=['get'])
+@multi_auth.login_required
+def student_record_all():
+    student_records = StudentRecord.query
+    if 'student_info_id' in request.args:
+        student_records = student_records.filter_by(student_info_id=request.args['student_info_id'])
+    student_records = student_records.all()
+    student_records_json = []
+    for student_record in student_records:
+        student_records_json.append(student_record.as_dict())
+    return jsonify(student_records_json)
+        
+
+@app.route('/api/student_records', methods=['POST'])
+@multi_auth.login_required
+def student_record_new():
+    if not request.json:
+        abort(400)
+
+    user = g.user
+    if not user:
+        abort(400)
+
+    if 'student_info_id' not in request.json:
+        abort(404)
+
+    student_record = StudentRecord()
+
+    student_record.student_info_id = request.json.get('student_info_id')
+    student_record.student_info = StudentInfo.query.filter_by(id = student_record.student_info_id).first()
+    db.session.add(student_record)
+    db.session.commit()
+    return jsonify({'student_record': student_record.as_dict()}), 201
+
+@app.route('/api/student_records/<int:id>', methods=['PUT'])
+@multi_auth.login_required
+def student_record_update(id):
+    if not request.json:
+        abort(400)
+    student_record = StudentRecord.query.get(id)
+    if not student_record:
+        abort(404)
+
+    db.session.add(student_record)
+    db.session.commit()
+    return jsonify({'student_record': student_record.as_dict()})
+
+@app.route('/api/student_records/<int:id>', methods=['DELETE'])
+@multi_auth.login_required
+def student_record_del(id):
+    student_record = StudentRecord.query.get(id)
+    if not student_record:
+        abort(404)
+    db.session.delete(student_record)
+    db.session.commit()
+    return jsonify({'result': True})
+
+##################################################
+# student_health_record 
+##################################################
+@app.route('/api/student_health_records', methods=['get'])
+@multi_auth.login_required
+def student_health_record_all():
+    student_health_records = StudentHealthRecord.query
+    if 'student_record_id' in request.args:
+        student_health_records = student_health_records.filter_by(student_record_id=request.args['student_record_id'])
+    student_health_records = student_health_records.all()
+    student_health_records_json = []
+    for student_health_record in student_health_records:
+        student_health_records_json.append(student_health_record.as_dict())
+    return jsonify(student_health_records_json)
+        
+
+@app.route('/api/student_health_records', methods=['POST'])
+@multi_auth.login_required
+def student_health_record_new():
+    if not request.json:
+        abort(400)
+
+    user = g.user
+    if not user:
+        abort(400)
+
+    if 'student_record_id' not in request.json:
+        abort(404)
+
+    student_health_record = StudentHealthRecord()
+
+    student_health_record.student_record_id = request.json.get('student_record_id')
+    student_health_record.date_is(request.json.get('date'))
+    student_health_record.internal_medicine = request.json.get('internal_medicine', '')
+    student_health_record.dental_clinic = request.json.get('dental_clinic', '')
+    student_health_record.fluorine_coating = request.json.get('fluorine_coating', '')
+    student_health_record.height = int(request.json.get('height', 0))
+    student_health_record.weight = int(request.json.get('weight', 0))
+    student_health_record.sight = float(request.json.get('sight', 0))
+    student_health_record.internal_medicine_content = request.json.get('internal_medicine_content', '')
+    student_health_record.cavity = request.json.get('cavity', '')
+    student_health_record.dental_clinic_content = request.json.get('dental_clinic_content', '')
+    student_health_record.content = request.json.get('content', '')
+
+    student_health_record.student_record = StudentRecord.query.filter_by(id = student_health_record.student_record_id).first()
+    db.session.add(student_health_record)
+    db.session.commit()
+    return jsonify({'student_health_record': student_health_record.as_dict()}), 201
+
+@app.route('/api/student_health_records/<int:id>', methods=['PUT'])
+@multi_auth.login_required
+def student_health_record_update(id):
+    if not request.json:
+        abort(400)
+    student_health_record = StudentHealthRecord.query.get(id)
+    if not student_health_record:
+        abort(404)
+
+    student_health_record.date_is(request.json.get('date'))
+    student_health_record.internal_medicine = request.json.get('internal_medicine', student_health_record.internal_medicine)
+    student_health_record.dental_clinic = request.json.get('dental_clinic', student_health_record.dental_clinic)
+    student_health_record.fluorine_coating = request.json.get('fluorine_coating', student_health_record.fluorine_coating)
+    student_health_record.height = int(request.json.get('height', student_health_record.height))
+    student_health_record.weight = int(request.json.get('weight', student_health_record.weight))
+    student_health_record.sight = float(request.json.get('sight', student_health_record.sight))
+    student_health_record.internal_medicine_content = request.json.get('internal_medicine_content', student_health_record.internal_medicine_content)
+    student_health_record.cavity = request.json.get('cavity', student_health_record.cavity)
+    student_health_record.dental_clinic_content = request.json.get('dental_clinic_content', student_health_record.dental_clinic_content)
+    student_health_record.content = request.json.get('content', student_health_record.content)
+    
+    db.session.add(student_health_record)
+    db.session.commit()
+    return jsonify({'student_health_record': student_health_record.as_dict()})
+
+@app.route('/api/student_health_records/<int:id>', methods=['GET'])
+@multi_auth.login_required
+def student_health_record_get(id):
+    student_health_record = StudentHealthRecord.query.get(id)
+    if not student_health_record:
+        abort(404)
+    return jsonify(student_health_record.as_dict())
+
+@app.route('/api/student_health_records/<int:id>', methods=['DELETE'])
+@multi_auth.login_required
+def student_health_record_del(id):
+    student_health_record = StudentHealthRecord.query.get(id)
+    if not student_health_record:
+        abort(404)
+    db.session.delete(student_health_record)
+    db.session.commit()
+    return jsonify({'result': True})
+
+
 
 @app.route('/api/menu')
 @multi_auth.login_required
@@ -957,6 +1352,23 @@ def get_menu():
         #{ 'href': '/hana/class', 'params': {'major_category':'agit'}, 'text': '수강신청', 'icon': 'plus' },
         #{ 'href': '/hana/enrollment_student', 'params': {'major_category':'agit', 'id':user.id}, 'text': '수강과목', 'icon': 'pencil' },
     ]
+    roles = literal_eval(user.role)
+    for role in roles:
+        privilege = Privilege.query.filter_by(name=role).first()
+        if privilege is None:
+            print("unknown role %s" % role)
+            continue
+        priv_strs = privilege.as_dict()
+        for priv_str in priv_strs:
+            priv = getattr(privilege, priv_str)
+            '''
+            if isinstance(priv, (bool)):
+                print(priv_str, priv)
+            '''
+    
+        
+         
+
 
     '''
     if 'agit_student' in user.role and 'agit_teacher' not in user.role and 'admin' not in user.role:
@@ -968,11 +1380,24 @@ def get_menu():
     
     if 'howcs_student' in user.role:
         menu.append({ 'heading': '하우학교'})
-        menu.append({ 'href': 'enrollment_student', 'params': {'major_category':'howcs', 'id':user.id}, 'text': '수강과목', 'icon': 'class' })
+        menu.append({ 'href': 'student_record', 'params': {'action':'view', 'id':user.id}, 'text': '인적사항', 'icon': 'assignment ind' })
+        menu.append({ 'href': 'student_health_record', 'params': {'action':'view', 'id':user.id}, 'text': '건강기록부', 'icon': 'local hospital' })
+        menu.append({ 'href': 'enrollment_student', 'params': {'major_category':'howcs', 'minor_category':'subject', 'action':'post', 'id':user.id}, 'text': '공지사항', 'icon': 'sms failed' })
+        menu.append({ 'href': 'enrollment_student', 'params': {'major_category':'howcs', 'minor_category':'class', 'action':'attendance', 'id':user.id}, 'text': '출결 관리', 'icon': 'event available' })
+        menu.append({ 'href': 'enrollment_student', 'params': {'major_category':'howcs', 'minor_category':'parent_school', 'action':'attendance', 'id':user.id}, 'text': '부모학교', 'icon': 'wc' })
+        menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'edu_resource'}, 'text': '교육자료실', 'icon': 'folder' })
+        menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'academic_resource'}, 'text': '교무자료실', 'icon': 'folder open' })
     
     if 'howcs_teacher' in user.role:
         menu.append({ 'heading': '하우학교'})
-        menu.append({ 'href': 'teaching_classes', 'params': {'major_category':'howcs', 'id':user.id}, 'text': '수업 관리', 'icon': 'class' })
+        menu.append({ 'href': 'howcs_class_teacher', 'params': {'major_category':'howcs', 'minor_category':'subject', 'action':'edit', 'teacher_id':user.id}, 'text': '수업 목록', 'icon': 'class' })
+        menu.append({ 'href': 'howcs_class_teacher', 'params': {'major_category':'howcs', 'minor_category':'class', 'action':'edit', 'teacher_id':user.id}, 'text': '학급 목록', 'icon': 'school' })
+        menu.append({ 'href': 'howcs_class_teacher', 'params': {'major_category':'howcs', 'minor_category':'class', 'action':'attendance', 'teacher_id':user.id}, 'text': '출결 관리', 'icon': 'event available' })
+        menu.append({ 'href': 'class_teacher', 'params': {'major_category':'howcs', 'action':'enrollment', 'teacher_id':user.id}, 'text': '수강생 관리', 'icon': 'group add' })
+        menu.append({ 'href': 'class_teacher', 'params': {'major_category':'howcs', 'action':'post', 'teacher_id':user.id}, 'text': '공지사항', 'icon': 'sms failed' })
+        menu.append({ 'href': 'class_teacher', 'params': {'major_category':'howcs', 'action':'student_health_record', 'teacher_id':user.id}, 'text': '건강 기록 관리', 'icon': 'local hospital' })
+        menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'edu_resource'}, 'text': '교육자료실', 'icon': 'folder' })
+        menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'academic_resource'}, 'text': '교무자료실', 'icon': 'folder open' })
     
     if 'admin' in user.role:
         menu.append({ 'heading': '관리자'})
@@ -980,9 +1405,15 @@ def get_menu():
         menu.append({ 'href': 'user', 'params': {}, 'text': '아지트 회원관리', 'icon': 'people' })
         #menu.append({ 'href': '/hana/agit_teacher', 'params': {}, 'text': '아지트 교사관리', 'icon': 'account-plus' })
         #menu.append({ 'href': '/hana/payment', 'params': {}, 'text': '아지트 회비관리', 'icon': 'currency-krw' })
-        menu.append({ 'href': 'student', 'params': {}, 'text': '하우학교 학생관리', 'icon': 'people' })
+        menu.append({ 'href': 'student', 'params': {'action':'student_record'}, 'text': '하우학교 학생관리', 'icon': 'group add' })
+        menu.append({ 'href': 'student', 'params': {'action':'student_health_record'}, 'text': '하우학교 학생 건강기록', 'icon': 'local hospital' })
         menu.append({ 'href': 'howcs_teacher', 'params': {}, 'text': '하우학교 교사관리', 'icon': 'person' })
-        menu.append({ 'href': 'class', 'params': {'major_category':'howcs'}, 'text': '하우학교 수업관리', 'icon': 'school' })
+        menu.append({ 'href': 'class_all', 'params': {'major_category':'howcs', 'action':'edit'}, 'text': '하우학교 수업관리', 'icon': 'class' })
+        menu.append({ 'href': 'class_all', 'params': {'major_category':'howcs', 'action':'attendance'}, 'text': '하우학교 출결관리', 'icon': 'event available' })
+        menu.append({ 'href': 'class_all', 'params': {'major_category':'howcs', 'action':'enrollment'}, 'text': '하우학교 수강관리', 'icon': 'group add' })
+        menu.append({ 'href': 'role', 'params': {}, 'text': '권한 관리', 'icon': 'lock' })
+        menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'edu_resource'}, 'text': '교육자료실', 'icon': 'folder' })
+        menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'academic_resource'}, 'text': '교무자료실', 'icon': 'folder open' })
     return jsonify(menu)
 
 @app.route('/', defaults={'path': ''})

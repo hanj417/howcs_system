@@ -52,7 +52,7 @@
 <script>
 
 export default {
-  data () {
+  data: function() {
     return {
       table_data: [],
       columns: [
@@ -63,33 +63,39 @@ export default {
         { name: 'phone', label: '전화번호', field: 'phone', sortable: true, align: 'left' },
         { name: 'birthday', label: '생년월일', field: 'birthday', sortable: true, align: 'left' },
         { name: 'school', label: '소속학교', field: 'school', sortable: true, align: 'left' },
-        { name: 'church', label: '출석교회', field: 'church', sortable: true, align: 'left' }
+        { name: 'church', label: '출석교회', field: 'church', sortable: true, align: 'left' },
+        { name: 'father_name', label: '부', field: row => row.student_info.father_name, sortable: true, align: 'left' },
+        { name: 'mother_name', label: '모', field: row => row.student_info.mother_name, sortable: true, align: 'left' },
       ],
       filter: '',
-      visible_columns: ['student_id', 'name', 'email', 'phone'],
+      visible_columns: ['student_id', 'name', 'email', 'phone', 'father_name', 'mother_name'],
       item: []
     }
   },
   props: ['action'],
   methods: {
-    fetch_data () {
+    fetch_data: function() {
       let query = {}
-      this.$axios.get(`student_infos`, {params: this.query})
-        .then(({ data }) => { this.table_data = data })
+      var self = this
+      self.$axios.get('student_infos', {params: self.query})
+        .then(function(response) { let data = response.data 
+        self.table_data = data })
     },
-    remove () {
-      this.$axios.delete(`student_infos/` + this.item[0].id)
-        .then(({ data }) => { this.fetch_data() })
+    remove: function () {
+      var self = this
+      self.$axios.delete('student_infos/' + self.item[0].id)
+        .then(function(response) { let data = response.data 
+        self.fetch_data() })
     },
-    rowClick(row) {
+    rowClick: function(row) {
       if (this.action === 'student_record') {
-        this.$router.push({name: 'student_record', params: {action:'update', id:row.id}})
+        this.$router.push({name: 'user_form', params: {action:'update', id:row.id}})
       } else if (this.action === 'student_health_record') {
         this.$router.push({name: 'student_health_record', params: {action:'edit', id:row.id}})
       }
     },
   },
-  created () {
+  created: function () {
     this.fetch_data()
   }
 }

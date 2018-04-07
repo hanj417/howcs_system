@@ -58,7 +58,7 @@ import { LocalStorage } from 'quasar'
 import './docs-input.styl'
 
 export default {
-  data () {
+  data: function() {
     return {
       username: '',
       password: '',
@@ -66,73 +66,34 @@ export default {
     }
   },
   methods: {
-    fetch_menu () {
+    fetch_menu: function () {
+      var self = this
       this.$axios.get('menu')
-        .then(({data}) =>
-          this.$store.commit('menu/UpdateMenu', data)
-        ).catch(function (data) {
+        .then(function(response) { let data = response.data
+          self.$store.commit('menu/UpdateMenu', data)
+        }).catch(function (data) {
           console.log('error')
         })
     },
-    login () {
+    login: function () {
+      var self = this
       this.$axios({
         method: 'post',
         url: 'login',
         auth: {username: this.username, password: this.password},
         headers: { 'Content-type': 'application/json' }
-      }).then(({data}) => {
-        this.$store.commit('auth/SetAuth', data)
-        this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + data.token
-        this.fetch_menu()
+      }).then(function(response) {
+        let data = response.data
+        self.$store.commit('auth/SetAuth', data)
+        self.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + data.token
+        self.fetch_menu()
         LocalStorage.set('user_', data.user)
         LocalStorage.set('token_', data.token)
-        this.$router.replace('/')
-      }).catch(({data}) => {
-        this.login_fail = true
+        self.$router.replace('/')
+      }).catch(function(response) { let data = response.data
+        self.login_fail = true
       })
     }
   }
 }
-/*
-import { mapState } from 'vuex'
-
-export default {
-  name: 'Login',
-  data () {
-    return {
-      username: '',
-      password: '',
-      login_failed: false,
-    }
-  },
-  computed: {
-    ...mapState(['user', 'token', 'menu'])
-  },
-  methods: {
-    fetch_menu() {
-      this.$axios.get('menu')
-      .then(({data}) =>
-        this.$store.commit('menu/SetMenu', data)
-      ).catch(function(data) {
-        console.log('error')
-      })
-    },
-    submit() {
-      this.$axios({
-        method: 'post',
-        url: 'https://howcs.kr:3000/api/login',
-        auth: {username: this.username, password: this.password},
-        headers: { 'Content-type': 'application/json' }
-      }).then(({data}) => {
-        this.$store.commit('set_auth', data)
-        this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + data.token
-        this.fetch_menu()
-        this.$router.replace('/')
-      }).catch(({data}) => {
-        this.login_failed = true
-      });
-    },
-  },
-}
-*/
 </script>

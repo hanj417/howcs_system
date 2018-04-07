@@ -41,9 +41,16 @@
       position="bottom-right"
       :offset="[18, 18]">
       <q-btn
+        v-if="$route.name == 'class_all'"
         round
         color="primary"
         @click="$router.push({name:'class_form_new', params:{major_category:'howcs', role:'admin'}})"
+        icon="add" />
+      <q-btn
+        v-if="$route.name == 'howcs_class_teacher'"
+        round
+        color="primary"
+        @click="$router.push({name:'class_form_new', params:{major_category:'howcs', role:'teacher'}})"
         icon="add" />
     </q-page-sticky>
   </q-page>
@@ -51,7 +58,7 @@
 
 <script>
 export default {
-  data () {
+  data: function() {
     return {
       table_data: [],
       columns: [
@@ -67,27 +74,25 @@ export default {
     }
   },
   watch: {
-    '$route.name' (val) {
+    '$route.name': function (val) {
       this.fetch_data()
     },
-  },
-  watch: {
-    'major_category' (val) {
+    'major_category': function (val) {
       this.fetch_data()
     },
-    'minor_category' (val) {
+    'minor_category': function (val) {
       this.fetch_data()
     },
-    'action' (val) {
+    'action': function (val) {
       this.fetch_data()
     },
-    'teacher_id' (val) {
+    'teacher_id': function (val) {
       this.fetch_data()
     },
   },
   props: ['major_category', 'minor_category', 'action', 'teacher_id'],
   methods: {
-    fetch_data () {
+    fetch_data: function() {
       let query = {}
       if (this.$route.name === 'class_all') {
         query['major_category'] = this.major_category
@@ -99,41 +104,47 @@ export default {
         query['major_category'] = this.major_category
         query['teacher_id'] = this.teacher_id
       }
-      this.$axios.get(`classes`, {params: query})
-      .then(({ data }) => {
-          this.table_data = data
+      var self = this
+      self.$axios.get('classes', {params: query})
+      .then(function(response) { let data = response.data
+          self.table_data = data
       })
     },
-    remove () {
-      this.$axios.delete(`classes/` + this.item[0].id)
-      .then(({ data }) => {
-        this.fetch_data()
+    remove: function () {
+      var self = this
+      self.$axios.delete('classes/' + self.item[0].id)
+      .then(function(response) { let data = response.data
+        self.fetch_data()
       })
     },
-    enroll () {
-      this.$axios.post(`enrollments`, {
+    enroll: function () {
+      this.$axios.post('enrollments', {
         'class_id': this.item.id
-      }).then(({ data }) => {
+      }).then(function(response) { let data = response.data
         this.fetch_data()
       })
     },
-    rowClick (row) {
+    rowClick: function (row) {
       if (this.action === 'enrollment') {
         this.$router.push({name:'enrollment_class', params: {class_id: row.id}})
       } else if (this.action === 'attendance') {
         this.$router.push({name:'attendance_class', params: {class_id: row.id}})
       } else if (this.action === 'post') {
         this.$router.push({name:'post_class', params: {class_id: row.id}})
+      } else if (this.action === 'student_health_record') {
+        this.$router.push({name:'enrollment_class_action', params: {class_id: row.id, action: 'student_health_record'}})
       } else if (this.action === 'edit') {
         if (this.$route.name === 'class_all') {
           this.$router.push({name:'class_form_edit', params: {role: 'admin', class_id: row.id, action:'edit'}})
         } else if (this.$route.name === 'class_teacher') {
           this.$router.push({name:'class_form_edit', params: {role: 'teacher', class_id: row.id, action:'edit'}})
+        } else if (this.$route.name === 'howcs_class_teacher') {
+          this.$router.push({name:'class_form_edit', params: {role: 'teacher', class_id: row.id, action:'edit'}})
         }
       }
     }, 
   },
-  created () {
+  created: function () {
     if (this.$route.name === 'class_all') {
     } else if (this.$route.name === 'class_teacher') {
     }

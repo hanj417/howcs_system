@@ -26,7 +26,7 @@
 import { LocalStorage } from 'quasar'
 
 export default {
-  data () {
+  data: function() {
     return {
       table_data: [],
       columns: [
@@ -47,18 +47,19 @@ export default {
   },
   props: ['minor_category'],
   methods: {
-    fetch_data () {
+    fetch_data: function() {
       let query = {}
       if (this.minor_category) {
         query['minor_category'] = this.minor_category
       }
-      this.$axios.get(`posts/homepage`, {params: query})
-        .then(({ data }) => {
-          this.table_data = data
+      var self = this
+      self.$axios.get('posts/homepage', {params: query})
+        .then(function(response) { let data = response.data
+          self.table_data = data
         })
     }
   },
-  created () {
+  created: function () {
     this.fetch_data()
   }
 }

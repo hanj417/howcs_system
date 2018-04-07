@@ -36,12 +36,14 @@
 <a :href="'/api/upload/' + file">{{ file }}</a><br>
     </template>
 </div>
+<!--
       <div class="row q-ma-md col-xs-12 justify-end">
       <div class="col-xs-4">
   <q-btn v-if="is_author" @click="$router.push({name:'post_form', params:{action:'update', id: id}})" label="수정" />
   <q-btn v-if="is_author" @click="remove" label="삭제" />
       </div>
       </div>
+-->
     </div>
   </div>
 
@@ -76,49 +78,52 @@ export default {
   },
   props: ['id'],
   watch: {
-    'major_category' (val) {
-      this.$axios.get(`classes/categories/` + this.major_category
-      ).then(({ data }) => {
-        this.minor_categories = data
+    'major_category': function (val) {
+      var self = this
+      self.$axios.get(`classes/categories/` + self.major_category
+      ).then(function (response) {
+        let data = response.data
+        self.minor_categories = data
       })
     }
   },
   methods: {
-    cancel () {
+    cancel: function () {
       this.$router.go(-1)
     },
-    remove () {
-      this.$axios.delete(`posts/` + this.id)
-        .then(({ data }) => { this.$router.go(-1) })
+    remove: function () {
+      var self = this
+      self.$axios.delete(`posts/` + self.id)
+        .then(function (response) {  self.$router.go(-1) })
     }
   },
-  created () {
+  created: function () {
     this.user = LocalStorage.get.item('user_')
 
-    this.$axios.get(`posts/categories`)
-      .then(({ data }) => { this.major_categories = data })
-    this.$axios.get(`posts/properties`)
-      .then(({ data }) => {})
-    this.$axios.get(`posts/homepage/` + this.id)
-      .then(({ data }) => {
-        this.major_category = data.major_category
-        this.minor_category = data.minor_category
-        this.category_disabled = true
-        this.properties = data.properties
-        this.date = (new Date(data.created_at)).toISOString().slice(0, 10)
-        this.author_name = data.author.name
-        this.files = JSON.parse(data.files)
+    var self = this
+    self.$axios.get(`posts/categories`)
+      .then(function (response) { self.major_categories = response.data })
+    self.$axios.get(`posts/homepage/` + self.id)
+      .then(function (response) {
+        let data = response.data
+        self.major_category = data.major_category
+        self.minor_category = data.minor_category
+        self.category_disabled = true
+        self.properties = data.properties
+        self.date = (new Date(data.created_at)).toISOString().slice(0, 10)
+        self.author_name = data.author.name
+        self.files = JSON.parse(data.files)
         
         /*
       if (JSON.parse(data.properties).includes('notice')) {
-        this.notice = true
+        self.notice = true
       }
 */
-        this.title = data.title
-        this.body = data.body
-        this.class_id = data.class_id
-        if (this.user.id === data.author_id) {
-          this.is_author = true
+        self.title = data.title
+        self.body = data.body
+        self.class_id = data.class_id
+        if (self.user.id === data.author_id) {
+          self.is_author = true
         }
       })
   }

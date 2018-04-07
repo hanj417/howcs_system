@@ -102,7 +102,7 @@
 <script>
 
 export default {
-  data () {
+  data: function() {
     return {
       table_data: [],
       columns: [
@@ -215,30 +215,37 @@ export default {
     }
   },
   methods: {
-    fetch_data () {
+    fetch_data: function() {
       let query = {}
-      this.$axios.get(`privileges`, {params: query})
-        .then(({ data }) => { this.table_data = data })
+      var self = this
+      self.$axios.get('privileges', {params: query})
+        .then(function(response) { let data = response.data 
+        self.table_data = data })
     },
-    role_new() {
-      this.$axios.post(`privileges`, {
-        'name': this.role_name,
-        'label': this.role_label,
-      }).then(({data}) => {
-        this.fetch_data()
+    role_new: function() {
+      var self = this
+      self.$axios.post('privileges', {
+        'name': self.role_name,
+        'label': self.role_label,
+      }).then(function(response) { let data = response.data
+        self.fetch_data()
       })
       this.add_modal = false
     },
-    save () {
-      this.$axios.put(`privileges/` + this.item[0].id, this.item[0])
-      .then(({ data }) => { this.fetch_data() })
+    save: function () {
+      var self = this
+      self.$axios.put('privileges/' + self.item[0].id, self.item[0])
+      .then(function(response) { let data = response.data 
+        self.fetch_data() })
     },
-    remove () {
-      this.$axios.delete(`privileges/` + this.item[0].id)
-        .then(({ data }) => { this.fetch_data() })
+    remove: function () {
+      var self = this
+      self.$axios.delete('privileges/' + self.item[0].id)
+        .then(function(response) { let data = response.data 
+        self.fetch_data() })
     }
   },
-  created () {
+  created: function () {
     this.fetch_data()
   }
 }

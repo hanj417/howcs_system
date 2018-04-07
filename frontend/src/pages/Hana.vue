@@ -21,23 +21,23 @@
 
 <script>
 export default {
-  data () {
+  data: function() {
     return {
     }
   },
   computed: {
     menu: {
-      get () {
+      get:function () {
         return this.$store.state.menu.menu_
       },
-      set (val) {
+      set: function (val) {
         this.$store.commit('menu/UpdateMenu', val)
       }
     }
   },
   methods: {
   },
-  created () {
+  created: function () {
   }
 }
 </script>

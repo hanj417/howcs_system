@@ -30,7 +30,7 @@
 import { date } from 'quasar'
 
 export default {
-  data () {
+  data: function() {
     return {
       table_data: [],
       columns: [
@@ -44,17 +44,17 @@ export default {
     }
   },
   watch: {
-    '$route.name' (val) {
+    '$route.name': function (val) {
       this.fetch_data()
     },
-    'date' (val) {
+    'date': function (val) {
       this.date = val
       this.fetch_data()
     },
   },
   props: ['class_id'],
   methods: {
-    fetch_data () {
+    fetch_data: function() {
       let d = new Date(this.date)
       let days = this.days
       this.columns = [this.columns_name]
@@ -80,47 +80,50 @@ export default {
         'date': (new Date(this.date)).toISOString().slice(0,10),
         'days': this.days,
       }
-      this.$axios.get(`attendances`, {params: query})
-      .then(({ data }) => {
+      var self = this
+      self.$axios.get('attendances', {params: query})
+      .then(function(response) { let data = response.data
         console.log(data)
-        this.table_data = data
+        self.table_data = data
       })
     },
-    toggle (item, index) {
+    toggle: function (item, index) {
       var i = this.categories.indexOf(item[index]['category'])
       i = (i + 1) % this.categories.length
       item[index]['category'] = this.categories[i]
 
+      var self = this
       if (i === 0) {
-        this.$axios.delete(`attendances/` + item[index]['id']
-        ).then(({data}) => {
-          this.fetch_data()
+        self.$axios.delete('attendances/' + item[index]['id']
+        ).then(function(response) { let data = response.data
+          self.fetch_data()
         })
       } else if (i === 1) {
-        this.$axios.post(`attendances`, {
-          'class_id': this.class_id,
+        self.$axios.post('attendances', {
+          'class_id': self.class_id,
           'student_id': item['id'],
           'date': index,
           'category': item[index]['category']
-        }).then(({data}) => {
-          this.fetch_data()
+        }).then(function(response) { let data = response.data
+          self.fetch_data()
         })
       } else {
-        this.$axios.put(`attendances/` + item[index]['id'], {
-          'class_id': this.class_id,
+        self.$axios.put('attendances/' + item[index]['id'], {
+          'class_id': self.class_id,
           'student_id': item['id'],
           'date': index,
           'category': item[index]['category']
-        }).then(({data}) => {
-          this.fetch_data()
+        }).then(function(response) { let data = response.data
+          self.fetch_data()
         })
       }
     }
   },
-  created () {
-    this.$axios.get(`attendances/categories`)
-      .then(({ data }) => {
-        this.categories = data
+  created: function () {
+    var self = this
+    self.$axios.get('attendances/categories')
+      .then(function(response) { let data = response.data
+        self.categories = data
       })
 
     var today = new Date()

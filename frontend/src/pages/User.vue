@@ -63,7 +63,7 @@
 <script>
 
 export default {
-  data () {
+  data: function() {
     return {
       table_data: [],
       role_str: {
@@ -89,17 +89,21 @@ export default {
     }
   },
   methods: {
-    fetch_data () {
+    fetch_data: function() {
       let query = {}
-      this.$axios.get(`users`, {params: query})
-        .then(({ data }) => { this.table_data = data })
+      var self = this
+      self.$axios.get('users', {params: query})
+        .then(function(response) { let data = response.data 
+        self.table_data = data })
     },
-    remove () {
-      this.$axios.delete(`users/` + this.item[0].id)
-        .then(({ data }) => { this.fetch_data() })
+    remove: function () {
+      var self = this
+      self.$axios.delete('users/' + self.item[0].id)
+        .then(function(response) { let data = response.data 
+        self.fetch_data() })
     }
   },
-  created () {
+  created: function () {
     this.fetch_data()
   }
 }

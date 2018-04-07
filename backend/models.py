@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship, backref
 from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from ast import literal_eval
 from backend import db, app
 from bs4 import BeautifulSoup
@@ -14,6 +14,10 @@ def date_from_str(date_str):
         return
     date_list = list(map(int, date_str.split('-')))
     return date(date_list[0], date_list[1], date_list[2])
+
+def daterange(start_date, end_date):
+    for n in range(int ((end_date - start_date).days)):
+        yield start_date + timedelta(n)
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -100,6 +104,58 @@ class User(db.Model):
             dic['student_info'] = self.student_info.as_dict()
         return dic
 
+class Privilege(db.Model):
+    __tablename__ = 'privileges'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(32))
+    label = db.Column(db.String(32))
+    user = db.Column(db.Boolean, default=False)
+    user_new = db.Column(db.Boolean, default=False)
+    user_update = db.Column(db.Boolean, default=False)
+    user_del = db.Column(db.Boolean, default=False)
+    student = db.Column(db.Boolean, default=False)
+    student_new = db.Column(db.Boolean, default=False)
+    student_update = db.Column(db.Boolean, default=False)
+    student_del = db.Column(db.Boolean, default=False)
+    howcs_teacher = db.Column(db.Boolean, default=False)
+    howcs_teacher_new = db.Column(db.Boolean, default=False)
+    howcs_teacher_update = db.Column(db.Boolean, default=False)
+    howcs_teacher_del = db.Column(db.Boolean, default=False)
+    howcs_class = db.Column(db.Boolean, default=False)
+    howcs_class_new = db.Column(db.Boolean, default=False)
+    howcs_class_update = db.Column(db.Boolean, default=False)
+    howcs_class_del = db.Column(db.Boolean, default=False)
+    howcs_enrollment = db.Column(db.Boolean, default=False)
+    howcs_enrollment_new = db.Column(db.Boolean, default=False)
+    howcs_enrollment_update = db.Column(db.Boolean, default=False)
+    howcs_enrollment_del = db.Column(db.Boolean, default=False)
+    howcs_attendance = db.Column(db.Boolean, default=False)
+    howcs_attendance_new = db.Column(db.Boolean, default=False)
+    howcs_attendance_update = db.Column(db.Boolean, default=False)
+    howcs_attendance_del = db.Column(db.Boolean, default=False)
+    howcs_post = db.Column(db.Boolean, default=False)
+    howcs_post_new = db.Column(db.Boolean, default=False)
+    howcs_post_update = db.Column(db.Boolean, default=False)
+    howcs_post_del = db.Column(db.Boolean, default=False)
+    homepage_post = db.Column(db.Boolean, default=False)
+    homepage_post_new = db.Column(db.Boolean, default=False)
+    homepage_post_update = db.Column(db.Boolean, default=False)
+    homepage_post_del = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime(), default=datetime.now)
+    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    def as_dict(self):
+        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return dic
+
+    @staticmethod
+    def exist(name_or_label):
+        if Privilege.query.filter_by(name=name_or_label).first() is not None:
+            return True
+        if Privilege.query.filter_by(label=name_or_label).first() is not None:
+            return True
+        return False
+
+
 class FamilyRelation(db.Model):
     __tablename__ = 'family_relations'
     id = db.Column(db.Integer, primary_key=True)
@@ -129,11 +185,11 @@ class StudentInfo(db.Model):
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     user = relationship('User', back_populates='student_info')
-    student_records = relationship('StudentRecord', back_populates="student_info")
+    student_record = relationship('StudentRecord', back_populates="student_info", uselist=False)
     def as_dict(self):
         dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
-        if self.student_records:
-            dic['student_records'] = self.student_records.as_dict()
+        if self.student_record:
+            dic['student_record'] = self.student_record.as_dict()
         return dic
 
 class ParentInfo(db.Model):
@@ -224,6 +280,14 @@ class Post(db.Model):
         dic['ellipsis'] = text[:100]
         return dic
 
+    def created_at_is(self, created_at_str):
+        if created_at_str is None or created_at_str == '':
+            return
+        print (created_at_str)
+        created_at_str = created_at_str.split('T')[0]
+        created_at_list = list(map(int, created_at_str.split('-')))
+        self.created_at = datetime(created_at_list[0], created_at_list[1], created_at_list[2])
+
     @staticmethod
     def major_categories():
         return [{'label':'홈페이지', 'value':'homepage'}, {'label':'아지트', 'value':'agit'}, {'label':'하우학교', 'value':'howcs'}]
@@ -238,6 +302,8 @@ class Post(db.Model):
                     {'label':'문학', 'value':'literature'},
                     {'label':'성인', 'value':'adult'}],
                 'howcs': [
+                    {'label':'교육자료', 'value':'edu_resource'},
+                    {'label':'교무자료', 'value':'academic_resource'},
                     {'label':'수업', 'value':'subject'},
                     {'label':'학급', 'value':'class'}]}
     @staticmethod
@@ -286,6 +352,7 @@ class Class(db.Model):
                     {'label':'문학', 'value':'literature'},
                     {'label':'성인', 'value':'adult'}],
                 'howcs': [
+                    {'label':'부모학교', 'value':'parent_school'},
                     {'label':'수업', 'value':'subject'},
                     {'label':'학급', 'value':'class'}]}
 
@@ -345,7 +412,7 @@ class StudentRecord(db.Model):
     __tablename__ = 'student_records'
     id = db.Column(db.Integer, primary_key=True)
     student_info_id = db.Column(db.Integer, ForeignKey('student_infos.id'))
-    student_info = relationship('StudentInfo', back_populates='student_records')
+    student_info = relationship('StudentInfo', back_populates='student_record')
     student_annual_records = relationship('StudentAnnualRecord', back_populates='student_record')
     student_award_records = relationship('StudentAwardRecord', back_populates='student_record')
     student_school_registration_records = relationship('StudentSchoolRegistrationRecord', back_populates='student_record')
@@ -355,11 +422,21 @@ class StudentRecord(db.Model):
     def as_dict(self):
         dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         if self.student_annual_records:
-            dic['student_annual_records'] = self.student_annual_records.as_dict()
+            dic['student_annual_records'] = []
+            for student_annual_record in self.student_annual_records:
+                dic['student_annual_records'].append(student_annual_record.as_dict())
         if self.student_award_records:
-            dic['student_award_records'] = self.student_award_records.as_dict()
+            dic['student_award_records'] = []
+            for student_award_record in self.student_award_records:
+                dic['student_award_records'].append(student_award_record.as_dict())
         if self.student_school_registration_records:
-            dic['student_school_registration_records'] = self.student_school_registration_records.as_dict()
+            dic['student_school_registration_records'] = []
+            if student_school_registration_record in self.student_school_registration_records:
+                dic['student_school_registration_records'].append(student_school_registration_record.as_dict())
+        if self.student_health_records:
+            dic['student_health_records'] = []
+            for student_health_record in self.student_health_records:
+                dic['student_health_records'].append(student_health_record.as_dict())
         return dic
 
 class StudentSchoolRegistrationRecord(db.Model):
@@ -449,11 +526,27 @@ class StudentHealthRecord(db.Model):
     __tablename__ = 'student_health_records'
     id = db.Column(db.Integer, primary_key=True)
     student_record_id = db.Column(db.Integer, ForeignKey('student_records.id'))
-    content = db.Column(db.UnicodeText())
     date = db.Column(db.Date(), nullable=True)
+    internal_medicine = db.Column(db.UnicodeText())
+    dental_clinic = db.Column(db.UnicodeText())
+    fluorine_coating = db.Column(db.UnicodeText())
+    height = db.Column(db.String(256))
+    weight = db.Column(db.String(256))
+    sight = db.Column(db.String(256))
+    internal_medicine_content = db.Column(db.UnicodeText())
+    cavity = db.Column(db.UnicodeText())
+    dental_clinic_content = db.Column(db.UnicodeText())
+    content = db.Column(db.UnicodeText())
     student_record = relationship('StudentRecord', back_populates='student_health_records')
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    def date_is(self, date_str):
+        if date_str is None:
+            return
+        date_str = date_str.split('T')[0]
+        date_list = list(map(int, date_str.split('-')))
+        self.date = date(date_list[0], date_list[1], date_list[2])
+
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 

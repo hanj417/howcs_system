@@ -123,6 +123,7 @@ export default [
       { path: 'agit_teacher', name: 'agit_teacher', component: () => import('pages/AgitTeacher'), props: true },
       { path: 'howcs_teacher', name: 'howcs_teacher', component: () => import('pages/HowcsTeacher'), props: true },
       { path: 'enrollments/classes/:class_id', name: 'enrollment_class', component: () => import('pages/EnrollmentClass'), props: true },
+      { path: 'enrollments/classes/:class_id/:action', name: 'enrollment_class_action', component: () => import('pages/EnrollmentClass'), props: true },
       { path: 'enrollments/students/:id/:major_category/:action', name: 'enrollment_student_all', component: () => import('pages/EnrollmentStudent'), props: true },
       { path: 'enrollments/students/:id/:major_category/:minor_category/:action', name: 'enrollment_student', component: () => import('pages/EnrollmentStudent'), props: true },
       { path: 'attendances/classes/:class_id', name: 'attendance_class', component: () => import('pages/AttendanceClass'), props: true },

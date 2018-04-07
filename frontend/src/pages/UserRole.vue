@@ -76,7 +76,7 @@
 <script>
 
 export default {
-  data () {
+  data: function() {
     return {
       priv: false,
       priv_update: false,
@@ -99,23 +99,28 @@ export default {
     }
   },
   methods: {
-    check_privilege() {
+    check_privilege: function() {
       let query = {priv: 'user'}
-      this.$axios.get(`privileges`, {params: query})
-        .then(({ data }) => { this.priv = data })
+      var self = this
+      self.$axios.get('privileges', {params: query})
+        .then(function(response) { let data = response.data 
+        self.priv = data })
 
       let update_query = {priv: 'user_update'}
-      this.$axios.get(`privileges`, {params: update_query})
-        .then(({ data }) => { this.priv_update = data })
+      self.$axios.get('privileges', {params: update_query})
+        .then(function(response) { let data = response.data 
+        self.priv_update = data })
     },
-    fetch_data () {
+    fetch_data: function() {
       if (this.priv === false) return
       let query = {}
-      this.$axios.get(`users`, {params: query})
-        .then(({ data }) => { this.table_data = data })
+      var self = this
+      self.$axios.get('users', {params: query})
+        .then(function(response) { let data = response.data 
+        self.table_data = data })
     },
   },
-  created () {
+  created: function () {
     this.check_privilege()
     this.fetch_data()
   }

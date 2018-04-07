@@ -100,7 +100,7 @@
 
 <script>
 export default {
-  data () {
+  data: function() {
     return {
       table_data: [],
       columns: [
@@ -133,40 +133,44 @@ export default {
     }
   },
   methods: {
-    fetch_data () {
+    fetch_data: function() {
       let query = {}
-      this.$axios.get(`howcs_teacher_infos`, {params: query})
-        .then(({ data }) => {
-          this.table_data = data
+      var self = this
+      self.$axios.get('howcs_teacher_infos', {params: query})
+        .then(function(response) { let data = response.data
+          self.table_data = data
         })
     },
-    remove () {
-      this.$axios.delete(`howcs_teacher_infos/` + this.item[0].id)
-        .then(({ data }) => {
-          this.fetch_data()
+    remove: function () {
+      var self = this
+      self.$axios.delete('howcs_teacher_infos/' + self.item[0].id)
+        .then(function(response) { let data = response.data
+          self.fetch_data()
         })
     },
-    howcs_teacher_new (row) {
-      this.$axios.post(`howcs_teacher_infos`, {
+    howcs_teacher_new: function (row) {
+      var self = this
+      self.$axios.post('howcs_teacher_infos', {
         'user_id': row.id
-      }).then(({ data }) => {
-        this.fetch_data()
+      }).then(function(response) { let data = response.data
+        self.fetch_data()
       })
     },
-    search () {
+    search: function () {
       let query = {}
-      this.$axios.get(`users`, {params: query})
-        .then(({ data }) => {
-          this.search_table_data = data
+      var self = this
+      self.$axios.get('users', {params: query})
+        .then(function(response) { let data = response.data
+          self.search_table_data = data
         })
-      this.search_modal = true
+      self.search_modal = true
     },
-    search_select (row) {
+    search_select: function (row) {
       this.howcs_teacher_new(row)
       this.search_modal = false
     }
   },
-  created () {
+  created: function () {
     this.fetch_data()
   }
 }

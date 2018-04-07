@@ -370,7 +370,7 @@
           <div class="how-story__detail">
             <div class="how-story__content">{{ recent_notice.ellipsis }}...
             </div>
-            <div class="how-story__created-at">
+            <div class="how-story__created: function-at">
 {{ recent_notice.date }}
             </div>
             <div class="how-story__author">
@@ -391,7 +391,7 @@
           </div>
           <div class="how-story__detail">
             <div class="how-story__content">{{ recent_story.ellipsis }}...</div>
-            <div class="how-story__created-at">
+            <div class="how-story__created: function-at">
 {{ recent_story.date }}
             </div>
             <div class="how-story__author">
@@ -414,7 +414,7 @@
             <div class="how-story__content">
 {{ recent_photo.ellipsis }}...
             </div>
-            <div class="how-story__created-at">
+            <div class="how-story__created: function-at">
 {{ recent_story.date }}
             </div>
             <div class="how-story__author">
@@ -471,13 +471,6 @@
 export default {
   data: function () {
     return {
-      recommendActive1: false,
-      recommendActive2: false,
-      recommendActive3: false,
-      recommendActive4: false,
-      recommendActive5: false,
-      recommendActive6: false,
-      recommendActive7: false,
       recent_notice: {},
       recent_story: {},
       recent_photo: {},
@@ -549,20 +542,25 @@ export default {
     }
   },
   methods: {
-    fetch_data () {
+    fetch_data: function () {
       let query = {}
       query['minor_category'] = 'notice'
       query['recent'] = '1'
-      this.$axios.get(`posts/homepage`, {params: query})
-        .then(({ data }) => {
-          this.recent_notice = data[0]
-          this.recent_notice['date'] = (new Date(this.recent_notice.created_at)).toISOString().substr(0, 10)
-          this.recent_notice['img'] = "/assets/img/how_notice.png"
-          let files = JSON.parse(this.recent_notice['files'])
+      var self = this
+      self.$axios.get("posts/homepage", {params: query})
+        .then(function(response) { let data = response.data
+          if (data.length > 0) {
+            self.recent_notice = data[0]
+          } else {
+            self.recent_notice = {title: '', ellipsis: ''}
+          }
+          self.recent_notice['date'] = (new Date(self.recent_notice.created_at)).toISOString().substr(0, 10)
+          self.recent_notice['img'] = "/assets/img/how_notice.png"
+          let files = JSON.parse(self.recent_notice['files'])
           if (files && files.length > 0) {
             let extensions = ['jpg', 'png', 'gif', 'jpeg', 'JPG', 'PNG', 'GIF', 'JPEG']
             if (extensions.indexOf(files[0].split('.').pop()) !== -1) {
-              this.recent_notice['img'] = "/api/upload/" + files[0]
+              self.recent_notice['img'] = "/api/upload/" + files[0]
             }
           }
         })
@@ -570,16 +568,20 @@ export default {
       let query_story = {}
       query_story['minor_category'] = 'story'
       query_story['recent'] = '1'
-      this.$axios.get(`posts/homepage`, {params: query_story})
-        .then(({ data }) => {
-          this.recent_story = data[0]
-          this.recent_story['date'] = (new Date(this.recent_story.created_at)).toISOString().substr(0, 10)
-          this.recent_story['img'] = "/assets/img/how_story.png"
-          let files = JSON.parse(this.recent_story['files'])
+      self.$axios.get("posts/homepage", {params: query_story})
+        .then(function(response) { let data = response.data
+          if (data.length > 0) {
+            self.recent_story = data[0]
+          } else {
+            self.recent_story = {title: '', ellipsis: ''}
+          }
+          self.recent_story['date'] = (new Date(self.recent_story.created_at)).toISOString().substr(0, 10)
+          self.recent_story['img'] = "/assets/img/how_story.png"
+          let files = JSON.parse(self.recent_story['files'])
           if (files && files.length > 0) {
             let extensions = ['jpg', 'png', 'gif', 'jpeg', 'JPG', 'PNG', 'GIF', 'JPEG']
             if (extensions.indexOf(files[0].split('.').pop()) !== -1) {
-              this.recent_story['img'] = "/api/upload/" + files[0]
+              self.recent_story['img'] = "/api/upload/" + files[0]
             }
           }
         })
@@ -587,23 +589,27 @@ export default {
       let query_photo = {}
       query_photo['minor_category'] = 'photo'
       query_photo['recent'] = '1'
-      this.$axios.get(`posts/homepage`, {params: query_photo})
-        .then(({ data }) => {
-          this.recent_photo = data[0]
-          this.recent_photo['date'] = (new Date(this.recent_photo.created_at)).toISOString().substr(0, 10)
-          this.recent_photo['img'] = "/assets/img/how_photo.png"
-          let files = JSON.parse(this.recent_photo['files'])
+      self.$axios.get("posts/homepage", {params: query_photo})
+        .then(function (data) {
+          if (data.length > 0) {
+            self.recent_photo = data[0]
+          } else {
+            self.recent_photo = {title: '', ellipsis: ''}
+          }
+          self.recent_photo['date'] = (new Date(self.recent_photo.created_at)).toISOString().substr(0, 10)
+          self.recent_photo['img'] = "/assets/img/how_photo.png"
+          let files = JSON.parse(self.recent_photo['files'])
           if (files && files.length > 0) {
             let extensions = ['jpg', 'png', 'gif', 'jpeg', 'JPG', 'PNG', 'GIF', 'JPEG']
             if (extensions.indexOf(files[0].split('.').pop()) !== -1) {
-              this.recent_photo['img'] = "/api/upload/" + files[0]
+              self.recent_photo['img'] = "/api/upload/" + files[0]
             }
           }
         })
 
     },
   },
-  created () {
+  created: function () {
     this.fetch_data()
   },
 }

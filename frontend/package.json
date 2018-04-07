@@ -17,6 +17,7 @@
     "i18n": "^0.8.3",
     "jquery": "^3.3.1",
     "localStorage": "^1.0.3",
+    "vue-fullcalendar": "^1.0.9",
     "vue-html-editor": "^0.2.1",
     "vue-i18n": "^7.6.0",
     "vue-quill-editor": "^3.0.5",
