@@ -2,8 +2,10 @@
   <q-page
     padding
     class="row justify-center">
-    <div style="width: 600px; max-width: 90vw;" class="shadow-8">
-    <div class="col-xs-12 text-center q-title text-weight-bold q-pa-md">회원 정보</div>
+    <div
+      style="width: 600px; max-width: 90vw;"
+      class="shadow-8">
+      <div class="col-xs-12 text-center q-title text-weight-bold q-pa-md">회원 정보</div>
       <div class="col-xs-10 docs-input q-mx-xl">
         <q-field
           label="학번"
@@ -105,7 +107,9 @@
           <q-input v-model="address" />
         </q-field>
       </div>
-      <div v-if="action == 'edit'" class="col-xs-12 row justify-end q-mt-lg">
+      <div
+        v-if="action == 'edit'"
+        class="col-xs-12 row justify-end q-mt-lg">
         <div class="col-xs-5 q-ma-xl">
           <q-btn
             @click="remove"
@@ -126,7 +130,7 @@ import { LocalStorage } from 'quasar'
 import { required, email } from 'vuelidate/lib/validators'
 
 export default {
-  data: function() {
+  data: function () {
     return {
       is_admin: false,
       user: {},
@@ -151,12 +155,12 @@ export default {
 
       health_table_data: [],
       health_columns: [
-        { name: 'date', label: '날짜', field: row => (new Date(row.date)).toISOString().slice(0,10), sortable: true, align: 'left' },
+        { name: 'date', label: '날짜', field: function (row) { return (new Date(row.date)).toISOString().slice(0, 10) }, sortable: true, align: 'left' },
         { name: 'height', label: '신장', field: 'height', sortable: true, align: 'left' },
         { name: 'weight', label: '체중', field: 'weight', sortable: true, align: 'left' },
         { name: 'sight', label: '시력', field: 'sight', sortable: true, align: 'left' },
-        { name: 'cavity', label: '충치', field: 'cavity', sortable: true, align: 'left' },
-      ],
+        { name: 'cavity', label: '충치', field: 'cavity', sortable: true, align: 'left' }
+      ]
     }
   },
   validations: {
@@ -174,58 +178,60 @@ export default {
     remove: function () {
       var self = this
       self.$axios.delete('student_infos/' + self.id)
-        .then(function(response) { let data = response.data 
-        self.$router.go(-1) })
+        .then(function (response) {
+          let data = response.data
+          self.$router.go(-1)
+        })
     },
     store: function () {
-      console.log('store')
-      console.log(this.id)
       if (this.action === 'new') {
-          var self = this
-          self.$axios.post('student_infos', {
-            'username': self.username,
-            'password': self.password,
-            'name': self.name,
-            'email': self.email,
-            'phone': self.phone,
-            'school': self.school,
-            'church': self.church,
-            'birthday': self.date,
-            'student_id': self.student_id,
-            'gender': self.gender,
-            'rrn': self.rrn,
-            'father_name': self.father_name,
-            'father_rrn': self.father_rrn,
-            'mother_name': self.mother_name,
-            'mother_rrn': self.mother_rrn,
-            'address': self.address
-          }).then(function(response) { let data = response.data
-            self.$router.go(-1)
-          })
+        var self = this
+        self.$axios.post('student_infos', {
+          'username': self.username,
+          'password': self.password,
+          'name': self.name,
+          'email': self.email,
+          'phone': self.phone,
+          'school': self.school,
+          'church': self.church,
+          'birthday': (new Date(self.birthday)).toISOString().substr(0, 10),
+          'student_id': self.student_id,
+          'gender': self.gender,
+          'rrn': self.rrn,
+          'father_name': self.father_name,
+          'father_rrn': self.father_rrn,
+          'mother_name': self.mother_name,
+          'mother_rrn': self.mother_rrn,
+          'address': self.address
+        }).then(function (response) {
+          let data = response.data
+          self.$router.go(-1)
+        })
       } else if (this.action === 'update') {
-          var self = this
-          self.$axios.put('student_infos/' + self.user_id, {
-            'username': self.username,
-            'password': self.password,
-            'name': self.name,
-            'email': self.email,
-            'phone': self.phone,
-            'school': self.school,
-            'church': self.church,
-            'birthday': self.date,
-            'student_id': self.student_id,
-            'gender': self.gender,
-            'rrn': self.rrn,
-            'father_name': self.father_name,
-            'father_rrn': self.father_rrn,
-            'mother_name': self.mother_name,
-            'mother_rrn': self.mother_rrn,
-            'address': self.address
-          }).then(function(response) { let data = response.data
-            self.$router.go(-1)
-          })
+        var self = this
+        self.$axios.put('student_infos/' + self.user_id, {
+          'username': self.username,
+          'password': self.password,
+          'name': self.name,
+          'email': self.email,
+          'phone': self.phone,
+          'school': self.school,
+          'church': self.church,
+          'birthday': (new Date(self.birthday)).toISOString().substr(0, 10),
+          'student_id': self.student_id,
+          'gender': self.gender,
+          'rrn': self.rrn,
+          'father_name': self.father_name,
+          'father_rrn': self.father_rrn,
+          'mother_name': self.mother_name,
+          'mother_rrn': self.mother_rrn,
+          'address': self.address
+        }).then(function (response) {
+          let data = response.data
+          self.$router.go(-1)
+        })
       }
-    },
+    }
   },
   created: function () {
     let loggedIn = LocalStorage.has('user_')
@@ -239,8 +245,8 @@ export default {
       }
       var self = this
       self.$axios.get('users/' + self.user_id
-      ).then(function(response) { let data = response.data
-        console.log(data)
+      ).then(function (response) {
+        let data = response.data
         self.user = data
         self.username = data.username
         self.name = data.name
@@ -248,8 +254,7 @@ export default {
         self.phone = data.phone
         self.school = data.school
         self.church = data.church
-        var d = new Date(data.birthday)
-        self.date = d.toISOString().substr(0, 10)
+        self.birthday = (new Date(data.birthday)).toISOString().substr(0, 10),
         self.is_howcs_student = true
         self.student_id = data.student_info.student_id
         self.gender = data.student_info.gender

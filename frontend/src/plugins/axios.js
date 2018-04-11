@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const axiosConfig = {
-  baseURL: 'https://howcs.kr:3000/api'
+  baseURL: 'https://howcs.kr/api'
 }
 
 export default ({ Vue }) => {

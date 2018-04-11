@@ -53,16 +53,27 @@
           icon="delete"
           @click="remove" />
       </template>
-      <q-tr slot="body" slot-scope="props" :props="props">
-       <q-td auto-width>
-        <q-checkbox color="primary" v-model="props.selected" />
-       </q-td>
-      <template v-for="col in visible_columns">
-        <q-td v-if="col == 'label'" :key="col" :props="props">{{ props.row.label }}</q-td>
-        <q-td v-else :key="col" :props="props">
-          <q-toggle v-model="props.row[col]" />
+      <q-tr
+        slot="body"
+        slot-scope="props"
+        :props="props">
+        <q-td auto-width>
+          <q-checkbox
+            color="primary"
+            v-model="props.selected" />
         </q-td>
-      </template>
+        <template v-for="col in visible_columns">
+          <q-td
+            v-if="col == 'label'"
+            :key="col"
+            :props="props">{{ props.row.label }}</q-td>
+          <q-td
+            v-else
+            :key="col"
+            :props="props">
+            <q-toggle v-model="props.row[col]" />
+          </q-td>
+        </template>
       </q-tr>
     </q-table>
     <q-page-sticky
@@ -78,9 +89,13 @@
       v-model="add_modal"
       class="row justify-center">
       <div class="col-xs-12">
-        <q-input v-model="role_label" float-label="권한 이름" />
-        <q-input v-model="role_name" float-label="권한 영문 이름" />
-      </div> 
+        <q-input
+          v-model="role_label"
+          float-label="권한 이름" />
+        <q-input
+          v-model="role_name"
+          float-label="권한 영문 이름" />
+      </div>
       <div class="row q-ma-md col-xs-12 justify-end">
         <div class="col-xs-5">
           <q-btn
@@ -102,7 +117,7 @@
 <script>
 
 export default {
-  data: function() {
+  data: function () {
     return {
       table_data: [],
       columns: [
@@ -131,6 +146,10 @@ export default {
         { name: 'howcs_attendance_new', label: '하우출결생성', field: 'howcs_attendance_new', align: 'center' },
         { name: 'howcs_attendance_update', label: '하우출결수정', field: 'howcs_attendance_update', align: 'center' },
         { name: 'howcs_attendance_del', label: '하우출결삭제', field: 'howcs_attendance_del', align: 'center' },
+        { name: 'howcs_student_health_record', label: '하우건강조회', field: 'howcs_student_health_record', align: 'center' },
+        { name: 'howcs_student_health_record_new', label: '하우건강생성', field: 'howcs_student_health_record_new', align: 'center' },
+        { name: 'howcs_student_health_record_update', label: '하우건강수정', field: 'howcs_student_health_record_update', align: 'center' },
+        { name: 'howcs_student_health_record_del', label: '하우건강삭제', field: 'howcs_student_health_record_del', align: 'center' },
         { name: 'howcs_post', label: '하우게시조회', field: 'howcs_post', align: 'center' },
         { name: 'howcs_post_new', label: '하우게시생성', field: 'howcs_post_new', align: 'center' },
         { name: 'howcs_post_update', label: '하우게시수정', field: 'howcs_post_update', align: 'center' },
@@ -138,7 +157,7 @@ export default {
         { name: 'homepage_post', label: '홈피게시조회', field: 'homepage_post', align: 'center' },
         { name: 'homepage_post_new', label: '홈피게시생성', field: 'homepage_post_new', align: 'center' },
         { name: 'homepage_post_update', label: '홈피게시수정', field: 'homepage_post_update', align: 'center' },
-        { name: 'homepage_post_del', label: '홈피게시삭제', field: 'homepage_post_del', align: 'center' },
+        { name: 'homepage_post_del', label: '홈피게시삭제', field: 'homepage_post_del', align: 'center' }
       ],
       filter: '',
       visible_columns: [
@@ -167,6 +186,10 @@ export default {
         'howcs_attendance_new',
         'howcs_attendance_update',
         'howcs_attendance_del',
+        'howcs_student_health_record',
+        'howcs_student_health_record_new',
+        'howcs_student_health_record_update',
+        'howcs_student_health_record_del',
         'howcs_post',
         'howcs_post_new',
         'howcs_post_update',
@@ -211,23 +234,26 @@ export default {
       item: [],
       add_modal: false,
       role_label: '',
-      role_name: '',
+      role_name: ''
     }
   },
   methods: {
-    fetch_data: function() {
+    fetch_data: function () {
       let query = {}
       var self = this
       self.$axios.get('privileges', {params: query})
-        .then(function(response) { let data = response.data 
-        self.table_data = data })
+        .then(function (response) {
+          let data = response.data
+          self.table_data = data
+        })
     },
-    role_new: function() {
+    role_new: function () {
       var self = this
       self.$axios.post('privileges', {
         'name': self.role_name,
-        'label': self.role_label,
-      }).then(function(response) { let data = response.data
+        'label': self.role_label
+      }).then(function (response) {
+        let data = response.data
         self.fetch_data()
       })
       this.add_modal = false
@@ -235,14 +261,18 @@ export default {
     save: function () {
       var self = this
       self.$axios.put('privileges/' + self.item[0].id, self.item[0])
-      .then(function(response) { let data = response.data 
-        self.fetch_data() })
+        .then(function (response) {
+          let data = response.data
+          self.fetch_data()
+        })
     },
     remove: function () {
       var self = this
       self.$axios.delete('privileges/' + self.item[0].id)
-        .then(function(response) { let data = response.data 
-        self.fetch_data() })
+        .then(function (response) {
+          let data = response.data
+          self.fetch_data()
+        })
     }
   },
   created: function () {

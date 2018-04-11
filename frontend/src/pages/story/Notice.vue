@@ -19,7 +19,7 @@
       <hr class="page-name--bottom-border" >
     </div>
 
-<!--
+    <!--
     <div class="row justify-center">
       <div class="col-xs-10">
         <q-tabs
@@ -54,16 +54,29 @@
 
     <!--toggle part-->
     <div class="container notice__section">
-<template v-for="recent in recents2">
-      <button class="enter__collapsible" @click="recent.hidden = !recent.hidden">{{ recent.title }}</button>
-      <div class="enter__content" v-html="recent.body" :class="{hidden: recent.hidden}"/>
-    <div v-if="recent.files" class="enter__content" style="padding: 0px 20px;" :class="{hidden: recent.hidden}">첨부파일</div>
-<div v-if="recent.files" class="enter__content" style="padding: 0px 20px 30px 20px;" :class="{hidden: recent.hidden}">
-    <template v-for="file in recent.files">
-<a :href="'/api/upload/' + file">{{ file }}</a>
-    </template>
-</div>
-</template>
+      <template v-for="recent in recents2">
+        <button
+          class="enter__collapsible"
+          @click="recent.hidden = !recent.hidden">{{ recent.title }}</button>
+        <div
+          class="enter__content"
+          v-html="recent.body"
+          :class="{hidden: recent.hidden}"/>
+        <div
+          v-if="recent.files"
+          class="enter__content"
+          style="padding: 0px 20px;"
+          :class="{hidden: recent.hidden}">첨부파일</div>
+        <div
+          v-if="recent.files"
+          class="enter__content"
+          style="padding: 0px 20px 30px 20px;"
+          :class="{hidden: recent.hidden}">
+          <template v-for="file in recent.files">
+            <a :href="'/api/upload/' + file">{{ file }}</a>
+          </template>
+        </div>
+      </template>
     </div><!--container notice__section-->
     <div style="clear:both"/>
   </div>
@@ -74,27 +87,27 @@ export default {
   data: function () {
     return {
       recents: [],
-      recents2: [],
+      recents2: []
     }
   },
   methods: {
     fetch_data: function () {
       let query = {}
       query['minor_category'] = 'notice'
-      //query['recent'] = '10'
+      // query['recent'] = '10'
       var self = this
       self.$axios.get('posts/homepage', {params: query})
         .then(function (response) {
           let data = response.data
           /*
           for (let i = 0; i < 3 && i < data.length; i++) {
-            self.recents.push(data[i]) 
+            self.recents.push(data[i])
           }
           */
           for (let i = 0; i < data.length; i++) {
-            self.recents2.push(data[i]) 
+            self.recents2.push(data[i])
             if (data[i].files) {
-              if (data[i].files != "[]") {
+              if (data[i].files != '[]') {
                 self.recents2[i].files = JSON.parse(data[i].files)
               } else {
                 self.recents2[i].files = false
@@ -108,7 +121,7 @@ export default {
             self.$set(self.recents2[i], 'hidden', true)
           }
         })
-    },
+    }
   },
   created: function () {
     this.fetch_data()

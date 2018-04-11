@@ -32,6 +32,7 @@ def verify_password(username_or_token, password):
         if not user or not user.verify_password(password):
             return False
     g.user = user
+    print(user.name)
     return True
 
 @token_auth.verify_token
@@ -193,7 +194,7 @@ def privilege_all():
     if not user:
         abort(400)
 
-    if not request.json or 'priv' not in request.json:
+    if 'priv' not in request.args:
         # admin
         if 'admin' not in user.role:
             abort(400)
@@ -207,7 +208,7 @@ def privilege_all():
     # user
     roles = literal_eval(user.role)
     has_priv = False
-    query_priv = request.json.get('priv')
+    query_priv = request.args['priv']
     for role in roles:
         privilege = Privilege.query.filter_by(name=role).first()
         if privilege is None:
@@ -261,6 +262,10 @@ def privilege_new():
     privilege.howcs_attendance_new = request.json.get('howcs_attendance_new')
     privilege.howcs_attendance_update = request.json.get('howcs_attendance_update')
     privilege.howcs_attendance_del = request.json.get('howcs_attendance_del')
+    privilege.howcs_student_health_record = request.json.get('howcs_student_health_record')
+    privilege.howcs_student_health_record_new = request.json.get('howcs_student_health_record_new')
+    privilege.howcs_student_health_record_update = request.json.get('howcs_student_health_record_update')
+    privilege.howcs_student_health_record_del = request.json.get('howcs_student_health_record_del')
     privilege.howcs_post = request.json.get('howcs_post')
     privilege.howcs_post_new = request.json.get('howcs_post_new')
     privilege.howcs_post_update = request.json.get('howcs_post_update')
@@ -330,6 +335,10 @@ def privilege_update(id):
     privilege.howcs_attendance_new = request.json.get('howcs_attendance_new', privilege.howcs_attendance_new)
     privilege.howcs_attendance_update = request.json.get('howcs_attendance_update', privilege.howcs_attendance_update)
     privilege.howcs_attendance_del = request.json.get('howcs_attendance_del', privilege.howcs_attendance_del)
+    privilege.howcs_student_health_record = request.json.get('howcs_student_health_record', privilege.howcs_student_health_record)
+    privilege.howcs_student_health_record_new = request.json.get('howcs_student_health_record_new', privilege.howcs_student_health_record_new)
+    privilege.howcs_student_health_record_update = request.json.get('howcs_student_health_record_update', privilege.howcs_student_health_record_update)
+    privilege.howcs_student_health_record_del = request.json.get('howcs_student_health_record_del', privilege.howcs_student_health_record_del)
     privilege.howcs_post = request.json.get('howcs_post', privilege.howcs_post)
     privilege.howcs_post_new = request.json.get('howcs_post_new', privilege.howcs_post_new)
     privilege.howcs_post_update = request.json.get('howcs_post_update', privilege.howcs_post_update)
@@ -463,6 +472,12 @@ def howcs_teacher_infos_new():
     if not user:
         abort(400)
     if 'admin' not in user.role:
+        abort(400)
+    if 'user_id' not in request.json:
+        abort(400)
+
+    user = User.query.filter_by(id = request.json.get('user_id')).first()
+    if not user:
         abort(400)
 
     howcs_teacher_info = HowcsTeacherInfo()
@@ -731,7 +746,10 @@ def class_update(id):
     class_.major_category = request.json.get('major_category', class_.major_category)
     class_.minor_category = request.json.get('minor_category', class_.minor_category)
     class_.year = int(request.json.get('year', class_.year))
-    class_.semester = int(request.json.get('semester', class_.semester))
+    try:
+        class_.semester = int(request.json.get('semester', class_.semester))
+    except:
+        class_.semester = None
     class_.time_slot = request.json.get('time_slot', class_.time_slot)
     class_.google_calendar = request.json.get('google_calendar')
     class_.audience = request.json.get('audience', class_.audience)
@@ -1280,16 +1298,18 @@ def student_health_record_new():
     student_health_record.internal_medicine = request.json.get('internal_medicine', '')
     student_health_record.dental_clinic = request.json.get('dental_clinic', '')
     student_health_record.fluorine_coating = request.json.get('fluorine_coating', '')
-    student_health_record.height = int(request.json.get('height', 0))
-    student_health_record.weight = int(request.json.get('weight', 0))
-    student_health_record.sight = float(request.json.get('sight', 0))
+    student_health_record.height = request.json.get('height', '')
+    student_health_record.weight = request.json.get('weight', '')
+    student_health_record.sight = request.json.get('sight', '')
     student_health_record.internal_medicine_content = request.json.get('internal_medicine_content', '')
     student_health_record.cavity = request.json.get('cavity', '')
     student_health_record.dental_clinic_content = request.json.get('dental_clinic_content', '')
     student_health_record.content = request.json.get('content', '')
 
-    student_health_record.student_record = StudentRecord.query.filter_by(id = student_health_record.student_record_id).first()
+    student_record = StudentRecord.query.filter_by(id = student_health_record.student_record_id).first()
+    student_record.student_health_records.append(student_health_record)
     db.session.add(student_health_record)
+    db.session.add(student_record)
     db.session.commit()
     return jsonify({'student_health_record': student_health_record.as_dict()}), 201
 
@@ -1306,9 +1326,9 @@ def student_health_record_update(id):
     student_health_record.internal_medicine = request.json.get('internal_medicine', student_health_record.internal_medicine)
     student_health_record.dental_clinic = request.json.get('dental_clinic', student_health_record.dental_clinic)
     student_health_record.fluorine_coating = request.json.get('fluorine_coating', student_health_record.fluorine_coating)
-    student_health_record.height = int(request.json.get('height', student_health_record.height))
-    student_health_record.weight = int(request.json.get('weight', student_health_record.weight))
-    student_health_record.sight = float(request.json.get('sight', student_health_record.sight))
+    student_health_record.height = request.json.get('height', student_health_record.height)
+    student_health_record.weight = request.json.get('weight', student_health_record.weight)
+    student_health_record.sight = request.json.get('sight', student_health_record.sight)
     student_health_record.internal_medicine_content = request.json.get('internal_medicine_content', student_health_record.internal_medicine_content)
     student_health_record.cavity = request.json.get('cavity', student_health_record.cavity)
     student_health_record.dental_clinic_content = request.json.get('dental_clinic_content', student_health_record.dental_clinic_content)
@@ -1382,7 +1402,7 @@ def get_menu():
         menu.append({ 'heading': '하우학교'})
         menu.append({ 'href': 'student_record', 'params': {'action':'view', 'id':user.id}, 'text': '인적사항', 'icon': 'assignment ind' })
         menu.append({ 'href': 'student_health_record', 'params': {'action':'view', 'id':user.id}, 'text': '건강기록부', 'icon': 'local hospital' })
-        menu.append({ 'href': 'enrollment_student', 'params': {'major_category':'howcs', 'minor_category':'subject', 'action':'post', 'id':user.id}, 'text': '공지사항', 'icon': 'sms failed' })
+        menu.append({ 'href': 'enrollment_student_all', 'params': {'major_category':'howcs', 'action':'post', 'id':user.id}, 'text': '공지사항', 'icon': 'sms failed' })
         menu.append({ 'href': 'enrollment_student', 'params': {'major_category':'howcs', 'minor_category':'class', 'action':'attendance', 'id':user.id}, 'text': '출결 관리', 'icon': 'event available' })
         menu.append({ 'href': 'enrollment_student', 'params': {'major_category':'howcs', 'minor_category':'parent_school', 'action':'attendance', 'id':user.id}, 'text': '부모학교', 'icon': 'wc' })
         menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'edu_resource'}, 'text': '교육자료실', 'icon': 'folder' })

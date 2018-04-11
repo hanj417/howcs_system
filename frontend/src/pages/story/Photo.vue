@@ -23,24 +23,24 @@
     <div class="container">
       <div class="row">
 
-<template v-for="post in posts">
-<a
-:href="'/story/photo_view/' + post.id">
-        <div class="col-sm-4 col-md-3 col-lg-3" >
+        <template v-for="post in posts">
+          <a
+            :href="'/story/photo_view/' + post.id">
+            <div class="col-sm-4 col-md-3 col-lg-3" >
 
-          <div id="howphoto">
-            <img
-              :src="post.img"
-              class="image"
-              style="width:100%">
-            <div class="middle">
-              <div class="text">{{ post.title }}</div>
+              <div id="howphoto">
+                <img
+                  :src="post.img"
+                  class="image"
+                  style="width:100%">
+                <div class="middle">
+                  <div class="text">{{ post.title }}</div>
+                </div>
+              </div>
+
             </div>
-          </div>
-
-        </div>
-</a>
-</template>
+          </a>
+        </template>
 
       </div>
 
@@ -56,13 +56,13 @@
 
 <script>
 export default {
-  data: function() {
+  data: function () {
     return {
-      posts: [],
+      posts: []
     }
   },
   methods: {
-    fetch_data: function() {
+    fetch_data: function () {
       let query = {}
       query['minor_category'] = 'photo'
       query['recent'] = '4'
@@ -72,12 +72,11 @@ export default {
           let data = response.data
           self.posts = data
           for (let i = 0; i < self.posts.length; i++) {
-            self.posts[i]['img'] = "/assets/img/howstoryP.jpg"
+            self.posts[i]['img'] = '/assets/img/howstoryP.jpg'
             let files = JSON.parse(self.posts[i]['files'])
             if (files && files.length > 0) {
-              self.posts[i]['img'] = "/api/upload/" + files[0]
+              self.posts[i]['img'] = '/api/upload/' + files[0]
             }
-            
           }
         })
     }

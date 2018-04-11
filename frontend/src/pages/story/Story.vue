@@ -50,24 +50,24 @@
             <div
               class="carousel-inner"
               role="listbox">
-<template v-for="post in posts">
-              <a
-                :href="'/story/story_view/' + post.id"
-                class="item story-story__carousel-item active">
-                <img
-                  :src="post.img"
-                  class="full-width">
+              <template v-for="post in posts">
+                <a
+                  :href="'/story/story_view/' + post.id"
+                  class="item story-story__carousel-item active">
+                  <img
+                    :src="post.img"
+                    class="full-width">
 
-                <div class="story-story__title">
-{{ post.title }}
-                </div>
+                  <div class="story-story__title">
+                    {{ post.title }}
+                  </div>
 
-                <div class="story-story__content">
-{{ post.ellipsis }}
-                </div>
+                  <div class="story-story__content">
+                    {{ post.ellipsis }}
+                  </div>
 
-              </a>
-</template>
+                </a>
+              </template>
 
             </div>
 
@@ -97,24 +97,24 @@
 
       <div class="hidden-xs">
         <div class="row story-story__row">
-<template v-for="post in posts">
-          <a
-            :href="'/story/story_view/' + post.id"
-            class="col-sm-4 col-md-4 col-lg-4 story-story__article">
-            <img
-              :src="post.img"
-              class="story-story__image--black" >
+          <template v-for="post in posts">
+            <a
+              :href="'/story/story_view/' + post.id"
+              class="col-sm-4 col-md-4 col-lg-4 story-story__article">
+              <img
+                :src="post.img"
+                class="story-story__image--black" >
 
-            <div class="story-story__title">
-{{ post.title }}
-            </div>
+              <div class="story-story__title">
+                {{ post.title }}
+              </div>
 
-            <div class="story-story__content">
-{{ post.ellipsis }}
-            </div>
+              <div class="story-story__content">
+                {{ post.ellipsis }}
+              </div>
 
-          </a>
-</template>
+            </a>
+          </template>
         </div>
 
       </div>
@@ -131,26 +131,25 @@
 export default {
   data: function () {
     return {
-      posts: [],
+      posts: []
     }
   },
   methods: {
     fetch_data: function () {
       let query = {}
       query['minor_category'] = 'story'
-      //query['recent'] = '3'
+      // query['recent'] = '3'
       var self = this
       self.$axios.get('posts/homepage', {params: query})
         .then(function (response) {
           let data = response.data
           self.posts = data
           for (let i = 0; i < self.posts.length; i++) {
-            self.posts[i]['img'] = "/assets/img/howstoryP.jpg"
+            self.posts[i]['img'] = '/assets/img/howstoryP.jpg'
             let files = JSON.parse(self.posts[i]['files'])
             if (files && files.length > 0) {
-              self.posts[i]['img'] = "/api/upload/" + files[0]
+              self.posts[i]['img'] = '/api/upload/' + files[0]
             }
-            
           }
         })
     }

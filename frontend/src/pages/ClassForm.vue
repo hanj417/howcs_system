@@ -3,13 +3,18 @@
     padding
     class="row justify-center">
     <div style="width: 600px; max-width: 90vw;">
-      <div v-if="role == 'admin'" class="col-xs-12 docs-input">
+      <div
+        v-if="role == 'admin'"
+        class="col-xs-12 docs-input">
         <q-field
           label="선생님"
           icon="account circle"
           :label-width="3"
         >
-          <q-input v-model="teacher.name"  class="col-xs-8" disabled />
+          <q-input
+            v-model="teacher.name"
+            class="col-xs-8"
+            disabled />
           <q-btn
             class="col-xs-4 float-right"
             @click="search"
@@ -81,18 +86,22 @@
         </q-field>
       </div>
       <div class="col-xs-12 row justify-end q-mt-lg">
-        <div v-if="$route.name == 'class_form_edit'" class="col-xs-2">
-          <q-btn
-            @click="remove"
-            label="삭제" />
-        </div>
-        <div class="col-xs-4">
+        <div class="col-xs-5">
           <q-btn
             @click="$router.go(-1)"
             label="취소" />
           <q-btn
-            @click="save"
-            :label="save_label" />
+            v-if="$route.name == 'class_form_edit' && priv_del"
+            @click="remove"
+            label="삭제" />
+          <q-btn
+            v-if="$route.name == 'class_form_new' && priv_new"
+            @click="class_new"
+            label="등록" />
+          <q-btn
+            v-if="$route.name == 'class_form_edit' && priv_update"
+            @click="class_update"
+            label="수정" />
         </div>
       </div>
     </div>
@@ -128,8 +137,16 @@
             :columns="search_columns"
           />
         </template>
-        <q-tr slot="body" slot-scope="props" :props="props" @click.native="search_select(props.row)" class="cursor-pointer">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+        <q-tr
+          slot="body"
+          slot-scope="props"
+          :props="props"
+          @click.native="search_select(props.row)"
+          class="cursor-pointer">
+          <q-td
+            v-for="col in props.cols"
+            :key="col.name"
+            :props="props">
             {{ col.value }}
           </q-td>
         </q-tr>
@@ -143,8 +160,11 @@ import { LocalStorage } from 'quasar'
 import { required, email } from 'vuelidate/lib/validators'
 
 export default {
-  data: function() {
+  data: function () {
     return {
+      priv_new: false,
+      priv_update: false,
+      priv_del: false,
       teacher_select: false,
       teacher: {name: '' },
       title: '',
@@ -162,13 +182,13 @@ export default {
       search_modal: false,
       search_table_data: [],
       search_columns: [
-        { name: 'username', label: '아이디', field: row => row.user.username, sortable: true, align: 'left' },
-        { name: 'name', label: '이름', field: row => row.user.name, sortable: true, align: 'left' },
-        { name: 'email', label: '이메일', field: row => row.user.email, sortable: true, align: 'left' },
-        { name: 'phone', label: '전화번호', field: row => row.user.phone, sortable: true, align: 'left' },
-        { name: 'birthday', label: '생년월일', field: row => row.user.birthday, sortable: true, align: 'left' },
-        { name: 'school', label: '소속학교', field: row => row.user.school, sortable: true, align: 'left' },
-        { name: 'church', label: '출석교회', field: row => row.user.church, sortable: true, align: 'left' }
+        { name: 'username', label: '아이디', field: function (row) { return row.user.username }, sortable: true, align: 'left' },
+        { name: 'name', label: '이름', field: function (row) { return row.user.name }, sortable: true, align: 'left' },
+        { name: 'email', label: '이메일', field: function (row) { return row.user.email }, sortable: true, align: 'left' },
+        { name: 'phone', label: '전화번호', field: function (row) { return row.user.phone }, sortable: true, align: 'left' },
+        { name: 'birthday', label: '생년월일', field: function (row) { return row.user.birthday }, sortable: true, align: 'left' },
+        { name: 'school', label: '소속학교', field: function (row) { return row.user.school }, sortable: true, align: 'left' },
+        { name: 'church', label: '출석교회', field: function (row) { return row.user.church }, sortable: true, align: 'left' }
       ],
       search_filter: '',
       search_visible_columns: ['username', 'name', 'email', 'phone'],
@@ -181,9 +201,49 @@ export default {
   },
   props: ['role', 'major_category', 'class_id'],
   methods: {
-    save: function () {
+    check_priv: function () {
       var self = this
-      if (this.$route.name === 'class_form_new') {
+      let priv_new_query = {priv: 'howcs_class_new'}
+      self.$axios.get('privileges', {params: priv_new_query})
+        .then(function (response) {
+          let data = response.data
+          self.priv_new = data
+        })
+  
+      let priv_update_query = {priv: 'howcs_class_update'}
+      self.$axios.get('privileges', {params: priv_update_query})
+        .then(function (response) {
+          let data = response.data
+          self.priv_update = data
+        })
+  
+      let priv_del_query = {priv: 'howcs_class_del'}
+      self.$axios.get('privileges', {params: priv_del_query})
+        .then(function (response) {
+          let data = response.data
+          self.priv_del = data
+        })
+
+      let priv_query = {priv: 'howcs_attendance_update'}
+      self.$axios.get('privileges', {params: priv_query})
+        .then(function (response) {
+          let data = response.data
+          self.priv = data
+      })
+    },
+    fetch_class_categories: function () {
+      var self = this
+      self.$axios.get('classes/categories/' + self.major_category)
+        .then(function (response) {
+          let data = response.data
+          self.minor_categories = data
+        })
+    },
+    class_new: function () {
+      var self = this
+      if (!self.priv_new)
+        return
+
         self.$axios.post('classes', {
           'teacher_id': self.teacher.id,
           'title': self.title,
@@ -196,10 +256,16 @@ export default {
           'audience': self.audience,
           'background': self.background,
           'content': self.content
-        }).then(function(response) { let data = response.data
+        }).then(function (response) {
+          let data = response.data
           self.$router.go(-1)
         })
-      } else if (self.$route.name === 'class_form_edit') {
+    },
+    class_update: function () {
+      var self = this
+      if (!self.priv_update)
+        return
+
         self.$axios.put('classes/' + self.class_id, {
           'teacher_id': self.teacher.id,
           'title': self.title,
@@ -211,26 +277,28 @@ export default {
           'google_calendar': self.google_calendar,
           'audience': self.audience,
           'background': self.background,
-           'content': self.content
-        }).then(function(response) { let data = response.data
+          'content': self.content
+        }).then(function (response) {
+          let data = response.data
           self.$router.go(-1)
         })
-      }
     },
     remove: function () {
       var self = this
       self.$axios.delete('classes/' + self.class_id)
-      .then(function(response) { let data = response.data
-        self.$router.go(-1)
-      })
+        .then(function (response) {
+          let data = response.data
+          self.$router.go(-1)
+        })
     },
     search: function () {
       let query = {}
       var self = this
       self.$axios.get('howcs_teacher_infos', {params: query})
-      .then(function(response) { let data = response.data
-        self.search_table_data = data
-      })
+        .then(function (response) {
+          let data = response.data
+          self.search_table_data = data
+        })
       self.search_modal = true
     },
     search_select: function (row) {
@@ -248,18 +316,14 @@ export default {
       this.$router.go(-1)
     }
 
-    var self = this
-    self.$axios.get('classes/categories/' + self.major_category
-    ).then(function(response) { let data = response.data
-      self.minor_categories = data
-    })
-    if (self.$route.name === 'class_form_new') {
-      self.save_label = '등록'
-    } else if (self.$route.name === 'class_form_edit') {
-      self.save_label = '수정'
+    this.check_priv()
+    this.fetch_class_categories()
+
+    if (this.$route.name === 'class_form_edit') {
+      var self = this
       self.$axios.get('classes/' + self.class_id
-      ).then(function(response) { let data = response.data
-        console.log(data)
+      ).then(function (response) {
+        let data = response.data
         self.teacher = data.teacher
         self.teacher_select = false
         self.title = data.title
@@ -273,8 +337,6 @@ export default {
         self.background = data.background
         self.content = data.content
       })
-    } else {
-      self.$router.go(-1)
     }
   }
 }

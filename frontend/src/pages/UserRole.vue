@@ -51,15 +51,32 @@
           icon="delete"
           @click="remove" />
       </template>
-      <q-tr slot="body" slot-scope="props" :props="props">
-        <q-td key="username" :props="props">{{ props.row.username }}</q-td>
-        <q-td key="name" :props="props">{{ props.row.name }}</q-td>
-        <q-td key="email" :props="props">{{ props.row.email }}</q-td>
-        <q-td key="phone" :props="props">{{ props.row.phone }}</q-td>
-        <q-td key="birthday" :props="props">{{ props.row.birthday }}</q-td>
-        <q-td key="school" :props="props">{{ props.row.school }}</q-td>
-        <q-td key="church" :props="props">{{ props.row.church }}</q-td>
-<!--
+      <q-tr
+        slot="body"
+        slot-scope="props"
+        :props="props">
+        <q-td
+          key="username"
+          :props="props">{{ props.row.username }}</q-td>
+        <q-td
+          key="name"
+          :props="props">{{ props.row.name }}</q-td>
+        <q-td
+          key="email"
+          :props="props">{{ props.row.email }}</q-td>
+        <q-td
+          key="phone"
+          :props="props">{{ props.row.phone }}</q-td>
+        <q-td
+          key="birthday"
+          :props="props">{{ props.row.birthday }}</q-td>
+        <q-td
+          key="school"
+          :props="props">{{ props.row.school }}</q-td>
+        <q-td
+          key="church"
+          :props="props">{{ props.row.church }}</q-td>
+          <!--
         <q-td key="calories" :props="props">
           <div class="row items-center justify-between no-wrap">
             <q-btn size="sm" round dense color="secondary" icon="remove" @click="props.row.calories--" class="q-mr-xs" />
@@ -76,7 +93,7 @@
 <script>
 
 export default {
-  data: function() {
+  data: function () {
     return {
       priv: false,
       priv_update: false,
@@ -84,9 +101,7 @@ export default {
       columns: [
         { name: 'username', label: '아이디', field: 'username', sortable: true, align: 'left' },
         { name: 'name', label: '이름', field: 'name', sortable: true, align: 'left' },
-        { name: 'role', label: '권한', field: row => {
-                JSON.parse(row.role)
-            }, sortable: true, align: 'left' },
+        { name: 'role', label: '권한', field: function (row) { return JSON.parse(row.role) }, sortable: true, align: 'left' },
         { name: 'email', label: '이메일', field: 'email', sortable: true, align: 'left' },
         { name: 'phone', label: '전화번호', field: 'phone', sortable: true, align: 'left' },
         { name: 'birthday', label: '생년월일', field: 'birthday', sortable: true, align: 'left' },
@@ -99,26 +114,32 @@ export default {
     }
   },
   methods: {
-    check_privilege: function() {
+    check_privilege: function () {
       let query = {priv: 'user'}
       var self = this
       self.$axios.get('privileges', {params: query})
-        .then(function(response) { let data = response.data 
-        self.priv = data })
+        .then(function (response) {
+          let data = response.data
+          self.priv = data
+        })
 
       let update_query = {priv: 'user_update'}
       self.$axios.get('privileges', {params: update_query})
-        .then(function(response) { let data = response.data 
-        self.priv_update = data })
+        .then(function (response) {
+          let data = response.data
+          self.priv_update = data
+        })
     },
-    fetch_data: function() {
+    fetch_data: function () {
       if (this.priv === false) return
       let query = {}
       var self = this
       self.$axios.get('users', {params: query})
-        .then(function(response) { let data = response.data 
-        self.table_data = data })
-    },
+        .then(function (response) {
+          let data = response.data
+          self.table_data = data
+        })
+    }
   },
   created: function () {
     this.check_privilege()

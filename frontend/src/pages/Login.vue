@@ -58,7 +58,7 @@ import { LocalStorage } from 'quasar'
 import './docs-input.styl'
 
 export default {
-  data: function() {
+  data: function () {
     return {
       username: '',
       password: '',
@@ -69,7 +69,8 @@ export default {
     fetch_menu: function () {
       var self = this
       this.$axios.get('menu')
-        .then(function(response) { let data = response.data
+        .then(function (response) {
+          let data = response.data
           self.$store.commit('menu/UpdateMenu', data)
         }).catch(function (data) {
           console.log('error')
@@ -82,7 +83,7 @@ export default {
         url: 'login',
         auth: {username: this.username, password: this.password},
         headers: { 'Content-type': 'application/json' }
-      }).then(function(response) {
+      }).then(function (response) {
         let data = response.data
         self.$store.commit('auth/SetAuth', data)
         self.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + data.token
@@ -90,7 +91,8 @@ export default {
         LocalStorage.set('user_', data.user)
         LocalStorage.set('token_', data.token)
         self.$router.replace('/')
-      }).catch(function(response) { let data = response.data
+      }).catch(function (response) {
+        let data = response.data
         self.login_fail = true
       })
     }

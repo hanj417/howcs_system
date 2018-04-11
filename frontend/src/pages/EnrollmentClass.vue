@@ -37,6 +37,7 @@
         slot-scope="props">
         <div class="col" />
         <q-btn
+          v-if="priv_del"
           color="negative"
           flat
           round
@@ -44,11 +45,21 @@
           icon="delete"
           @click="remove" />
       </template>
-      <q-tr slot="body" slot-scope="props" :props="props" @click.native="rowClick(props.row)" class="cursor-pointer">
-       <q-td auto-width>
-        <q-checkbox color="primary" v-model="props.selected" />
-       </q-td>
-        <q-td v-for="col in props.cols" :key="col.name" :props="props">
+      <q-tr
+        slot="body"
+        slot-scope="props"
+        :props="props"
+        @click.native="rowClick(props.row)"
+        class="cursor-pointer">
+        <q-td auto-width>
+          <q-checkbox
+            color="primary"
+            v-model="props.selected" />
+        </q-td>
+        <q-td
+          v-for="col in props.cols"
+          :key="col.name"
+          :props="props">
           {{ col.value }}
         </q-td>
       </q-tr>
@@ -57,6 +68,7 @@
       position="bottom-right"
       :offset="[18, 18]">
       <q-btn
+        v-if="priv_new"
         round
         color="primary"
         @click="search"
@@ -95,8 +107,16 @@
             :columns="search_columns"
           />
         </template>
-        <q-tr slot="body" slot-scope="props" :props="props" @click.native="search_select(props.row)" class="cursor-pointer">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+        <q-tr
+          slot="body"
+          slot-scope="props"
+          :props="props"
+          @click.native="search_select(props.row)"
+          class="cursor-pointer">
+          <q-td
+            v-for="col in props.cols"
+            :key="col.name"
+            :props="props">
             {{ col.value }}
           </q-td>
         </q-tr>
@@ -108,17 +128,20 @@
 <script>
 
 export default {
-  data: function() {
+  data: function () {
     return {
+      priv_new: false,
+      priv_update: false,
+      priv_del: false,
       table_data: [],
       columns: [
-        { name: 'username', label: '아이디', field: row => row.student.username, sortable: true, align: 'left' },
-        { name: 'name', label: '이름', field: row => row.student.name, sortable: true, align: 'left' },
-        { name: 'email', label: '이메일', field: row => row.student.email, sortable: true, align: 'left' },
-        { name: 'phone', label: '전화번호', field: row => row.student.phone, sortable: true, align: 'left' },
-        { name: 'birthday', label: '생년월일', field: row => row.student.birthday, sortable: true, align: 'left' },
-        { name: 'school', label: '소속학교', field: row => row.student.school, sortable: true, align: 'left' },
-        { name: 'church', label: '출석교회', field: row => row.student.church, sortable: true, align: 'left' }
+        { name: 'username', label: '아이디', field: function (row) { return row.student.username }, sortable: true, align: 'left' },
+        { name: 'name', label: '이름', field: function (row) { return row.student.name }, sortable: true, align: 'left' },
+        { name: 'email', label: '이메일', field: function (row) { return row.student.email }, sortable: true, align: 'left' },
+        { name: 'phone', label: '전화번호', field: function (row) { return row.student.phone }, sortable: true, align: 'left' },
+        { name: 'birthday', label: '생년월일', field: function (row) { return row.student.birthday }, sortable: true, align: 'left' },
+        { name: 'school', label: '소속학교', field: function (row) { return row.student.school }, sortable: true, align: 'left' },
+        { name: 'church', label: '출석교회', field: function (row) { return row.student.church }, sortable: true, align: 'left' }
       ],
       filter: '',
       visible_columns: ['username', 'name', 'email', 'phone'],
@@ -143,22 +166,57 @@ export default {
   watch: {
     '$route.name': function (val) {
       this.fetch_data()
-    },
+    }
   },
   props: ['action', 'class_id'],
   methods: {
-    fetch_data: function() {
+    check_priv: function () {
+      var self = this
+      let priv_new_query = {priv: 'howcs_enrollment_new'}
+      self.$axios.get('privileges', {params: priv_new_query})
+        .then(function (response) {
+          let data = response.data
+          self.priv_new = data
+        })
+  
+      let priv_update_query = {priv: 'howcs_enrollment_update'}
+      self.$axios.get('privileges', {params: priv_update_query})
+        .then(function (response) {
+          let data = response.data
+          self.priv_update = data
+        })
+  
+      let priv_del_query = {priv: 'howcs_enrollment_del'}
+      self.$axios.get('privileges', {params: priv_del_query})
+        .then(function (response) {
+          let data = response.data
+          self.priv_del = data
+        })
+
+      let priv_query = {priv: 'howcs_attendance_update'}
+      self.$axios.get('privileges', {params: priv_query})
+        .then(function (response) {
+          let data = response.data
+          self.priv = data
+      })
+    },
+    fetch_data: function () {
       let query = {'class_id': this.class_id}
       var self = this
       self.$axios.get('enrollments', {params: query})
-        .then(function(response) { let data = response.data
+        .then(function (response) {
+          let data = response.data
           self.table_data = data
         })
     },
     remove: function () {
       var self = this
+      if (!self.priv_del)
+        return
+
       self.$axios.delete('enrollments/' + self.item[0].class_id + '/' + self.item[0].student_id)
-        .then(function(response) { let data = response.data
+        .then(function (response) {
+          let data = response.data
           self.fetch_data()
         })
     },
@@ -166,7 +224,8 @@ export default {
       let query = {}
       var self = this
       self.$axios.get('student_infos', {params: self.query})
-        .then(function(response) { let data = response.data
+        .then(function (response) {
+          let data = response.data
           self.search_table_data = data
         })
       self.search_modal = true
@@ -176,19 +235,20 @@ export default {
       self.$axios.post('enrollments', {
         'class_id': self.class_id,
         'student_id': row.id
-      }).then(function(response) { let data = response.data
+      }).then(function (response) {
+        let data = response.data
         self.search_modal = false
         self.fetch_data()
       })
     },
     rowClick: function (row) {
-      console.log(this.action)
       if (this.action === 'student_health_record') {
-        this.$router.push({name:'student_health_record', params: {id: row.student.id, action: 'edit'}})
+        this.$router.push({name: 'student_health_record', params: {id: row.student.id, action: 'edit'}})
       }
-    },
+    }
   },
   created: function () {
+    this.check_priv()
     this.fetch_data()
   }
 }

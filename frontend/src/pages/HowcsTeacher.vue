@@ -88,8 +88,16 @@
             :columns="search_columns"
           />
         </template>
-        <q-tr slot="body" slot-scope="props" :props="props" @click.native="search_select(props.row)" class="cursor-pointer">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+        <q-tr
+          slot="body"
+          slot-scope="props"
+          :props="props"
+          @click.native="search_select(props.row)"
+          class="cursor-pointer">
+          <q-td
+            v-for="col in props.cols"
+            :key="col.name"
+            :props="props">
             {{ col.value }}
           </q-td>
         </q-tr>
@@ -100,17 +108,17 @@
 
 <script>
 export default {
-  data: function() {
+  data: function () {
     return {
       table_data: [],
       columns: [
-        { name: 'username', label: '아이디', field: row => row.user.username, sortable: true, align: 'left' },
-        { name: 'name', label: '이름', field: row => row.user.name, sortable: true, align: 'left' },
-        { name: 'email', label: '이메일', field: row => row.user.email, sortable: true, align: 'left' },
-        { name: 'phone', label: '전화번호', field: row => row.user.phone, sortable: true, align: 'left' },
-        { name: 'birthday', label: '생년월일', field: row => row.user.birthday, sortable: true, align: 'left' },
-        { name: 'school', label: '소속학교', field: row => row.user.school, sortable: true, align: 'left' },
-        { name: 'church', label: '출석교회', field: row => row.user.church, sortable: true, align: 'left' }
+        { name: 'username', label: '아이디', field: function (row) { return row.user.username }, sortable: true, align: 'left' },
+        { name: 'name', label: '이름', field: function (row) { return row.user.name }, sortable: true, align: 'left' },
+        { name: 'email', label: '이메일', field: function (row) { return row.user.email }, sortable: true, align: 'left' },
+        { name: 'phone', label: '전화번호', field: function (row) { return row.user.phone }, sortable: true, align: 'left' },
+        { name: 'birthday', label: '생년월일', field: function (row) { return row.user.birthday }, sortable: true, align: 'left' },
+        { name: 'school', label: '소속학교', field: function (row) { return row.user.school }, sortable: true, align: 'left' },
+        { name: 'church', label: '출석교회', field: function (row) { return row.user.church }, sortable: true, align: 'left' }
       ],
       filter: '',
       visible_columns: ['username', 'name', 'email', 'phone'],
@@ -133,18 +141,20 @@ export default {
     }
   },
   methods: {
-    fetch_data: function() {
+    fetch_data: function () {
       let query = {}
       var self = this
       self.$axios.get('howcs_teacher_infos', {params: query})
-        .then(function(response) { let data = response.data
+        .then(function (response) {
+          let data = response.data
           self.table_data = data
         })
     },
     remove: function () {
       var self = this
       self.$axios.delete('howcs_teacher_infos/' + self.item[0].id)
-        .then(function(response) { let data = response.data
+        .then(function (response) {
+          let data = response.data
           self.fetch_data()
         })
     },
@@ -152,7 +162,8 @@ export default {
       var self = this
       self.$axios.post('howcs_teacher_infos', {
         'user_id': row.id
-      }).then(function(response) { let data = response.data
+      }).then(function (response) {
+        let data = response.data
         self.fetch_data()
       })
     },
@@ -160,7 +171,8 @@ export default {
       let query = {}
       var self = this
       self.$axios.get('users', {params: query})
-        .then(function(response) { let data = response.data
+        .then(function (response) {
+          let data = response.data
           self.search_table_data = data
         })
       self.search_modal = true

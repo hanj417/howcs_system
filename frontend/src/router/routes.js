@@ -66,7 +66,7 @@ export default [
       { path: 'notice', name: 'notice', component: () => import('pages/story/Notice') },
       { path: 'photo', name: 'photo', component: () => import('pages/story/Photo') },
       { path: 'story_view/:id', name: 'story_view', component: () => import('pages/story/StoryView'), props: true },
-      { path: 'photo_view/:id', name: 'photo_view', component: () => import('pages/story/PhotoView'), props: true },
+      { path: 'photo_view/:id', name: 'photo_view', component: () => import('pages/story/PhotoView'), props: true }
     ]
   },
   {
@@ -119,8 +119,8 @@ export default [
       { path: 'post_view/:id', name: 'post_view', component: () => import('pages/PostView'), props: true },
       { path: 'post_form/:action/:id', name: 'post_form', component: () => import('pages/PostForm'), props: true },
       { path: 'post_form/:action', name: 'post_form_admin', component: () => import('pages/PostForm'), props: true },
-      { path: 'agit_teacher_application_form', name: 'agit_teacher_application_form', component: () => import('pages/AgitTeacherApplicationForm'), props: true },
-      { path: 'agit_teacher', name: 'agit_teacher', component: () => import('pages/AgitTeacher'), props: true },
+      // { path: 'agit_teacher_application_form', name: 'agit_teacher_application_form', component: () => import('pages/AgitTeacherApplicationForm'), props: true },
+      // { path: 'agit_teacher', name: 'agit_teacher', component: () => import('pages/AgitTeacher'), props: true },
       { path: 'howcs_teacher', name: 'howcs_teacher', component: () => import('pages/HowcsTeacher'), props: true },
       { path: 'enrollments/classes/:class_id', name: 'enrollment_class', component: () => import('pages/EnrollmentClass'), props: true },
       { path: 'enrollments/classes/:class_id/:action', name: 'enrollment_class_action', component: () => import('pages/EnrollmentClass'), props: true },
@@ -131,7 +131,7 @@ export default [
       // { path: 'payments', component: () => import('pages/Payment'), props: true },
       // { path: 'payments/:action/:id', component: () => import('pages/PaymentForm'), props: true },
       { path: 'role', name: 'role', component: () => import('pages/Role'), props: true },
-      { path: 'resource/:major_category/:minor_category', name: 'resource', component: () => import('pages/Resource'), props: true },
+      { path: 'resource/:major_category/:minor_category', name: 'resource', component: () => import('pages/Resource'), props: true }
     ]
   },
   {

@@ -1,6 +1,6 @@
 <template>
   <div>
-<!--
+    <!--
     <div class="page-intro">
       <img
         src="~assets/img/howstory_background_image.png"
@@ -21,22 +21,29 @@
       <hr class="page-name--bottom-border" >
     </div>
 
+    <div
+      class="row justify-center">
+      <div
+        style="width: 800px; max-width: 80vw;"
+        class="q-pa-xl shadow-10">
+        <div class="col-xs-12 text-center q-title text-weight-bold q-pa-md">{{ title }}</div>
+        <div class="col-xs-12 text-right q-body-2 text-weight-bold q-px-md">{{ date }}</div>
+        <div class="col-xs-12 text-right q-body-2 text-weight-bold q-px-md">{{ author_name }}</div>
 
-  <div
-    class="row justify-center">
-    <div style="width: 800px; max-width: 80vw;" class="q-pa-xl shadow-10">
-    <div class="col-xs-12 text-center q-title text-weight-bold q-pa-md">{{ title }}</div>
-    <div class="col-xs-12 text-right q-body-2 text-weight-bold q-px-md">{{ date }}</div>
-    <div class="col-xs-12 text-right q-body-2 text-weight-bold q-px-md">{{ author_name }}</div>
-    
-      <div v-html="body" class="col-xs-12 q-pt-xl"/>
-    <div v-if="files" class="col-xs-12 text-left q-body-2 text-weight-bold q-px-md">첨부파일</div>
-<div v-if="files" class="col-xs-12 text-left q-body-1">
-    <template v-for="file in files">
-<a :href="'/api/upload/' + file">{{ file }}</a><br>
-    </template>
-</div>
-<!--
+        <div
+          v-html="body"
+          class="col-xs-12 q-pt-xl"/>
+        <div
+          v-if="files"
+          class="col-xs-12 text-left q-body-2 text-weight-bold q-px-md">첨부파일</div>
+        <div
+          v-if="files"
+          class="col-xs-12 text-left q-body-1">
+          <template v-for="file in files">
+            <a :href="'/api/upload/' + file">{{ file }}</a><br>
+          </template>
+        </div>
+        <!--
       <div class="row q-ma-md col-xs-12 justify-end">
       <div class="col-xs-4">
   <q-btn v-if="is_author" @click="$router.push({name:'post_form', params:{action:'update', id: id}})" label="수정" />
@@ -44,10 +51,8 @@
       </div>
       </div>
 -->
+      </div>
     </div>
-  </div>
-
-
 
   </div>
 </template>
@@ -73,7 +78,7 @@ export default {
       files: [],
 
       user: {},
-      is_author: false,
+      is_author: false
     }
   },
   props: ['id'],
@@ -94,7 +99,7 @@ export default {
     remove: function () {
       var self = this
       self.$axios.delete(`posts/` + self.id)
-        .then(function (response) {  self.$router.go(-1) })
+        .then(function (response) { self.$router.go(-1) })
     }
   },
   created: function () {
@@ -113,7 +118,7 @@ export default {
         self.date = (new Date(data.created_at)).toISOString().slice(0, 10)
         self.author_name = data.author.name
         self.files = JSON.parse(data.files)
-        
+
         /*
       if (JSON.parse(data.properties).includes('notice')) {
         self.notice = true

@@ -25,7 +25,10 @@
                   <template v-for="subitem in item.submenu">
                     <q-item :to="subitem.href">
                       <q-item-main>
-                        <q-item-tile label class="q-body-2" style="color:#57a1d0;">{{ subitem.label }}</q-item-tile>
+                        <q-item-tile
+                          label
+                          class="q-body-2"
+                          style="color:#57a1d0;">{{ subitem.label }}</q-item-tile>
                       </q-item-main>
                     </q-item>
                   </template>
@@ -58,7 +61,9 @@
                     </q-item>
                   </template>
                 </q-collapsible>
-                <q-item v-else :to="item.href">
+                <q-item
+                  v-else
+                  :to="item.href">
                   <q-item-main
                     :label="item.label"
                     class="navbar__menu"/>
@@ -126,7 +131,9 @@
         <template v-else>
           <q-item :to="{name:item.href, params:item.params}">
             <q-item-side :icon='item.icon' />
-            <q-item-main :label='item.text' class="q-body-2"/>
+            <q-item-main
+              :label='item.text'
+              class="q-body-2"/>
           </q-item>
         </template>
       </template>
@@ -143,7 +150,7 @@ import { LocalStorage } from 'quasar'
 export default {
   name: 'LayoutDefault',
   props: ['leftDrawerOpen'],
-  data : function() {
+  data: function () {
     return {
       // leftDrawerOpen: this.$q.platform.is.desktop,
       header_transparency: true,
@@ -182,7 +189,6 @@ export default {
   },
   watch: {
     user: function (new_user, old_user) {
-      console.log(new_user)
       this.update_toolbar()
     }
   },
@@ -211,13 +217,14 @@ export default {
       if (loggedIn) {
         let _user = LocalStorage.get.item('user_')
         let _token = LocalStorage.get.item('token_')
-        this.$store.commit('auth/SetAuth', {user:_user, token:_token})
+        this.$store.commit('auth/SetAuth', {user: _user, token: _token})
         this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + _token
-        this.$axios.get('login')
-          .then(function(data) {
-            this.fetch_menu()
-          }).catch(function(error) {
-            this.$store.commit('auth/SetAuth', {user: {}, token: ''})
+        var self = this
+        self.$axios.get('login')
+          .then(function (data) {
+            self.fetch_menu()
+          }).catch(function (error) {
+            self.$store.commit('auth/SetAuth', {user: {}, token: ''})
             LocalStorage.remove('user_')
             LocalStorage.remove('token_')
           })
@@ -226,9 +233,11 @@ export default {
       }
     },
     fetch_menu: function () {
-      this.$axios.get('menu')
-        .then(function (data) {
-          this.$store.commit('menu/UpdateMenu', data)
+      var self = this
+      self.$axios.get('menu')
+        .then(function (response) {
+          let data = response.data
+          self.$store.commit('menu/UpdateMenu', data)
         }).catch(function (error) {
           console.log('error')
         })

@@ -11,8 +11,10 @@
       </template>
       <template v-else>
         <div class="col-auto justify-center">
-            <div @click="$router.push({name: item.href, params: item.params})"><q-icon :name="item.icon" size="150px"/></div>
-            <div class="text-center">{{ item.text }}</div>
+          <div @click="$router.push({name: item.href, params: item.params})"><q-icon
+            :name="item.icon"
+            size="150px"/></div>
+          <div class="text-center">{{ item.text }}</div>
         </div>
       </template>
     </template>
@@ -21,13 +23,13 @@
 
 <script>
 export default {
-  data: function() {
+  data: function () {
     return {
     }
   },
   computed: {
     menu: {
-      get:function () {
+      get: function () {
         return this.$store.state.menu.menu_
       },
       set: function (val) {
