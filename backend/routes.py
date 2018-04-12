@@ -619,22 +619,21 @@ def student_update(id):
         student_info.user_id = user.id
         user.role_new('howcs_student')
         user.student_info = student_info
+        student_record = StudentRecord()
+        student_info.student_record = student_record
+        db.session.add(student_record)
 
-    student_info.student_id = request.json.get('student_id')
-    student_info.gender = request.json.get('gender')
-    student_info.rrn = request.json.get('rrn')
-    student_info.father_name = request.json.get('father_name')
-    student_info.father_rrn = request.json.get('father_rrn')
-    student_info.mother_name = request.json.get('mother_name')
-    student_info.mother_rrn = request.json.get('mother_rrn')
-    student_info.address = request.json.get('address')
+    student_info.student_id = request.json.get('student_id', student_info.student_id)
+    student_info.gender = request.json.get('gender', student_info.gender)
+    student_info.rrn = request.json.get('rrn', student_info.rrn)
+    student_info.father_name = request.json.get('father_name', student_info.father_name)
+    student_info.father_rrn = request.json.get('father_rrn', student_info.father_rrn)
+    student_info.mother_name = request.json.get('mother_name', student_info.mother_name)
+    student_info.mother_rrn = request.json.get('mother_rrn', student_info.mother_rrn)
+    student_info.address = request.json.get('address', student_info.address)
 
-    student_record = StudentRecord()
-    student_info.student_record = student_record
-    
     db.session.add(user)
     db.session.add(student_info)
-    db.session.add(student_record)
     db.session.commit()
     return jsonify({'user': user.as_dict()})
 

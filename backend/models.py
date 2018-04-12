@@ -395,7 +395,7 @@ class Attendance(db.Model):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     @staticmethod
     def categories():
-        return ['출석', '결석', '지각']
+        return ['출석', '결석(질병)', '결석(무단)', '결석(기타)', '지각(질병)', '지각(무단)', '지각(기타)', '조퇴(질병)', '조퇴(무단)', '조퇴(기타)']
 
 class Payment(db.Model):
     __tablename__ = 'payments'

@@ -24,9 +24,10 @@
       <div class="row">
 
         <template v-for="post in posts">
+            <div class="col-sm-4 col-md-3 col-lg-3" >
           <a
             :href="'/story/photo_view/' + post.id">
-            <div class="col-sm-4 col-md-3 col-lg-3" >
+            <div id="howphoto">
 
               <div id="howphoto">
                 <img
@@ -40,6 +41,7 @@
 
             </div>
           </a>
+            </div>
         </template>
 
       </div>

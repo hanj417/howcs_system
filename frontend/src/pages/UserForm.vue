@@ -10,21 +10,33 @@
         <q-field
           label="아이디"
           icon="account circle"
+          disabled
           :label-width="3"
-          :error="$v.username.$error"
+          :error="$v.form.username.$error"
           error-label="아이디를 잘못 입력하였습니다."
         >
-          <q-input v-model="username" />
+          <q-input v-model="form.username" />
         </q-field>
         <q-field
           label="비밀번호"
           icon="lock"
           :label-width="3"
-          :error="$v.password.$error"
+          :error="$v.form.password.$error"
           error-label="비밀번호를 잘못 입력하였습니다."
         >
           <q-input
-            v-model="password"
+            v-model="form.password"
+            type="password" />
+        </q-field>
+        <q-field
+          label="비밀번호 확인"
+          icon="lock"
+          :label-width="3"
+          :error="$v.form.password_confirm.$error"
+          error-label="비밀번호가 일치하지 않습니다."
+        >
+          <q-input
+            v-model="form.password_confirm"
             type="password" />
         </q-field>
         <hr>
@@ -32,58 +44,58 @@
           label="이름"
           icon="format size"
           :label-width="3"
-          :error="$v.name.$error"
+          :error="$v.form.name.$error"
           error-label="이름을 잘못 입력하였습니다."
         >
-          <q-input v-model="name" />
+          <q-input v-model="form.name" />
         </q-field>
         <q-field
           label="이메일"
           icon="email"
           :label-width="3"
-          :error="$v.email.$error"
+          :error="$v.form.email.$error"
           error-label="이메일을 잘못 입력하였습니다."
         >
           <q-input
-            v-model="email"
+            v-model="form.email"
             type="email" />
         </q-field>
         <q-field
           label="전화번호"
           icon="phone"
           :label-width="3"
-          :error="$v.phone.$error"
+          :error="$v.form.phone.$error"
           error-label="전화번호를 잘못 입력하였습니다."
         >
-          <q-input v-model="phone" />
+          <q-input v-model="form.phone" />
         </q-field>
         <q-field
           label="출석교회"
           icon="business"
           :label-width="3"
-          :error="$v.church.$error"
+          :error="$v.form.church.$error"
           error-label="출석교회를 잘못 입력하였습니다."
         >
-          <q-input v-model="church" />
+          <q-input v-model="form.church" />
         </q-field>
         <q-field
           label="소속학교"
           icon="school"
           :label-width="3"
-          :error="$v.school.$error"
+          :error="$v.form.school.$error"
           error-label="소속학교를 잘못 입력하였습니다."
         >
-          <q-input v-model="school" />
+          <q-input v-model="form.school" />
         </q-field>
         <q-field
           label="생년월일"
           icon="cake"
           :label-width="3"
-          :error="$v.birthday.$error"
+          :error="$v.form.birthday.$error"
           error-label="생년월일을 잘못 입력하였습니다."
         >
           <q-datetime
-            v-model="birthday"
+            v-model="form.birthday"
             type="date" />
         </q-field>
       </div>
@@ -94,11 +106,12 @@
         <q-field
           label="학번"
           icon="create"
+          :disabled="!is_admin"
           :label-width="3"
-          :error="$v.school.$error"
-          error-label="소속학교를 잘못 입력하였습니다."
+          :error="$v.form.student_id.$error"
+          error-label="학번을 잘못 입력하였습니다."
         >
-          <q-input v-model="student_id" />
+          <q-input v-model="form.student_id" />
         </q-field>
         <q-field
           label="성별"
@@ -107,7 +120,7 @@
         >
           <q-option-group
             type="radio"
-            v-model="gender"
+            v-model="form.gender"
             inline
             :options="[
               { label: '남학생', value: 'male' },
@@ -119,46 +132,46 @@
           label="부 성명"
           icon="face"
           :label-width="3"
-          :error="$v.school.$error"
-          error-label="소속학교를 잘못 입력하였습니다."
+          :error="$v.form.father_name.$error"
+          error-label="이름을 잘못 입력하였습니다."
         >
-          <q-input v-model="father_name" />
+          <q-input v-model="form.father_name" />
         </q-field>
         <q-field
           label="부 주민번호"
           icon="featured play list"
           :label-width="3"
-          :error="$v.school.$error"
-          error-label="소속학교를 잘못 입력하였습니다."
+          :error="$v.form.father_rrn.$error"
+          error-label="주민번호를 잘못 입력하였습니다."
         >
-          <q-input v-model="father_rrn" />
+          <q-input v-model="form.father_rrn" />
         </q-field>
         <q-field
           label="모 성명"
           icon="face"
           :label-width="3"
-          :error="$v.school.$error"
-          error-label="소속학교를 잘못 입력하였습니다."
+          :error="$v.form.mother_name.$error"
+          error-label="이름을 잘못 입력하였습니다."
         >
-          <q-input v-model="mother_name" />
+          <q-input v-model="form.mother_name" />
         </q-field>
         <q-field
           label="모 주민번호"
           icon="featured play list"
           :label-width="3"
-          :error="$v.school.$error"
-          error-label="소속학교를 잘못 입력하였습니다."
+          :error="$v.form.mother_rrn.$error"
+          error-label="주민번호를 잘못 입력하였습니다."
         >
-          <q-input v-model="mother_rrn" />
+          <q-input v-model="form.mother_rrn" />
         </q-field>
         <q-field
           label="주소"
           icon="home"
           :label-width="3"
-          :error="$v.school.$error"
-          error-label="소속학교를 잘못 입력하였습니다."
+          :error="$v.form.address.$error"
+          error-label="주소를 잘못 입력하였습니다."
         >
-          <q-input v-model="address" />
+          <q-input v-model="form.address" />
         </q-field>
       </div>
       <div class="col-xs-12 row justify-end q-my-lg">
@@ -189,7 +202,7 @@
 
 <script>
 import { LocalStorage } from 'quasar'
-import { required, email } from 'vuelidate/lib/validators'
+import { required, email, minLength, sameAsPassword, sameAs} from 'vuelidate/lib/validators'
 
 export default {
   data: function () {
@@ -197,6 +210,7 @@ export default {
       is_admin: false,
       is_howcs_student: false,
       user_id: '',
+form: {
       username: '',
       password: '',
       password_confirm: '',
@@ -214,6 +228,7 @@ export default {
       mother_name: '',
       mother_rrn: '',
       address: '',
+},
       conditions: false,
       content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc.',
       terms: false,
@@ -221,52 +236,69 @@ export default {
     }
   },
   validations: {
+form: {
     username: { required },
-    password: { required },
+    password: { },
+    password_confirm: { sameAsPassword: sameAs('password') },
     name: { required },
     email: { required, email },
     phone: { required },
-    school: { required },
-    church: { required },
-    birthday: { required }
+    school: { },
+    church: { },
+    birthday: { required },
+      student_id: {},
+      gender: {},
+      rrn: {},
+      father_name: {},
+      father_rrn: {},
+      mother_name: {},
+      mother_rrn: {},
+      address: {},
+}
   },
   props: ['action', 'id'],
   methods: {
     store: function () {
+      this.$v.form.$touch()
+      if (this.$v.form.$error) {
+        this.$q.notify('회원 정보가 잘못 되었습니다.')
+        return
+      }
+
       var self = this
       if (self.action === 'new') {
         if (self.is_howcs_student === false) {
           self.$axios.post('users', {
-            'username': self.username,
-            'password': self.password,
-            'name': self.name,
-            'email': self.email,
-            'phone': self.phone,
-            'school': self.school,
-            'church': self.church,
-            'birthday': (new Date(self.birthday)).toISOString().substr(0, 10)
+            'username': self.form.username,
+            'password': self.form.password,
+            'name': self.form.name,
+            'email': self.form.email,
+            'phone': self.form.phone,
+            'school': self.form.school,
+            'church': self.form.church,
+            'birthday': (new Date(self.form.birthday)).toISOString().substr(0, 10)
           }).then(function (response) {
             let data = response.data
             self.$router.go(-1)
           })
         } else {
           self.$axios.post('student_infos', {
-            'username': self.username,
-            'password': self.password,
-            'name': self.name,
-            'email': self.email,
-            'phone': self.phone,
-            'school': self.school,
-            'church': self.church,
-            'birthday': (new Date(self.birthday)).toISOString().substr(0, 10),
-            'student_id': self.student_id,
-            'gender': self.gender,
-            'rrn': self.rrn,
-            'father_name': self.father_name,
-            'father_rrn': self.father_rrn,
-            'mother_name': self.mother_name,
-            'mother_rrn': self.mother_rrn,
-            'address': self.address
+            'username': self.form.username,
+            'password': self.form.password,
+            'name': self.form.name,
+            'email': self.form.email,
+            'phone': self.form.phone,
+            'school': self.form.school,
+            'church': self.form.church,
+            'birthday': (new Date(self.form.birthday)).toISOString().substr(0, 10),
+            'student_id': self.form.student_id,
+            'gender': self.form.gender,
+            'rrn': self.form.rrn,
+            'father_name': self.form.father_name,
+            'father_rrn': self.form.father_rrn,
+            'mother_name': self.form.mother_name,
+            'mother_rrn': self.form.mother_rrn,
+            'address': self.form.address
           }).then(function (response) {
             let data = response.data
             self.$router.go(-1)
@@ -274,22 +306,22 @@ export default {
         }
       } else if (self.action === 'new_student') {
         self.$axios.post('student_infos', {
-          'username': self.username,
-          'password': self.password,
-          'name': self.name,
-          'email': self.email,
-          'phone': self.phone,
-          'school': self.school,
-          'church': self.church,
-          'birthday': (new Date(self.birthday)).toISOString().substr(0, 10),
-          'student_id': self.student_id,
-          'gender': self.gender,
-          'rrn': self.rrn,
-          'father_name': self.father_name,
-          'father_rrn': self.father_rrn,
-          'mother_name': self.mother_name,
-          'mother_rrn': self.mother_rrn,
-          'address': self.address
+          'username': self.form.username,
+          'password': self.form.password,
+          'name': self.form.name,
+          'email': self.form.email,
+          'phone': self.form.phone,
+          'school': self.form.school,
+          'church': self.form.church,
+          'birthday': (new Date(self.form.birthday)).toISOString().substr(0, 10),
+          'student_id': self.form.student_id,
+          'gender': self.form.gender,
+          'rrn': self.form.rrn,
+          'father_name': self.form.father_name,
+          'father_rrn': self.form.father_rrn,
+          'mother_name': self.form.mother_name,
+          'mother_rrn': self.form.mother_rrn,
+          'address': self.form.address
         }).then(function (response) {
           let data = response.data
           self.$router.go(-1)
@@ -297,36 +329,36 @@ export default {
       } else if (self.action === 'update') {
         if (self.is_howcs_student === false) {
           self.$axios.put('users/' + self.user_id, {
-            'username': self.username,
-            'password': self.password,
-            'name': self.name,
-            'email': self.email,
-            'phone': self.phone,
-            'school': self.school,
-            'church': self.church,
-            'birthday': (new Date(self.birthday)).toISOString().substr(0, 10)
+            'username': self.form.username,
+            'password': self.form.password,
+            'name': self.form.name,
+            'email': self.form.email,
+            'phone': self.form.phone,
+            'school': self.form.school,
+            'church': self.form.church,
+            'birthday': (new Date(self.form.birthday)).toISOString().substr(0, 10)
           }).then(function (response) {
             let data = response.data
             self.$router.go(-1)
           })
         } else {
           self.$axios.put('student_infos/' + self.user_id, {
-            'username': self.username,
-            'password': self.password,
-            'name': self.name,
-            'email': self.email,
-            'phone': self.phone,
-            'school': self.school,
-            'church': self.church,
-            'birthday': (new Date(self.birthday)).toISOString().substr(0, 10),
-            'student_id': self.student_id,
-            'gender': self.gender,
-            'rrn': self.rrn,
-            'father_name': self.father_name,
-            'father_rrn': self.father_rrn,
-            'mother_name': self.mother_name,
-            'mother_rrn': self.mother_rrn,
-            'address': self.address
+            'username': self.form.username,
+            'password': self.form.password,
+            'name': self.form.name,
+            'email': self.form.email,
+            'phone': self.form.phone,
+            'school': self.form.school,
+            'church': self.form.church,
+            'birthday': (new Date(self.form.birthday)).toISOString().substr(0, 10),
+            'student_id': self.form.student_id,
+            'gender': self.form.gender,
+            'rrn': self.form.rrn,
+            'father_name': self.form.father_name,
+            'father_rrn': self.form.father_rrn,
+            'mother_name': self.form.mother_name,
+            'mother_rrn': self.form.mother_rrn,
+            'address': self.form.address
           }).then(function (response) {
             let data = response.data
             self.$router.go(-1)
@@ -360,24 +392,24 @@ export default {
       self.$axios.get('users/' + self.user_id
       ).then(function (response) {
         let data = response.data
-        self.username = data.username
-        self.name = data.name
-        self.email = data.email
-        self.phone = data.phone
-        self.school = data.school
-        self.church = data.church
+        self.form.username = data.username
+        self.form.name = data.name
+        self.form.email = data.email
+        self.form.phone = data.phone
+        self.form.school = data.school
+        self.form.church = data.church
         var d = new Date(data.birthday)
-        self.birthday = d.toISOString().substr(0, 10)
+        self.form.birthday = d.toISOString().substr(0, 10)
         if (data.hasOwnProperty('student_info')) {
           self.is_howcs_student = true
-          self.student_id = data.student_info.student_id
-          self.gender = data.student_info.gender
-          self.rrn = data.student_info.rrn
-          self.father_name = data.student_info.father_name
-          self.father_rrn = data.student_info.father_rrn
-          self.mother_name = data.student_info.mother_name
-          self.mother_rrn = data.student_info.mother_rrn
-          self.address = data.student_info.address
+          self.form.student_id = data.student_info.student_id
+          self.form.gender = data.student_info.gender
+          self.form.rrn = data.student_info.rrn
+          self.form.father_name = data.student_info.father_name
+          self.form.father_rrn = data.student_info.father_rrn
+          self.form.mother_name = data.student_info.mother_name
+          self.form.mother_rrn = data.student_info.mother_rrn
+          self.form.address = data.student_info.address
         }
       })
     } else if (this.action === 'new_student') {
