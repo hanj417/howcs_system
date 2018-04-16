@@ -429,7 +429,7 @@
               {{ recent_photo.ellipsis }}...
             </div>
             <div class="how-story__created: function-at">
-              {{ recent_story.date }}
+              {{ recent_photo.date }}
             </div>
             <div class="how-story__author">
               하우학교
