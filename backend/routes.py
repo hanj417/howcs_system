@@ -947,8 +947,8 @@ def post_all():
     if 'class_id' in request.args:
         posts = posts.filter_by(class_id=request.args['class_id'])
     if 'recent' in request.args:
-        posts = posts.order_by('id desc').order_by('created_at desc').limit(int(request.args['recent']))
-    posts = posts.order_by('id desc').order_by('created_at desc')
+        posts = posts.order_by('created_at desc').order_by('id desc').limit(int(request.args['recent']))
+    posts = posts.order_by('created_at desc').order_by('id desc')
     posts = posts.all()
     posts_json = []
     for post in posts:
@@ -962,9 +962,9 @@ def post_homepage_all():
     if 'minor_category' in request.args:
         posts = posts.filter_by(minor_category=request.args['minor_category'])
     if 'recent' in request.args:
-        posts = posts.order_by('id desc').order_by('created_at desc').limit(int(request.args['recent']))
+        posts = posts.order_by('created_at desc').order_by('id desc').limit(int(request.args['recent']))
     else:
-        posts = posts.order_by('id desc').order_by('created_at desc')
+        posts = posts.order_by('created_at desc').order_by('id desc')
     posts = posts.all()
     posts_json = []
     for post in posts:

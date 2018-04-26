@@ -16,37 +16,100 @@
     <div class="container">
       <div class="row">
         <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 about__title-container">
-          <div class="project__title">2018학년도 <br>하늘빛우리학교 입학 요강</div>
+          <div class="project__title">
+            2018학년도 <br>하늘빛우리학교 입학 요강<br>
+           (2018학년도 <br> 가을학기 편입학)
+          </div>
         </div>
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 about__subtitle-container">
+          <div class="project__content">
+              <p>가. 모집정원 </p>
+          </div>
           <div
             id="notice_table"
             style="overflow-x:auto;">
-            <table>
+            <table align="center">
               <tr>
-                <th>모집학년</th>
-                <th>예비초등반(7세)</th>
-                <th>1학년</th>
-                <th>2,3학년</th>
-                <th>4학년</th>
-                <th>정원</th>
+                <th colspan="5" align="center">초등과정</th>
+                <th align="center">과정</th>
+                <th align="center">하우스콜레</th>
               </tr>
               <tr>
-                <td>정원</td>
-                <td>00명</td>
-                <td>00명</td>
-                <td>00명</td>
-                <td>0명</td>
-                <td>48명</td>
+                <td align="center">예비초등반(7세)</td>
+                <td align="center">1학년</td>
+                <td align="center">2학년</td>
+                <td align="center">3학년</td>
+                <td align="center">4학년</td>
+                <td align="center">학년</td>
+                <td align="center">13~15세</td>
+              </tr>
+              <tr>
+                <td align="center">16</td>
+                <td align="center">16</td>
+                <td align="center" colspan="2">16</td>
+                <td align="center">16</td>
+                <td align="center">정원</td>
+                <td align="center">12명</td>
               </tr>
             </table>
           </div>
           <!--  <div class="project__subtitle">text</div> -->
           <div class="project__content">
-            <li style="margin-left:15px">2~3학년은 통합학년으로 구성하며 지원자가 많을 경우 학년을 분리할 수도 있습니다.</li>
-            <li style="margin-left:15px">초등과정의 경우 학년담임을 중심으로 수업을 운영하지만 특정 교과의 경우 저마다 속도가 다른 개별 학생의 특성에 따라 무학년으로 운영할 수도 있습니다.</li>
-            ※ 중등과정(2020학년도 모집 예정)은 무학년 학점제의 개별 맞춤형 교육과정으로 운영합니다.<br>
-            ※ 하늘빛우리교회 성도의 자녀에게는 교육비10%감면(입학금 제외) 혜택이 있습니다.
+            <li style="margin-left:15px">현재 2~3학년은 통합학년으로 구성되어 있습니다. 단, 지원자가 많을 경우 학년을 분리할 수도 있습니다.</li>
+            <li style="margin-left:15px">각 학년별 담임교사 외 수학(수와논리), 영어, 음악, 체육교과의 경우 교과전담교사가 교육합니다.</li>
+            <li style="margin-left:15px">하우스콜레(HowSkole)는 13~15세를 위한 무학년제 자기주도형교육과정으로 운영하며 하우학교 중등과정(2020학년도 모집 예정)에 우선 편입학할 수 있습니다. 단, 적정인원이 모집되지 않을 경우 열리지 않을 수도 있습니다.</li><br>
+            <p>나. 지원 자격</p>
+            <li style="margin-left:15px">기독교교육에 동의하며 본교가 추구하는 교육철학과 핵심가치에 적극적으로 동의하는 부모의 자녀</li>
+            <li style="margin-left:15px">2~4학년 편입 지원 학생은 이전 학년 과정을 이수했거나 해당 학력이 있다고 인정된 학생</li><br>
+            <p>다. 모집일정 및 절차</p>
+          </div>
+          <div
+            id="notice_table"
+            style="overflow-x:auto;">
+            <table align="center">
+              <tr>
+                <th></th>
+                <th align="center">원서접수 마감</th>
+                <th align="center">하우만나다<br>(선발캠프)</th>
+                <th align="center">부모면접</th>
+                <th align="center">합격자발표</th>
+                <th align="center">합격자 등록</th>
+                <th align="center">등교</th>
+              </tr>
+              <tr>
+                <td align="center">편입학</td>
+                <td align="center">5/24(목)17시</td>
+                <td align="center" rowspan="2">5/26(토)<br>10:00~15:00</td>
+                <td align="center">5/26(토)~30(수)</td>
+                <td align="center">5/31(목)</td>
+                <td align="center">6/14(목)</td>
+                <td align="center">8/20(월)</td>
+              </tr>
+              <tr>
+                <td align="center">스콜레</td>
+                <td align="center">5/21(월)17시</td>
+                <td align="center">5/23(수)~26(토)</td>
+                <td align="center">5/28(월)</td>
+                <td align="center">5/31(목)</td>
+                <td align="center">6/1(금)</td>
+              </tr>
+            </table>
+          </div>
+          <div class="project__content">
+            <li style="margin-left:15px">부모면접은 원서접수 완료시 선택하며 면접시간은 30분, 사전질문지 작성 포함 약 1시간소요</li>
+            <li style="margin-left:15px">합격자 발표는 개별 문자메시지로 알림, 합격자 등록은 입학금 및 가을학기(하우스콜레의 경우 여름학기) 교육비 납부</li><br>
+            <p>라. 지원 서류</p>
+            <ol>
+            <li style="margin-left:15px"><b>입학원서</b>(지원자소개, 지원자약속 포함) <b>1부</b> 및 <b>추천서 1부 </b></li>
+            <li style="margin-left:15px"><b>감상문 1편 : 하우교육세미나 강의</b>(하늘빛우리교회 홈페이지hbwoorichurch.org ‘하늘빛방송>특별행사’나 유튜브youtube.com에서 ‘하우세미나’로 검색 후 시청 가능) <b>또는 부모학교 필독도서(기적의 사과, 대한민국 부모, 신본주의 교육, 가르침과 배움의 영성) 중 선택(A4 1쪽 분량)</b></li>
+            <li style="margin-left:15px"><b>주민등록등본 1부   </b></li>
+            <li style="margin-left:15px"><b>사진</b>(반명함) <b>1장</b>(입학원서 이메일지원 시 사진 첨부가 어려운 경우에만 제출)</li>
+            <li style="margin-left:15px">편입학 및 하우스콜레 지원자(2018년 현재 2~4학년, 6~8학년)의 경우 <b>학교생활기록부(Ⅱ) 1부</b></li>
+            <li style="margin-left:15px"><b>입학전형료(선발캠프비 포함) 10만원</b>(반드시 지원자 이름으로 입금)</li>
+            </ol>
+            ※ <a href="assets/file/하우학교입학지원양식.zip">입학원서와 추천서(추천자 작성 후 직접 발송) 내려받기</a><br>
+            <!--※ 입학원서와 추천서(추천자 작성 후 직접 발송)는 학교홈페이지 공지사항에서 내려받기<br>-->
+            ※ 지원서류를 이메일로 보낼 경우 반드시 다음과 같이 파일명(예: 입학원서_지원자이름, 감상문_지원자이름, 등본_지원자이름)을 붙여 전송하고 주민등록등본과 같이 파일로 보내기 어려운 서류는 면접일에 제출
           </div>
         </div>
       </div>
@@ -63,7 +126,30 @@
         </div>
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 about__subtitle-container">
           <!--  <div class="project__subtitle">text</div> -->
-          <div class="project__content"><br><br><br></div>
+          <div class="project__content">
+            <div style="font-size:medium;"><b>2018학년도 가을학기 편입학 및 하우스콜레 입학설명회 일정</b></div>
+            <li style="margin-left:15px">1차 : 5/10(목) 오후7:30 하우부모학교(하늘빛우리교회6층)시 학교설명회(10분)</li>
+            <li style="margin-left:15px">2차 : 5/13(일) 오후3:30 하늘빛우리교회 4층 본당</li>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hidden-xs">
+      <div class="space"/>
+      <div class="space"/>
+      <div class="space"/>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 about__title-container">
+          <div class="project__title">하우스콜레 HowSkole</div>
+        </div>
+        <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 about__subtitle-container">
+          <!--  <div class="project__subtitle">text</div> -->
+          <div class="project__content">
+하우스콜레는, 홈스쿨러나 탈학교 학생 중 하우학교의 교육철학과 방향에 동의하는 청소년(13~15세 대상)을 대상으로 한 하우학교 안의 기독교대안교육과정이다. 모든 교육과정과 활동에 있어 학생의 자발성을 원칙으로 하며 학년 구분 없이 1년 단위로 교육과정을 운영한다. 하우학교의 교육과정을 바탕으로 발표, 토론, 프로젝트 수업을 연계한 자기주도형 학습을 실시하며 1월에는 해외이동학습(필리핀)을 실시한다. 교사는 지식전달자가 아니라 학습코치로서 학기가 시작되기 전 각 학생이 계획한 교과별 목표와 학점을 관리하며 학생과 부모가 작성한 학습계획표를 점검하고 자기주도적으로 학습할 수 있도록 돕는 역할을 한다. 열매나누기 때 학생 스스로 교육과정 수행 과정을 성찰하고 성취한 내용을 평가하며 이를 교사와 학부모 앞에서 발표(프리젠테이션)한다.<br>
+※ ‘하우스콜레에 관한 자세한 사항은 첨부파일을 참고해주세요. <a href="assets/file/하우스콜레.pdf"><하우스콜레 자료 내려받기></a>
+          </div>
         </div>
       </div>
     </div>
@@ -80,13 +166,16 @@
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 about__subtitle-container">
           <!--  <div class="project__subtitle">text</div> -->
           <div class="project__content">
+
             (1) 입학금 : 100만원<br>
-            (2) 수업료 : 예비초등/초등과정 월 50만원<br>
+            (2) 수업료 : 예비초등/초등과정 및 하우스콜레 월 50만원<br>
             (3) 수업료는 분기납(3개월)이 원칙(가정의 형편에 따라 학교와 협의 후 월납 가능)<br>
             (4) 체험학습비/교육활동비 별도(월 2~3만원 예상)<br>
-            (5) 식비 1식에 3,000원<br><br>
-
-            <p style="text-align:justify">하우학교는 교육청이나 정부의 지원을 받지 않고 운영하는 기독교 대안학교로 학부모가 부담하는 교육비로 학교를 운영합니다. 그런데 좋은교사를 채용하고 미래형 교육과정을 운영하며 쾌적한 환경에서 교육하기 위해서는 적잖은 예산이 필요합니다. 특히 교육공간을 마련하고 학교시설을 유지하는 데 들어가는 비용이 많기 때문에 입학 시 학부모로부터 기부금이나 학교발전기금을 받아 이를 해결하고 있습니다. 하지만 하우학교는 교육공간이나 시설 유지 비용을 하늘빛우리교회에서 전적으로 지원하고 후원하기 때문에 <b>의무적으로 내야할 기부금이나 학교발전기금은 없습니다.</b></p>
+            (5) 식비 1식에 3,000원<br>
+            ※ 하늘빛우리교회 성도의 자녀에게는 수업료 10%감면 혜택이 있습니다.<br>
+            ※ 다자녀가 동시에 재학 중인 경우 둘째 20%, 셋째 50%, 넷째 100% 수업료를 감면합니다.<br>
+            ※ 단, 상기 혜택이 중복 적용되지는 않습니다.<br>
+            (6) 하우스콜레 과정의 경우 입학 시 크롬북 별도 구입(필수)<br>
           </div>
         </div>
       </div>

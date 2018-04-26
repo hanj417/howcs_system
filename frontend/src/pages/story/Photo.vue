@@ -67,7 +67,7 @@ export default {
     fetch_data: function () {
       let query = {}
       query['minor_category'] = 'photo'
-      query['recent'] = '4'
+      //query['recent'] = '4'
       var self = this
       self.$axios.get('posts/homepage', {params: query})
         .then(function (response) {
