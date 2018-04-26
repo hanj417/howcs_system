@@ -86,6 +86,7 @@
       </div>
     </div> -->
 
+<!--
       <div class="agit__container">
         <div class="row">
 
@@ -94,7 +95,7 @@
               class="glyphicon glyphicon-circle-arrow-right"
               aria-hidden="true"
               style="font-size:15px"/> 강좌제목</div>
-          </div><!--end-->
+          </div>
 
           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <div
@@ -123,7 +124,7 @@
 
               </table>
             </div>
-          </div><!--end-->
+          </div>
 
           <div>
             <div class="space"/>
@@ -131,96 +132,42 @@
 
         </div>
       </div>
+-->
 
       <div class="agit__container">
         <div id="agit__box">
           <div class="row">
+            <div class="col-xs-12 col-md-6">
+                <div class="col-xs-4"><span class="agit__ftitle">분류</span></div>
+                <div class="col-xs-8">
+                <q-select v-model="category_filter" :options="categories" />
+                </div>
+            </div><!--end-->
 
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            <div class="col-xs-12 col-md-6">
+                <div class="col-xs-4"><span class="agit__ftitle">대상</span></div>
+                <div class="col-xs-8">
+                <q-select v-model="age_filter" :options="ages" />
+                </div>
+            </div><!--end-->
 
-              <div
-                class="agit__form"
-                align="center">
-                <span class="agit__ftitle">대상</span>
-                <label class="checkbox-inline"><input
-                  type="checkbox"
-                  value="">1~7세 </label>
-                <label class="checkbox-inline"><input
-                  type="checkbox"
-                  value="">8~13세</label>
-                <label class="checkbox-inline"><input
-                  type="checkbox"
-                  value="">14~19세</label>
-                <label class="checkbox-inline"><input
-                  type="checkbox"
-                  value="">성인</label>
+            <div class="col-xs-12 col-md-6">
+                <div class="col-xs-4"><span class="agit__ftitle">수강요일</span></div>
+                <div class="col-xs-8">
+                <q-select v-model="weekday_filter" :options="weekday" />
+                </div>
+            </div><!--end-->
+
+
+            <div class="col-xs-12 col-md-6">
+              <div class="col-xs-4"><span class="agit__ftitle">키워드</span></div>
+
+
+
+              <div class="col-xs-8">
+                <q-input v-model="search" placeholder="Search.."/>
               </div>
-            </div><!--end-->
-
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-
-              <div
-                class="agit__form"
-                align="center">
-                <span class="agit__ftitle">수강요일</span>
-
-                <label class="checkbox-inline"><input
-                  type="checkbox"
-                  value="">전체</label>
-                <label class="checkbox-inline"><input
-                  type="checkbox"
-                  value="">월</label>
-                <label class="checkbox-inline"><input
-                  type="checkbox"
-                  value="">화</label>
-                <label class="checkbox-inline"><input
-                  type="checkbox"
-                  value="">수</label>
-                <label class="checkbox-inline"><input
-                  type="checkbox"
-                  value="">목</label>
-                <label class="checkbox-inline"><input
-                  type="checkbox"
-                  value="">금</label>
-                <label class="checkbox-inline"><input
-                  type="checkbox"
-                  value="">토</label>
-
-              </div>
-
-            </div><!--end-->
-          </div>
-
-          <div class="row">
-
-            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
-
-              <p
-                align="right"
-                class="agit__ftitle"
-                style="padding-right:13px;">키워드 </p>
-
-            </div><!--end-->
-
-            <div class="col-xs-5 col-sm-5 col-md-7 col-lg-7">
-
-              <form class="example">
-                <input
-                  type="text"
-                  placeholder="Search.."
-                  name="search"></form>
-
-            </div><!--end-->
-
-            <div class="col-xs-5 col-sm-5 col-md-3 col-lg-3">
-
-              <button
-                type="button"
-                class="btn btn-primary">search</button> &nbsp; <button
-                  type="button"
-                  class="btn btn-info">초기화</button>
-
-            </div><!--end-->
+            </div>
           </div>
 
         </div>
@@ -233,6 +180,7 @@
 
     <!--강좌목록-->
 
+<template v-for="item in items">
     <div class="agit__container">
       <div id="box__blue">
         <div class="row">
@@ -250,23 +198,23 @@
               <table>
                 <tr>
                   <td width="17%">강좌명 </td>
-                  <td class="agit__ftitle_bl">과학교실1</td>
+                  <td class="agit__ftitle_bl">{{ item.title }}</td>
                 </tr>
                 <tr>
                   <td>길잡이 교사</td>
-                  <td>홍길동</td>
+                  <td>{{ item.teacher.name }}</td>
                 </tr>
                 <tr>
                   <td width="15%">대상</td>
-                  <td>성인</td>
+                  <td>{{ item.audience }}</td>
                 </tr>
                 <tr>
                   <td>요일/시간</td>
-                  <td>월,수</td>
+                  <td>{{ item.time_slot}}</td>
                 </tr>
                 <tr>
                   <td>기간</td>
-                  <td>2018.01.01 ~ 2018.03.01</td>
+                  <td>{{ item.year }}{{ semester_label[item.semester] }}</td>
                 </tr>
               </table>
             </div>
@@ -275,14 +223,20 @@
           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <div
               class="mg15"
-              align="center"><a href="class1.html"><button
+              align="center">
+<!--
+<a href="class1.html"><button
                 type="button"
-                class="btn btn-primary">강좌신청하기</button></a></div>
+                class="btn btn-primary">강좌신청하기</button></a>
+-->
+<q-btn label="강좌보기" @click="$router.push({name:'class1', params:{id:item.id}})" />
+</div>
           </div><!--end-->
 
         </div>
       </div>
     </div>
+</template>
 
   </div>
 </div>
@@ -290,6 +244,158 @@
 
 <script>
 export default {
+  data: function () {
+    return {
+      semester_label: {
+        'spring':'봄',
+        'summer':'.5.1 ~ 7.31',
+        'fall':'가을',
+        'winter':'겨울',
+        'year':'.1.1 ~ 12.31',
+      },
+      weekday_label: {
+        'mon':'월',
+        'tue':'화',
+        'wed':'수',
+        'thu':'목',
+        'fri':'금',
+        'sat':'토',
+      },
+      age_filter: '',
+      ages: [
+        {label: '전체', value: ''},
+        {label: '1세', value: '1'},
+        {label: '2세', value: '2'},
+        {label: '3세', value: '3'},
+        {label: '4세', value: '4'},
+        {label: '5세', value: '5'},
+        {label: '6세', value: '6'},
+        {label: '7세', value: '7'},
+        {label: '8세', value: '8'},
+        {label: '9세', value: '9'},
+        {label: '10세', value: '10'},
+        {label: '11세', value: '11'},
+        {label: '12세', value: '12'},
+        {label: '13세', value: '13'},
+        {label: '14세', value: '14'},
+        {label: '15세', value: '15'},
+        {label: '16세', value: '16'},
+        {label: '17세', value: '17'},
+        {label: '18세', value: '18'},
+        {label: '19세', value: '19'},
+        {label: '20세', value: '20'},
+        {label: '성인', value: 'adult'},
+      ],
+      weekday_filter: '',
+      weekday: [
+        {label: '전체', value: ''},
+        {label: '월', value: 'mon'},
+        {label: '화', value: 'tue'},
+        {label: '수', value: 'wed'},
+        {label: '목', value: 'thu'},
+        {label: '금', value: 'fri'},
+        {label: '토', value: 'sat'},
+      ],
+      category_filter: '',
+      categories: [
+        {label: '전체', value: ''},
+        {label: '숨', value: 'breath'},
+        {label: '몫', value: 'role'},
+        {label: '삶', value: 'life'},
+        {label: '꿈', value: 'dream'},
+      ],
+      search: '',
+      items: [],
+      all_items: []
+    }
+  },
+  methods: {
+    apply_filter: function() {
+      this.items = []
+      for (let i = 0; i < this.all_items.length; i++) {
+        if (this.category_filter != '' &&
+            this.all_items[i].minor_category != this.category_filter)
+          continue
+           
+        if (this.age_filter != '' &&
+            !this.all_items[i].audience_array.includes(this.age_filter))
+          continue
+           
+        if (this.weekday_filter != '' &&
+            this.all_items[i].weekday != this.weekday_filter)
+          continue
+           
+        if (this.search != '' &&
+            !this.all_items[i].title.includes(this.search))
+          continue
+           
+        this.items.push(this.all_items[i])
+      }
+    },
+  },
+  watch: {
+    'category_filter': function (val) {
+      this.apply_filter()
+    },
+    'age_filter': function (val) {
+      this.apply_filter()
+    },
+    'weekday_filter': function (val) {
+      this.apply_filter()
+    },
+    'search': function (val) {
+      this.apply_filter()
+    },
+  },
+  created: function() {
+      let query = {}
+      query['major_category'] = 'agit'
+      var self = this
+      self.$axios.get('classes', {params: query})
+        .then(function (response) {
+          let data = response.data
+          self.all_items = data
+
+          let age_label = {}
+          for (let i = 1; i < 21; i++) {
+            age_label[i.toString()] = i.toString() + '세'
+          }
+          age_label['adult'] = '성인'
+
+          for (let i = 0; i < self.all_items.length; i++ ) {
+            let ts_arr = self.all_items[i].time_slot.split(',')
+console.log(ts_arr)
+            self.all_items[i].weekday = ts_arr[0]
+            self.all_items[i].time_slot = self.weekday_label[ts_arr[0]] + ' ' + ts_arr[1]
+
+            let aud_arr = self.all_items[i].audience.split(',')
+            self.all_items[i].audience_array = aud_arr
+            self.all_items[i].audience = ''
+            for (var j = 1; j < 21; j++) {
+              if (aud_arr.includes(j.toString())) {
+                self.all_items[i].audience = j.toString()
+                j++
+                break
+              }
+            }
+            for (; j < 21; j++) {
+              if (aud_arr.includes(j.toString())) {
+                self.all_items[i].audience = self.all_items[i].audience + ', ' + j.toString()
+              }
+            }
+            if (self.all_items[i].audience != '') {
+              self.all_items[i].audience = self.all_items[i].audience + '세'
+            }
+            if (aud_arr.includes('adult')) {
+              if (self.all_items[i].audience != '') {
+                self.all_items[i].audience = self.all_items[i].audience + ', '
+              }
+              self.all_items[i].audience = self.all_items[i].audience + '성인'
+            }
+          }
+          self.apply_filter()
+        })
+  },
 }
 </script>
 

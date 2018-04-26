@@ -174,6 +174,30 @@
           <q-input v-model="form.address" />
         </q-field>
       </div>
+      <div
+        v-if="is_agit_teacher"
+        class="col-xs-10 docs-input q-mx-xl">
+        <hr>
+        <q-field
+          label="이력"
+          icon="create"
+          :label-width="3"
+          :error="$v.form.career.$error"
+          error-label="이력을 잘못 입력하였습니다."
+        >
+          <q-input v-model="form.career" type="textarea"/>
+        </q-field>
+        <q-field
+          v-if="is_admin"
+          label="승인"
+          icon="agit_teacher_approval"
+          :label-width="3"
+          :error="$v.form.agit_teacher_approval.$error"
+          error-label="이력을 잘못 입력하였습니다."
+        >
+          <q-select v-model="form.agit_teacher_approval" type="textarea" :options="agit_teacher_approval_options"/>
+        </q-field>
+      </div>
       <div class="col-xs-12 row justify-end q-my-lg">
         <div class="col-xs-4">
           <q-btn
@@ -209,7 +233,13 @@ export default {
     return {
       is_admin: false,
       is_howcs_student: false,
+      is_agit_teacher: false,
       user_id: '',
+      agit_teacher_info_id: '',
+      agit_teacher_approval_options: [
+        {label: '승인', value: true},
+        {label: '대기', value: false},
+      ],
 form: {
       username: '',
       password: '',
@@ -228,6 +258,8 @@ form: {
       mother_name: '',
       mother_rrn: '',
       address: '',
+      career: '',
+      agit_teacher_approval: '',
 },
       conditions: false,
       content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc.',
@@ -254,6 +286,8 @@ form: {
       mother_name: {},
       mother_rrn: {},
       address: {},
+      career: {},
+      agit_teacher_approval: {},
 }
   },
   props: ['action', 'id'],
@@ -364,6 +398,20 @@ form: {
             self.$router.go(-1)
           })
         }
+        if (self.is_agit_teacher === true) {
+          if (self.is_admin === true) {
+            self.$axios.put('agit_teacher_infos/' + self.agit_teacher_info_id, {
+              'approval': self.form.agit_teacher_approval,
+              'career': self.form.career,
+            }).then(function (response) {
+            })
+          } else {
+            self.$axios.put('agit_teacher_infos/' + self.agit_teacher_info_id, {
+              'career': self.form.career,
+            }).then(function (response) {
+            })
+          }
+        }
       }
     },
     convert_student: function () {
@@ -410,6 +458,12 @@ form: {
           self.form.mother_name = data.student_info.mother_name
           self.form.mother_rrn = data.student_info.mother_rrn
           self.form.address = data.student_info.address
+        }
+        if (data.hasOwnProperty('agit_teacher_info')) {
+          self.is_agit_teacher = true
+          self.agit_teacher_info_id = data.agit_teacher_info.id
+          self.form.career = data.agit_teacher_info.career
+          self.form.agit_teacher_approval = data.agit_teacher_info.approval
         }
       })
     } else if (this.action === 'new_student') {

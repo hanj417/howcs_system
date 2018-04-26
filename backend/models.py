@@ -59,24 +59,48 @@ class User(db.Model):
     def birthday_is(self, birthday_str):
         if birthday_str is None:
             return
-        birthday_list = list(map(int, birthday_str.split('-')))
+        try:
+            birthday_list = list(map(int, birthday_str.split('-')))
+        except:
+            return
+        if len(birthday_list) < 3:
+            return
         self.birthday = date(birthday_list[0], birthday_list[1], birthday_list[2])
 
     def role_new(self, new_role):
         role = []
         if self.role:
             role = literal_eval(self.role)
+        if new_role in role:
+            return
         role.append(new_role)
-        print(role)
         self.role = json.dumps(role)
 
     def role_del(self, del_role):
         role = []
         if self.role:
             role = literal_eval(self.role)
+        if del_role not in role:
+            return
         role.remove(del_role)
-        print(role)
         self.role = json.dumps(role)
+
+    def role_check(self, role):
+        if self.role is None:
+            return False
+        return role in literal_eval(self.role)
+
+    def check_priv(self, priv_name):
+        if self.role is None:
+            return
+        roles = literal_eval(self.role)
+        for role in roles:
+            privs = Privilege.query.filter_by(name=role).first()
+            if privs is None:
+                continue
+            if getattr(privs, priv_name):
+                return True
+        return False
 
     @staticmethod
     def verify_auth_token(token):
@@ -102,6 +126,8 @@ class User(db.Model):
         dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         if self.student_info:
             dic['student_info'] = self.student_info.as_dict()
+        if self.agit_teacher_info:
+            dic['agit_teacher_info'] = self.agit_teacher_info.as_dict_from_user()
         return dic
 
 class Privilege(db.Model):
@@ -141,6 +167,14 @@ class Privilege(db.Model):
     howcs_post_new = db.Column(db.Boolean, default=False)
     howcs_post_update = db.Column(db.Boolean, default=False)
     howcs_post_del = db.Column(db.Boolean, default=False)
+    agit_teacher = db.Column(db.Boolean, default=False)
+    agit_teacher_new = db.Column(db.Boolean, default=False)
+    agit_teacher_update = db.Column(db.Boolean, default=False)
+    agit_teacher_del = db.Column(db.Boolean, default=False)
+    agit_class = db.Column(db.Boolean, default=False)
+    agit_class_new = db.Column(db.Boolean, default=False)
+    agit_class_update = db.Column(db.Boolean, default=False)
+    agit_class_del = db.Column(db.Boolean, default=False)
     homepage_post = db.Column(db.Boolean, default=False)
     homepage_post_new = db.Column(db.Boolean, default=False)
     homepage_post_update = db.Column(db.Boolean, default=False)
@@ -159,6 +193,9 @@ class Privilege(db.Model):
             return True
         return False
 
+    @staticmethod
+    def categories():
+        return ['user', 'student', 'howcs_teacher', 'howcs_class', 'howcs_enrollment', 'howcs_attendance', 'howcs_student_health_record', 'howcs_post', 'agit_teacher', 'agit_class', 'homepage_post']
 
 class FamilyRelation(db.Model):
     __tablename__ = 'family_relations'
@@ -218,6 +255,9 @@ class AgitTeacherInfo(db.Model):
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     user = relationship('User', back_populates='agit_teacher_info')
+    def as_dict_from_user(self):
+        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return dic
     def as_dict(self):
         dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         dic['user'] = self.user.as_dict()
@@ -302,9 +342,10 @@ class Post(db.Model):
                     {'label':'하우하다', 'value':'story'},
                     {'label':'하우포토', 'value':'photo'}],
                 'agit': [
-                    {'label':'청소년', 'value':'teenager'},
-                    {'label':'문학', 'value':'literature'},
-                    {'label':'성인', 'value':'adult'}],
+                    {'label':'숨', 'value':'breath'},
+                    {'label':'몫', 'value':'role'},
+                    {'label':'삶', 'value':'life'},
+                    {'label':'꿈', 'value':'dream'}],
                 'howcs': [
                     {'label':'교육자료', 'value':'edu_resource'},
                     {'label':'교무자료', 'value':'academic_resource'},
@@ -322,7 +363,7 @@ class Class(db.Model):
     major_category = db.Column(db.String(64))
     minor_category = db.Column(db.String(64))
     year = db.Column(db.Integer)
-    semester = db.Column(db.Integer, nullable=True)
+    semester = db.Column(db.String(64), nullable=True)
     approval = db.Column(db.Boolean, default=False)
     time_slot = db.Column(db.String(64), nullable=True)
     audience = db.Column(db.String(64), nullable=True)
@@ -352,9 +393,10 @@ class Class(db.Model):
                     {'label':'하우하다', 'value':'story'},
                     {'label':'하우포토', 'value':'photo'}],
                 'agit': [
-                    {'label':'청소년', 'value':'teenager'},
-                    {'label':'문학', 'value':'literature'},
-                    {'label':'성인', 'value':'adult'}],
+                    {'label':'숨', 'value':'breath'},
+                    {'label':'몫', 'value':'role'},
+                    {'label':'삶', 'value':'life'},
+                    {'label':'꿈', 'value':'dream'}],
                 'howcs': [
                     {'label':'부모학교', 'value':'parent_school'},
                     {'label':'수업', 'value':'subject'},

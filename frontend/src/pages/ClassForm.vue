@@ -52,13 +52,14 @@
           label="학기"
           icon="create"
           :label-width="3">
-          <q-input v-model="semester" />
+          <q-select v-model="semester" :options="semester_option" />
         </q-field>
         <q-field
           label="수업시간"
           icon="create"
           :label-width="3">
-          <q-input v-model="time_slot" />
+          <q-select v-model="time_slot_weekday" :options="weekday" class="col-xs-3" placeholder="요일"/>
+          <q-input v-model="time_slot_hour" placeholder="시간" />
         </q-field>
         <q-field
           label="구글캘린더ID"
@@ -70,19 +71,25 @@
           label="대상"
           icon="create"
           :label-width="3">
-          <q-input v-model="audience" />
+          <q-select chips multiple v-model="audience" :options="ages" />
         </q-field>
         <q-field
           label="배경"
           icon="create"
           :label-width="3">
-          <q-input v-model="background" />
+          <q-input v-model="background" type="textarea"/>
         </q-field>
         <q-field
           label="내용"
           icon="create"
           :label-width="3">
-          <q-input v-model="content" />
+          <q-input v-model="content" type="textarea"/>
+        </q-field>
+        <q-field
+          label="승인"
+          icon="create"
+          :label-width="3">
+          <q-select :disabled="$route.name != 'class_form_edit' || !priv_del" v-model="approval" :options="approval_options"/>
         </q-field>
       </div>
       <div class="col-xs-12 row justify-end q-mt-lg">
@@ -172,12 +179,59 @@ export default {
       minor_category: '',
       year: '2018',
       semester: '',
+      semester_option : [
+        {label: '봄', value: 'spring'},
+        {label: '여름', value: 'summer'},
+        {label: '가을', value: 'fall'},
+        {label: '겨울', value: 'winter'},
+        {label: '전체', value: 'year'},
+      ],
       time_slot: '',
+      time_slot_weekday: '',
+      time_slot_hour: '',
+      weekday: [
+        {label: '월', value: 'mon'},
+        {label: '화', value: 'tue'},
+        {label: '수', value: 'wed'},
+        {label: '목', value: 'thu'},
+        {label: '금', value: 'fri'},
+        {label: '토', value: 'sat'},
+      ],
       google_calendar: '',
-      audience: '',
+      audience: [],
+      audience_min: '',
+      audience_max: '',
       background: '',
       content: '',
       save_label: '등록',
+      ages: [
+        {label: '1세', value: '1'},
+        {label: '2세', value: '2'},
+        {label: '3세', value: '3'},
+        {label: '4세', value: '4'},
+        {label: '5세', value: '5'},
+        {label: '6세', value: '6'},
+        {label: '7세', value: '7'},
+        {label: '8세', value: '8'},
+        {label: '9세', value: '9'},
+        {label: '10세', value: '10'},
+        {label: '11세', value: '11'},
+        {label: '12세', value: '12'},
+        {label: '13세', value: '13'},
+        {label: '14세', value: '14'},
+        {label: '15세', value: '15'},
+        {label: '16세', value: '16'},
+        {label: '17세', value: '17'},
+        {label: '18세', value: '18'},
+        {label: '19세', value: '19'},
+        {label: '20세', value: '20'},
+        {label: '성인', value: 'adult'},
+      ],
+      approval: false,
+      approval_options: [
+        {label: '승인', value: true},
+        {label: '대기', value: false},
+      ],
 
       search_modal: false,
       search_table_data: [],
@@ -203,33 +257,26 @@ export default {
   methods: {
     check_priv: function () {
       var self = this
-      let priv_new_query = {priv: 'howcs_class_new'}
+      let priv_new_query = {priv: this.major_category + '_class_new'}
       self.$axios.get('privileges', {params: priv_new_query})
         .then(function (response) {
           let data = response.data
           self.priv_new = data
         })
   
-      let priv_update_query = {priv: 'howcs_class_update'}
+      let priv_update_query = {priv: this.major_category + '_class_update'}
       self.$axios.get('privileges', {params: priv_update_query})
         .then(function (response) {
           let data = response.data
           self.priv_update = data
         })
   
-      let priv_del_query = {priv: 'howcs_class_del'}
+      let priv_del_query = {priv: this.major_category + '_class_del'}
       self.$axios.get('privileges', {params: priv_del_query})
         .then(function (response) {
           let data = response.data
           self.priv_del = data
         })
-
-      let priv_query = {priv: 'howcs_attendance_update'}
-      self.$axios.get('privileges', {params: priv_query})
-        .then(function (response) {
-          let data = response.data
-          self.priv = data
-      })
     },
     fetch_class_categories: function () {
       var self = this
@@ -244,6 +291,7 @@ export default {
       if (!self.priv_new)
         return
 
+      this.time_slot = this.time_slot_weekday + ',' + this.time_slot_hour
         self.$axios.post('classes', {
           'teacher_id': self.teacher.id,
           'title': self.title,
@@ -253,7 +301,7 @@ export default {
           'semester': self.semester,
           'time_slot': self.time_slot,
           'google_calendar': self.google_calendar,
-          'audience': self.audience,
+          'audience': self.audience.toString(),
           'background': self.background,
           'content': self.content
         }).then(function (response) {
@@ -266,6 +314,8 @@ export default {
       if (!self.priv_update)
         return
 
+      this.time_slot = this.time_slot_weekday + ',' + this.time_slot_hour
+
         self.$axios.put('classes/' + self.class_id, {
           'teacher_id': self.teacher.id,
           'title': self.title,
@@ -275,12 +325,43 @@ export default {
           'semester': self.semester,
           'time_slot': self.time_slot,
           'google_calendar': self.google_calendar,
-          'audience': self.audience,
+          'audience': self.audience.toString(),
           'background': self.background,
-          'content': self.content
+          'content': self.content,
+          'approval': self.approval
         }).then(function (response) {
           let data = response.data
           self.$router.go(-1)
+        })
+    },
+    class_approve: function () {
+      var self = this
+      if (!self.priv_del)
+        return
+
+      this.time_slot = this.time_slot_weekday + ',' + this.time_slot_hour
+
+        self.$axios.put('classes/' + self.class_id, {
+          'teacher_id': self.teacher.id,
+          'title': self.title,
+          'major_category': self.major_category,
+          'minor_category': self.minor_category,
+          'year': self.year,
+          'semester': self.semester,
+          'time_slot': self.time_slot,
+          'google_calendar': self.google_calendar,
+          'audience': self.audience.toString(),
+          'background': self.background,
+          'content': self.content,
+          'approval': !self.approval,
+        }).then(function (response) {
+          let data = response.data
+          self.approval = data.approval
+        if (self.approval) {
+          self.approval_str = '승인'
+        } else {
+          self.approval_str = '대기'
+        }
         })
     },
     remove: function () {
@@ -332,10 +413,18 @@ export default {
         self.year = data.year
         self.semester = data.semester
         self.time_slot = data.time_slot
+        self.time_slot_weekday = self.time_slot.split(',')[0]
+        self.time_slot_hour = self.time_slot.split(',')[1]
         self.google_calendar = data.google_calendar
-        self.audience = data.audience
+        self.audience = data.audience.split(',')
         self.background = data.background
         self.content = data.content
+        self.approval = data.approval
+        if (self.approval) {
+          self.approval_str = '승인'
+        } else {
+          self.approval_str = '대기'
+        }
       })
     }
   }
