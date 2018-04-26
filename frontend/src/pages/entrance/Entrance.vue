@@ -16,7 +16,10 @@
     <div class="container">
       <div class="row">
         <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 about__title-container">
-          <div class="project__title">2018학년도 <br>하늘빛우리학교 입학 요강</div>
+          <div class="project__title">
+            2018학년도 <br>하늘빛우리학교 입학 요강<br>
+           (2018학년도 <br> 가을학기 편입학)
+          </div>
         </div>
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 about__subtitle-container">
           <div class="project__content">
@@ -124,7 +127,8 @@
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 about__subtitle-container">
           <!--  <div class="project__subtitle">text</div> -->
           <div class="project__content">
-            <li style="margin-left:15px">1차 : 5/10(목) 오후7:30 하우부모학교 시 학교설명회(10분)</li>
+            <div style="font-size:medium;"><b>2018학년도 가을학기 편입학 및 하우스콜레 입학설명회 일정</b></div>
+            <li style="margin-left:15px">1차 : 5/10(목) 오후7:30 하우부모학교(하늘빛우리교회6층)시 학교설명회(10분)</li>
             <li style="margin-left:15px">2차 : 5/13(일) 오후3:30 하늘빛우리교회 4층 본당</li>
           </div>
         </div>
@@ -144,7 +148,7 @@
           <!--  <div class="project__subtitle">text</div> -->
           <div class="project__content">
 하우스콜레는, 홈스쿨러나 탈학교 학생 중 하우학교의 교육철학과 방향에 동의하는 청소년(13~15세 대상)을 대상으로 한 하우학교 안의 기독교대안교육과정이다. 모든 교육과정과 활동에 있어 학생의 자발성을 원칙으로 하며 학년 구분 없이 1년 단위로 교육과정을 운영한다. 하우학교의 교육과정을 바탕으로 발표, 토론, 프로젝트 수업을 연계한 자기주도형 학습을 실시하며 1월에는 해외이동학습(필리핀)을 실시한다. 교사는 지식전달자가 아니라 학습코치로서 학기가 시작되기 전 각 학생이 계획한 교과별 목표와 학점을 관리하며 학생과 부모가 작성한 학습계획표를 점검하고 자기주도적으로 학습할 수 있도록 돕는 역할을 한다. 열매나누기 때 학생 스스로 교육과정 수행 과정을 성찰하고 성취한 내용을 평가하며 이를 교사와 학부모 앞에서 발표(프리젠테이션)한다.<br>
-※ ‘하우스콜레에 관한 자세한 사항은 첨부파일을 참고해주세요.
+※ ‘하우스콜레에 관한 자세한 사항은 첨부파일을 참고해주세요. <a href="assets/file/하우스콜레.pdf"><하우스콜레 자료 내려받기></a>
           </div>
         </div>
       </div>
