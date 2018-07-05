@@ -17,36 +17,38 @@
       <div class="row">
         <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 about__title-container">
           <div class="project__title">
-            2018학년도 <br>하늘빛우리학교 입학 요강<br>
-           (2018학년도 <br> 가을학기 편입학)
+            2019학년도 <br>하늘빛우리학교 신(편)입학 요강<br>
           </div>
         </div>
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 about__subtitle-container">
           <div class="project__content">
-              <p>가. 모집정원 </p>
+              <p>가. 정원 </p>
           </div>
           <div
             id="notice_table"
             style="overflow-x:auto;">
             <table align="center">
               <tr>
-                <th colspan="5" align="center">초등과정</th>
+                <th colspan="6" align="center">초등과정</th>
                 <th align="center">과정</th>
                 <th align="center">하우스콜레</th>
               </tr>
               <tr>
-                <td align="center">예비초등반(7세)</td>
+                <td align="center">예비초등(7세)</td>
                 <td align="center">1학년</td>
                 <td align="center">2학년</td>
                 <td align="center">3학년</td>
                 <td align="center">4학년</td>
+                <td align="center">5학년</td>
                 <td align="center">학년</td>
-                <td align="center">13~15세</td>
+                <td align="center">13~16세</td>
               </tr>
               <tr>
                 <td align="center">16</td>
                 <td align="center">16</td>
-                <td align="center" colspan="2">16</td>
+                <td align="center">16</td>
+                <td align="center">16</td>
+                <td align="center">16</td>
                 <td align="center">16</td>
                 <td align="center">정원</td>
                 <td align="center">12명</td>
@@ -55,12 +57,13 @@
           </div>
           <!--  <div class="project__subtitle">text</div> -->
           <div class="project__content">
-            <li style="margin-left:15px">현재 2~3학년은 통합학년으로 구성되어 있습니다. 단, 지원자가 많을 경우 학년을 분리할 수도 있습니다.</li>
-            <li style="margin-left:15px">각 학년별 담임교사 외 수학(수와논리), 영어, 음악, 체육교과의 경우 교과전담교사가 교육합니다.</li>
-            <li style="margin-left:15px">하우스콜레(HowSkole)는 13~15세를 위한 무학년제 자기주도형교육과정으로 운영하며 하우학교 중등과정(2020학년도 모집 예정)에 우선 편입학할 수 있습니다. 단, 적정인원이 모집되지 않을 경우 열리지 않을 수도 있습니다.</li><br>
+            <li style="margin-left:15px">각 학년별 담임교사 외 수학(수와논리), 영어, 음악, 미술, 체육교과의 경우 교과전담교사가 교육합니다.</li>
+            <li style="margin-left:15px">하우스콜레(HowSkole)는 13~16세를 위한 무학년제 자기주도형교육과정으로 운영하며 하우학교 중등과정(2020학년도 모집 예정)에 우선 편입학할 수 있습니다.</li><br>
+            ※ 하우스콜레의 경우 수시로 지원 및 입학이 가능합니다.<br>
+            ※ 2018 가을학기 편입학 전형도 동일한 일정으로 진행합니다.<br><br><br>
             <p>나. 지원 자격</p>
             <li style="margin-left:15px">기독교교육에 동의하며 본교가 추구하는 교육철학과 핵심가치에 적극적으로 동의하는 부모의 자녀</li>
-            <li style="margin-left:15px">2~4학년 편입 지원 학생은 이전 학년 과정을 이수했거나 해당 학력이 있다고 인정된 학생</li><br>
+            <li style="margin-left:15px">2~5학년 편입 지원 학생은 이전 학년 과정을 이수했거나 해당 학력이 있다고 인정된 학생</li><br>
             <p>다. 모집일정 및 절차</p>
           </div>
           <div
@@ -68,44 +71,32 @@
             style="overflow-x:auto;">
             <table align="center">
               <tr>
-                <th></th>
                 <th align="center">원서접수 마감</th>
-                <th align="center">하우만나다<br>(선발캠프)</th>
-                <th align="center">부모면접</th>
+                <th align="center">여름캠프</th>
+                <th align="center">가족면접</th>
                 <th align="center">합격자발표</th>
                 <th align="center">합격자 등록</th>
-                <th align="center">등교</th>
               </tr>
               <tr>
-                <td align="center">편입학</td>
-                <td align="center">5/24(목)17시</td>
-                <td align="center" rowspan="2">5/26(토)<br>10:00~15:00</td>
-                <td align="center">5/26(토)~30(수)</td>
-                <td align="center">5/31(목)</td>
-                <td align="center">6/14(목)</td>
-                <td align="center">8/20(월)</td>
-              </tr>
-              <tr>
-                <td align="center">스콜레</td>
-                <td align="center">5/21(월)17시</td>
-                <td align="center">5/23(수)~26(토)</td>
-                <td align="center">5/28(월)</td>
-                <td align="center">5/31(목)</td>
-                <td align="center">6/1(금)</td>
+                <td align="center">~7/19(목)17시</td>
+                <td align="center">7/24(화)~26(목)</td>
+                <td align="center">7/25(수)~27(금)</td>
+                <td align="center">7/30(월)</td>
+                <td align="center">~8/9(목)</td>
               </tr>
             </table>
           </div>
           <div class="project__content">
-            <li style="margin-left:15px">부모면접은 원서접수 완료시 선택하며 면접시간은 30분, 사전질문지 작성 포함 약 1시간소요</li>
-            <li style="margin-left:15px">합격자 발표는 개별 문자메시지로 알림, 합격자 등록은 입학금 및 가을학기(하우스콜레의 경우 여름학기) 교육비 납부</li><br>
+            <li style="margin-left:15px">가족면접은 원서접수 완료시 선택하며 면접시간은 30분, 사전질문지 작성 포함 약 1시간소요</li>
+            <li style="margin-left:15px">합격자 발표는 개별 문자메시지로 알림, 합격자 등록은 입학금 및 학기 교육비 납부</li><br>
             <p>라. 지원 서류</p>
             <ol>
             <li style="margin-left:15px"><b>입학원서</b>(지원자소개, 지원자약속 포함) <b>1부</b> 및 <b>추천서 1부 </b></li>
-            <li style="margin-left:15px"><b>감상문 1편 : 하우교육세미나 강의</b>(하늘빛우리교회 홈페이지hbwoorichurch.org ‘하늘빛방송>특별행사’나 유튜브youtube.com에서 ‘하우세미나’로 검색 후 시청 가능) <b>또는 부모학교 필독도서(기적의 사과, 대한민국 부모, 신본주의 교육, 가르침과 배움의 영성) 중 선택(A4 1쪽 분량)</b></li>
+            <li style="margin-left:15px"><b>감상문 1편 : 부모학교 필독도서(기적의 사과, 대한민국 부모, 신본주의 교육, 가르침과 배움의 영성) 중 선택(A4 1쪽 분량)</b></li>
             <li style="margin-left:15px"><b>주민등록등본 1부   </b></li>
             <li style="margin-left:15px"><b>사진</b>(반명함) <b>1장</b>(입학원서 이메일지원 시 사진 첨부가 어려운 경우에만 제출)</li>
-            <li style="margin-left:15px">편입학 및 하우스콜레 지원자(2018년 현재 2~4학년, 6~8학년)의 경우 <b>학교생활기록부(Ⅱ) 1부</b></li>
-            <li style="margin-left:15px"><b>입학전형료(선발캠프비 포함) 10만원</b>(반드시 지원자 이름으로 입금)</li>
+            <li style="margin-left:15px">편입학 및 하우스콜레 지원자(2018년 현재 2~4학년, 12~15세)의 경우 <b>학교생활기록부(Ⅱ) 1부</b></li>
+            <li style="margin-left:15px"><b>입학전형료(선발캠프비 포함) 15만원+재료비(2018학년도 현재 예비초~3학년:3만원 4학년이상:5만원, 반드시 지원자 이름으로 입금)</b></li>
             </ol>
             ※ <a href="assets/file/하우학교입학지원양식.zip">입학원서와 추천서(추천자 작성 후 직접 발송) 내려받기</a><br>
             <!--※ 입학원서와 추천서(추천자 작성 후 직접 발송)는 학교홈페이지 공지사항에서 내려받기<br>-->
@@ -127,9 +118,8 @@
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 about__subtitle-container">
           <!--  <div class="project__subtitle">text</div> -->
           <div class="project__content">
-            <div style="font-size:medium;"><b>2018학년도 가을학기 편입학 및 하우스콜레 입학설명회 일정</b></div>
-            <li style="margin-left:15px">1차 : 5/10(목) 오후7:30 하우부모학교(하늘빛우리교회6층)시 학교설명회(10분)</li>
-            <li style="margin-left:15px">2차 : 5/13(일) 오후3:30 하늘빛우리교회 4층 본당</li>
+※ 입학설명회 영상 보러가기(<a href="https://youtu.be/j6CFeTtShPI">유투브</a>)
+            
           </div>
         </div>
       </div>
