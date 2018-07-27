@@ -53,7 +53,7 @@ module.exports = function (ctx) {
     devServer: {
       // https: true,
       host: '0.0.0.0',
-      port: 6000,
+      port: 8000,
       open: false // opens browser window automatically
     },
     // framework: 'all' --- includes everything; for dev only!
@@ -61,6 +61,7 @@ module.exports = function (ctx) {
     i18n: 'ko-kr',
       components: [
     //'PostCard',
+    'QSelect',
     'QChip',
     'QCheckbox',
     'QToggle',

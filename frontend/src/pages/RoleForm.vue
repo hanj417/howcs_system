@@ -85,6 +85,8 @@ export default {
         'howcs_post': '하우학교공지',
         'agit_teacher': '아지트교사',
         'agit_class': '아지트수업',
+        'agit_enrollment': '아지트수강',
+        'agit_attendance': '아지트출석',
         'homepage_post': '홈페이지게시',
       },
       item: [],
@@ -118,7 +120,7 @@ export default {
         priv_name += "_" + col_name
       } 
       let query = {}
-      query[priv_name] = !row[col_name]
+      query[priv_name] = row[col_name]
       self.$axios.put('privileges/' + self.id, query)
         .then(function (response) {
           let data = response.data

@@ -68,9 +68,6 @@
 export default {
   data: function () {
     return {
-      privCreate: false,
-      privUpdate: false,
-      privDelete: false,
       tableData: [],
       columns: [
         { name: 'teacher_name', label: '선생님', field: function (row) { return row.teacher.name }, sortable: true, align: 'left' },
@@ -84,45 +81,22 @@ export default {
       item: []
     }
   },
-  watch: {
-    '$route.name': function (val) {
-      this.getData()
-    },
-    'major_category': function (val) {
-      this.getData()
-    },
-    'minor_category': function (val) {
-      this.getData()
-    },
-    'action': function (val) {
-      this.getData()
-    },
-    'teacher_id': function (val) {
-      this.getData()
-    }
-  },
-  props: ['major_category', 'minor_category', 'action', 'teacher_id'],
+  props: ['state', 'major_category', 'minor_category'],
   methods: {
     getData: function () {
       let query = {}
-      if (this.$route.name === 'class_all') {
-        query['major_category'] = this.major_category
-      } else if (this.$route.name === 'howcs_class_teacher') {
-        query['major_category'] = this.major_category
-        query['minor_category'] = this.minor_category
-        query['teacher_id'] = this.teacher_id
-      } else if (this.$route.name === 'class_teacher') {
-        query['major_category'] = this.major_category
-        query['teacher_id'] = this.teacher_id
-      }
+      query['major_category'] = this.major_category
+      query['minor_category'] = this.minor_category
+
       var self = this
-      self.$axios.get('classes', {params: query})
+      self.$axios.get('resource/classes', {params: query})
         .then(function (response) {
           let data = response.data
           self.tableData = data
         })
     },
     rowClick: function (row) {
+/*
       if (this.action === 'enrollment') {
         if (this.major_category == 'agit') {
           this.$router.push({name: 'agit_enrollment_class', params: {class_id: row.id}})
@@ -144,6 +118,7 @@ export default {
           this.$router.push({name: 'class_form_edit', params: {role: 'teacher', class_id: row.id, action: 'edit'}})
         }
       }
+*/
     }
   },
   created: function () {

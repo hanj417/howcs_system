@@ -47,7 +47,7 @@ def verify_token(username_or_token):
     g.user = user
     return True
 
-@app.route('/api/login', methods=['GET'])
+@app.route('/api/v1/login', methods=['GET'])
 @multi_auth.login_required
 def login_get():
     user = g.user
@@ -56,14 +56,14 @@ def login_get():
     user_info = g.user.as_dict()
     return jsonify({'user': user_info})
 
-@app.route('/api/login', methods=['POST'])
+@app.route('/api/v1/login', methods=['POST'])
 @multi_auth.login_required
 def login():
     token = g.user.generate_auth_token(3600)
     user_info = g.user.as_dict()
     return jsonify({'user': user_info, 'token': token.decode('ascii')})
 
-@app.route('/api/token')
+@app.route('/api/v1/token')
 @multi_auth.login_required
 def auth_token_new():
     token = g.user.generate_auth_token(600)
@@ -99,25 +99,97 @@ def upload_file():
 ##################################################
 # user 
 ##################################################
-@app.route('/api/users', methods=['GET'])
+@app.route('/api/v1/resource/<resource>', methods=['GET'])
 @multi_auth.login_required
-def user_all():
+def resources_read(resource):
     user = g.user
-    if not user.check_priv('user'):
+    if not user.check_priv(resource, 'read'):
         abort(403)
 
-    users = User.query
-    if 'name' in request.args:
-        users = users.filter_by(name=request.args['name'])
-    if 'role' in request.args:
-        users = users.filter(User.role.contains(request.args['role']))
-    users = users.all()
-    users_json = []
-    for user in users:
-        users_json.append(user.as_dict())
-    return jsonify(users_json)
+    print("resource read %s" % resource)
+    resource_class = globals()[resource]
+    resource_query = resource_class.query
+    for arg in request.args:
+        resource_query = result.filter(resource_class.c[arg].like(request.args[arg]))
 
-@app.route('/api/users', methods=['POST'])
+    resources = resource_query.all()
+    resources_json = []
+    for r in resources:
+        resources_json.append(r.as_dict())
+    return jsonify(resources_json)
+
+@app.route('/api/v1/resource/<resource>', methods=['POST'])
+@multi_auth.login_required
+def resource_create(resource):
+    user = g.user
+    if not user:
+        abort(400)
+    if not user.check_priv(resource, 'create'):
+        abort(403)
+    if not request.json:
+        abort(400)
+
+    resource_class = globals()[resource]
+    new_resource = resouce_class()
+    for attr in resource_class.required_attrs_for_create():
+        if attr not in request.json:
+            abort(400)
+        new_resource[attr] = request.json[attr]
+
+    for (parent_class, parent_attr, child_attr) in resource_class.parent_class():
+        parent_instance = parend_class.query.filter_by(id = request.json[child_attr]).first()
+        getattr(parent_instance, parent_attr).append(new_resource)
+    db.session.add(new_resource)
+    db.session.commit()
+
+    return jsonify({resource: new_resource.as_dict()}), 201
+
+@app.route('/api/v1/resource/<resource>/<int:id>', methods=['PUT'])
+@multi_auth.login_required
+def resource_update(resource, id):
+    user = g.user
+    if not user:
+        abort(401)
+    if not user.check_priv(resource, 'update'):
+        abort(403)
+    if not request.json:
+        abort(400)
+
+    resource_class = globals()[resource]
+    resource_query = resource_class.query.get(id)
+    if not resource_query:
+        abort(404)
+    #if agit_teacher_info.user_id != user.id:
+    #    abort(403)
+
+    for attr in resource_class.required_attrs_for_update():
+        if attr not in request.json:
+            abort(400)
+        resource_query[attr] = request.json[attr]
+         
+    db.session.add(resource_query)
+    db.session.commit()
+    return jsonify({resource: resource_query.as_dict()})
+
+@app.route('/api/v1/resource/<resource>/<int:id>', methods=['DELETE'])
+@multi_auth.login_required
+def resource_delete(id):
+    user = g.user
+    if not user:
+        abort(401)
+    if not user.check_priv(resource, 'delete'):
+        abort(403)
+
+    resource_class = globals()[resource]
+    resource_query = resource_class.query.get(id)
+    if not resource_query:
+        abort(404)
+    db.session.delete(resource_query)
+    db.session.commit()
+    return jsonify({'result': True})
+
+'''
+@app.route('/api/v1/<resource>', methods=['POST'])
 def user_new():
     # login not required
     if not request.json or 'username' not in request.json or 'password' not in request.json:
@@ -338,6 +410,14 @@ def privilege_update(id):
     privilege.agit_teacher_new = request.json.get('agit_teacher_new', privilege.agit_teacher_new)
     privilege.agit_teacher_update = request.json.get('agit_teacher_update', privilege.agit_teacher_update)
     privilege.agit_teacher_del = request.json.get('agit_teacher_del', privilege.agit_teacher_del)
+    privilege.agit_enrollment = request.json.get('agit_enrollment', privilege.agit_enrollment)
+    privilege.agit_enrollment_new = request.json.get('agit_enrollment_new', privilege.agit_enrollment_new)
+    privilege.agit_enrollment_update = request.json.get('agit_enrollment_update', privilege.agit_enrollment_update)
+    privilege.agit_enrollment_del = request.json.get('agit_enrollment_del', privilege.agit_enrollment_del)
+    privilege.agit_attendance = request.json.get('agit_attendance', privilege.agit_attendance)
+    privilege.agit_attendance_new = request.json.get('agit_attendance_new', privilege.agit_attendance_new)
+    privilege.agit_attendance_update = request.json.get('agit_attendance_update', privilege.agit_attendance_update)
+    privilege.agit_attendance_del = request.json.get('agit_attendance_del', privilege.agit_attendance_del)
     privilege.homepage_post = request.json.get('homepage_post', privilege.homepage_post)
     privilege.homepage_post_new = request.json.get('homepage_post_new', privilege.homepage_post_new)
     privilege.homepage_post_update = request.json.get('homepage_post_update', privilege.homepage_post_update)
@@ -593,11 +673,12 @@ def student_new():
 @app.route('/api/student_infos/<int:id>', methods=['PUT'])
 @multi_auth.login_required
 def student_update(id):
-    user = g.user
+    current_user = g.user
+    if not current_user.check_priv('student_update'):
+        abort(403)
+    user = User.query.get(id)
     if not user:
         abort(401)
-    if not user.check_priv('student_update'):
-        abort(403)
     if not request.json:
         abort(400)
 
@@ -902,7 +983,7 @@ def enrollment_update(class_id, student_id):
     if not enrollment:
         abort(404)
 
-    approval = request.json.get('approval', False)
+    enrollment.approval = request.json.get('approval', False)
     
     db.session.add(enrollment)
     db.session.commit()
@@ -1005,6 +1086,9 @@ def post_new():
     post.author = user
     db.session.add(post)
     db.session.commit()
+
+    post.create_user_posts()
+
     return jsonify({'post': post.as_dict()}), 201
 
 @app.route('/api/posts/<int:id>', methods=['GET'])
@@ -1224,16 +1308,12 @@ def payment_new():
         abort(400)
 
     payment = Payment()
-    for column in payment.required_columns():
-        if column not in request.json:
-            abort(400)
-
     payment.user_id = request.json.get('user_id')
     payment.cost = request.json.get('cost')
     payment.major_category = request.json.get('major_category')
     payment.year = request.json.get('year')
     payment.semester = request.json.get('semester')
-    payment.date = request.json.get('date')
+    payment.date_is(request.json.get('date'))
 
     payment.user = User.query.filter_by(id = payment.user_id).first()
     db.session.add(payment)
@@ -1249,11 +1329,11 @@ def payment_update(id):
     if not payment:
         abort(404)
 
-    payment.cost = request.json.get('cost')
-    payment.major_category = request.json.get('major_category')
-    payment.year = request.json.get('year')
-    payment.semester = request.json.get('semester')
-    payment.date = request.json.get('date')
+    payment.cost = request.json.get('cost', payment.cost)
+    payment.major_category = request.json.get('major_category', payment.major_category)
+    payment.year = request.json.get('year', payment.year)
+    payment.semester = request.json.get('semester', payment.semester)
+    payment.date_is(request.json.get('date', payment.date))
     
     db.session.add(payment)
     db.session.commit()
@@ -1423,35 +1503,66 @@ def student_health_record_del(id):
     db.session.commit()
     return jsonify({'result': True})
 
+##################################################
+# user_post 
+##################################################
+@app.route('/api/user_posts', methods=['GET'])
+@multi_auth.login_required
+def user_post_all():
+    user = g.user
+    if not user:
+        abort(401)
+    user_posts = UserPost.query
+    user_posts = user_posts.filter_by(user_id=user.id)
+    user_posts = user_posts.all()
+    user_posts_json = []
+    for user_post in user_posts:
+        user_posts_json.append(user_post.as_dict())
+    return jsonify(user_posts_json)
+        
+@app.route('/api/user_posts/<int:post_id>', methods=['DELETE'])
+@multi_auth.login_required
+def user_post_del(post_id):
+    user = g.user
+    if not user:
+        abort(401)
+    user_post = UserPost.query.filter_by(user_id = user.id, post_id = post_id).first()
+    if not user_post:
+        abort(404)
+    db.session.delete(user_post)
+    db.session.commit()
+    return jsonify({'result': True})
+'''
 
 
-@app.route('/api/menu')
+@app.route('/api/v1/menu')
 @multi_auth.login_required
 def get_menu():
     user = g.user
     if not user:
         abort(404)
 
+    new_post_num = len(user.unread_posts)
+
     menu = [
         { 'heading': '회원' },
         { 'href': 'user_form', 'params': {'action':'update'}, 'text': '회원정보', 'icon': 'account circle' },
+        { 'href': 'new_post', 'params': {}, 'text': '새글보기', 'icon': 'sms failed', 'number': new_post_num},
         #{ 'href': '/hana/class', 'params': {'major_category':'agit'}, 'text': '수강신청', 'icon': 'plus' },
         #{ 'href': '/hana/enrollment_student', 'params': {'major_category':'agit', 'id':user.id}, 'text': '수강과목', 'icon': 'pencil' },
     ]
-    '''
-    roles = literal_eval(user.role)
-    privs = {}
-    for role in roles:
-        privilege = Privilege.query.filter_by(name=role).first()
-        if privilege is None:
-            print("unknown role %s" % role)
-            continue
-        role_privs = privilege.as_dict()
-        for priv in role_privs:
-            if priv not in privs:
-                privs[priv] = role_privs[priv]
-            privs[priv] |= role_privs[priv]
-    '''
+    #roles = literal_eval(user.role)
+    #privs = {}
+    #for role in roles:
+    #    privilege = Privilege.query.filter_by(name=role).first()
+    #    if privilege is None:
+    #        print("unknown role %s" % role)
+    #        continue
+    #    role_privs = privilege.as_dict()
+    #    for priv in role_privs:
+    #        if priv not in privs:
+    #            privs[priv] = role_privs[priv]
+    #        privs[priv] |= role_privs[priv]
 
     if 'agit_student' in user.role and 'agit_teacher' not in user.role and 'admin' not in user.role:
         menu.append({ 'heading': '아지트 학생'})
@@ -1492,13 +1603,13 @@ def get_menu():
         menu.append({ 'href': 'agit_teacher', 'params': {}, 'text': '아지트 교사관리', 'icon': 'person' })
         menu.append({ 'href': 'agit_class_admin', 'params': {'major_category':'agit', 'action':'edit'}, 'text': '아지트 수업관리', 'icon': 'class' })
         menu.append({ 'href': 'class_all', 'params': {'major_category':'agit', 'action':'enrollment'}, 'text': '아지트 수강관리', 'icon': 'group add' })
-        #menu.append({ 'href': '/hana/payment', 'params': {}, 'text': '아지트 회비관리', 'icon': 'currency-krw' })
+        menu.append({ 'href': 'payment', 'params': {}, 'text': '아지트 회비관리', 'icon': 'folder' })
         menu.append({ 'href': 'student', 'params': {'action':'student_record'}, 'text': '하우학교 학생관리', 'icon': 'group add' })
         menu.append({ 'href': 'student', 'params': {'action':'student_health_record'}, 'text': '하우학교 학생 건강기록', 'icon': 'local hospital' })
         menu.append({ 'href': 'howcs_teacher', 'params': {}, 'text': '하우학교 교사관리', 'icon': 'person' })
-        menu.append({ 'href': 'class_all', 'params': {'major_category':'howcs', 'action':'edit'}, 'text': '하우학교 수업관리', 'icon': 'class' })
-        menu.append({ 'href': 'class_all', 'params': {'major_category':'howcs', 'action':'attendance'}, 'text': '하우학교 출결관리', 'icon': 'event available' })
-        menu.append({ 'href': 'class_all', 'params': {'major_category':'howcs', 'action':'enrollment'}, 'text': '하우학교 수강관리', 'icon': 'group add' })
+        menu.append({ 'href': 'class_major_list', 'params': {'major_category':'howcs', 'state':'edit'}, 'text': '하우학교 수업관리', 'icon': 'class' })
+        menu.append({ 'href': 'class_major_list', 'params': {'major_category':'howcs', 'state':'attendance'}, 'text': '하우학교 출결관리', 'icon': 'event available' })
+        menu.append({ 'href': 'class_major_list', 'params': {'major_category':'howcs', 'state':'enrollment'}, 'text': '하우학교 수강관리', 'icon': 'group add' })
         menu.append({ 'href': 'role', 'params': {}, 'text': '권한 관리', 'icon': 'lock' })
         menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'edu_resource'}, 'text': '교육자료실', 'icon': 'folder' })
         menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'academic_resource'}, 'text': '교무자료실', 'icon': 'folder open' })

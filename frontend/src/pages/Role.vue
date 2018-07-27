@@ -50,7 +50,8 @@
         slot="body"
         slot-scope="props"
         @click.native="$router.push({name:'role_form', params:{id: props.row.id}})"
-        :props="props">
+        :props="props"
+        class="cursor-pointer">
         <q-td auto-width>
           <q-checkbox
             color="primary"

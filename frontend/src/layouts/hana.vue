@@ -132,8 +132,10 @@
           <q-item :to="{name:item.href, params:item.params}">
             <q-item-side :icon='item.icon' />
             <q-item-main
-              :label='item.text'
-              class="q-body-2"/>
+              class="q-body-2">
+{{item.text}}
+              <q-chip v-if='item.number' small class="q-caption">{{item.number}}</q-chip>
+            </q-item-main>
           </q-item>
         </template>
       </template>

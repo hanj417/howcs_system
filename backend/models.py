@@ -31,18 +31,19 @@ class User(db.Model):
     church = db.Column(db.String(32), nullable=True)
     school = db.Column(db.String(32), nullable=True)
     birthday = db.Column(db.Date(), nullable=True)
-    student_info = relationship('StudentInfo', uselist=False, back_populates='user')
-    parent_info = relationship('ParentInfo', uselist=False, back_populates='user')
-    agit_teacher_info = relationship('AgitTeacherInfo', uselist=False, back_populates='user')
-    howcs_teacher_info = relationship('HowcsTeacherInfo', uselist=False, back_populates='user')
+    student_info = relationship('StudentInfo', uselist=False, back_populates='user', cascade="delete")
+    parent_info = relationship('ParentInfo', uselist=False, back_populates='user', cascade="delete")
+    agit_teacher_info = relationship('AgitTeacherInfo', uselist=False, back_populates='user', cascade="delete")
+    howcs_teacher_info = relationship('HowcsTeacherInfo', uselist=False, back_populates='user', cascade="delete")
     #children = relationship('FamilyRelation', back_populates='parent')
     #parents = relationship('FamilyRelation', back_populates='child')
 
-    teaching_classes = relationship('Class', back_populates='teacher')
-    attending_classes = relationship('Enrollment', back_populates='student')
-    posts = relationship('Post', back_populates='author')
-    payments = relationship('Payment', back_populates='user')
-    attendances = relationship('Attendance', back_populates='student')
+    teaching_classes = relationship('Class', back_populates='teacher', cascade="delete")
+    attending_classes = relationship('Enrollment', back_populates='student', cascade="delete")
+    posts = relationship('Post', back_populates='author', cascade="delete")
+    payments = relationship('Payment', back_populates='user', cascade="delete")
+    attendances = relationship('Attendance', back_populates='student', cascade="delete")
+    unread_posts = relationship('UserPost', back_populates='user', cascade="delete")
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
 
@@ -90,16 +91,18 @@ class User(db.Model):
             return False
         return role in literal_eval(self.role)
 
-    def check_priv(self, priv_name):
+    def check_priv(self, resource, action):
         if self.role is None:
             return
         roles = literal_eval(self.role)
         for role in roles:
-            privs = Privilege.query.filter_by(name=role).first()
-            if privs is None:
+            priv = Privilege.query.filter_by(name=role).first()
+            if priv is None:
                 continue
-            if getattr(privs, priv_name):
-                return True
+            priv_dict = priv.as_dict()
+            if resource not in priv_dict or action not in priv_dict[resource]:
+                continue
+            return priv_dict[resource][action]
         return False
 
     @staticmethod
@@ -124,65 +127,90 @@ class User(db.Model):
 
     def as_dict(self):
         dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
-        if self.student_info:
-            dic['student_info'] = self.student_info.as_dict()
-        if self.agit_teacher_info:
-            dic['agit_teacher_info'] = self.agit_teacher_info.as_dict_from_user()
         return dic
+
+    @staticmethod
+    def required_attrs_for_create():
+        return []
+
+    @staticmethod
+    def required_attrs_for_update():
+        return []
+
+    @staticmethod
+    def parent_class():
+        return []
+        #return [('', '')]
 
 class Privilege(db.Model):
     __tablename__ = 'privileges'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(32))
     label = db.Column(db.String(32))
-    user = db.Column(db.Boolean, default=False)
-    user_new = db.Column(db.Boolean, default=False)
+    user_create = db.Column(db.Boolean, default=False)
+    user_read = db.Column(db.Boolean, default=False)
     user_update = db.Column(db.Boolean, default=False)
-    user_del = db.Column(db.Boolean, default=False)
-    student = db.Column(db.Boolean, default=False)
-    student_new = db.Column(db.Boolean, default=False)
+    user_delete = db.Column(db.Boolean, default=False)
+    student_create = db.Column(db.Boolean, default=False)
+    student_read = db.Column(db.Boolean, default=False)
     student_update = db.Column(db.Boolean, default=False)
-    student_del = db.Column(db.Boolean, default=False)
-    howcs_teacher = db.Column(db.Boolean, default=False)
-    howcs_teacher_new = db.Column(db.Boolean, default=False)
+    student_delete = db.Column(db.Boolean, default=False)
+    howcs_teacher_create = db.Column(db.Boolean, default=False)
+    howcs_teacher_read = db.Column(db.Boolean, default=False)
     howcs_teacher_update = db.Column(db.Boolean, default=False)
-    howcs_teacher_del = db.Column(db.Boolean, default=False)
-    howcs_class = db.Column(db.Boolean, default=False)
-    howcs_class_new = db.Column(db.Boolean, default=False)
+    howcs_teacher_delete = db.Column(db.Boolean, default=False)
+    howcs_class_create = db.Column(db.Boolean, default=False)
+    howcs_class_read = db.Column(db.Boolean, default=False)
     howcs_class_update = db.Column(db.Boolean, default=False)
-    howcs_class_del = db.Column(db.Boolean, default=False)
-    howcs_enrollment = db.Column(db.Boolean, default=False)
-    howcs_enrollment_new = db.Column(db.Boolean, default=False)
+    howcs_class_delete = db.Column(db.Boolean, default=False)
+    howcs_enrollment_create = db.Column(db.Boolean, default=False)
+    howcs_enrollment_read = db.Column(db.Boolean, default=False)
     howcs_enrollment_update = db.Column(db.Boolean, default=False)
-    howcs_enrollment_del = db.Column(db.Boolean, default=False)
-    howcs_attendance = db.Column(db.Boolean, default=False)
-    howcs_attendance_new = db.Column(db.Boolean, default=False)
+    howcs_enrollment_delete = db.Column(db.Boolean, default=False)
+    howcs_attendance_create = db.Column(db.Boolean, default=False)
+    howcs_attendance_read = db.Column(db.Boolean, default=False)
     howcs_attendance_update = db.Column(db.Boolean, default=False)
-    howcs_attendance_del = db.Column(db.Boolean, default=False)
-    howcs_student_health_record = db.Column(db.Boolean, default=False)
-    howcs_student_health_record_new = db.Column(db.Boolean, default=False)
+    howcs_attendance_delete = db.Column(db.Boolean, default=False)
+    howcs_student_health_record_create = db.Column(db.Boolean, default=False)
+    howcs_student_health_record_read = db.Column(db.Boolean, default=False)
     howcs_student_health_record_update = db.Column(db.Boolean, default=False)
-    howcs_student_health_record_del = db.Column(db.Boolean, default=False)
-    howcs_post = db.Column(db.Boolean, default=False)
-    howcs_post_new = db.Column(db.Boolean, default=False)
+    howcs_student_health_record_delete = db.Column(db.Boolean, default=False)
+    howcs_post_create = db.Column(db.Boolean, default=False)
+    howcs_post_read = db.Column(db.Boolean, default=False)
     howcs_post_update = db.Column(db.Boolean, default=False)
-    howcs_post_del = db.Column(db.Boolean, default=False)
-    agit_teacher = db.Column(db.Boolean, default=False)
-    agit_teacher_new = db.Column(db.Boolean, default=False)
+    howcs_post_delete = db.Column(db.Boolean, default=False)
+    agit_teacher_create = db.Column(db.Boolean, default=False)
+    agit_teacher_read = db.Column(db.Boolean, default=False)
     agit_teacher_update = db.Column(db.Boolean, default=False)
-    agit_teacher_del = db.Column(db.Boolean, default=False)
-    agit_class = db.Column(db.Boolean, default=False)
-    agit_class_new = db.Column(db.Boolean, default=False)
+    agit_teacher_delete = db.Column(db.Boolean, default=False)
+    agit_class_create = db.Column(db.Boolean, default=False)
+    agit_class_read = db.Column(db.Boolean, default=False)
     agit_class_update = db.Column(db.Boolean, default=False)
-    agit_class_del = db.Column(db.Boolean, default=False)
-    homepage_post = db.Column(db.Boolean, default=False)
-    homepage_post_new = db.Column(db.Boolean, default=False)
+    agit_class_delete = db.Column(db.Boolean, default=False)
+    agit_enrollment_create = db.Column(db.Boolean, default=False)
+    agit_enrollment_read = db.Column(db.Boolean, default=False)
+    agit_enrollment_update = db.Column(db.Boolean, default=False)
+    agit_enrollment_delete = db.Column(db.Boolean, default=False)
+    agit_attendance_create = db.Column(db.Boolean, default=False)
+    agit_attendance_read = db.Column(db.Boolean, default=False)
+    agit_attendance_update = db.Column(db.Boolean, default=False)
+    agit_attendance_delete = db.Column(db.Boolean, default=False)
+    homepage_post_create = db.Column(db.Boolean, default=False)
+    homepage_post_read = db.Column(db.Boolean, default=False)
     homepage_post_update = db.Column(db.Boolean, default=False)
-    homepage_post_del = db.Column(db.Boolean, default=False)
+    homepage_post_delete = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+
     def as_dict(self):
-        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        #dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        resources = Privilege.resources()
+        actions = Privilege.actions()
+        dic = {}
+        for resource in resources:
+            dic[resource] = {}
+            for action in actions:
+                dic[resource][action] = getattr(self, "%s_%s" % (resource, action))
         return dic
 
     @staticmethod
@@ -194,8 +222,25 @@ class Privilege(db.Model):
         return False
 
     @staticmethod
-    def categories():
-        return ['user', 'student', 'howcs_teacher', 'howcs_class', 'howcs_enrollment', 'howcs_attendance', 'howcs_student_health_record', 'howcs_post', 'agit_teacher', 'agit_class', 'homepage_post']
+    def resources():
+        return ['user', 'student', 'howcs_teacher', 'howcs_class', 'howcs_enrollment', 'howcs_attendance', 'howcs_student_health_record', 'howcs_post', 'agit_teacher', 'agit_class', 'agit_enrollment', 'agit_attendance', 'homepage_post']
+    def resources_singular_format():
+        return {
+            'user':'user',
+            'student':'student',
+            'howcs_teacher':' ,
+            'howcs_class',
+            'howcs_enrollment',
+            'howcs_attendance',
+            'howcs_student_health_record',
+            'howcs_post',
+            'agit_teacher',
+            'agit_class',
+            'agit_enrollment',
+            'agit_attendance',
+            'homepage_post': }
+    def actions():
+        return ['create', 'read', 'update', 'delete']
 
 class FamilyRelation(db.Model):
     __tablename__ = 'family_relations'
@@ -206,8 +251,8 @@ class FamilyRelation(db.Model):
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     #parent = relationship('User', foreign_keys=[parent_id], back_populates='children')
     #child = relationship('User', foreign_keys=[child_id], back_populates='parents')
-    parent = relationship('User', foreign_keys=[parent_id], backref='children')
-    child = relationship('User', foreign_keys=[child_id], backref='parents')
+    parent = relationship('User', foreign_keys=[parent_id], backref='children', cascade="delete")
+    child = relationship('User', foreign_keys=[child_id], backref='parents', cascade="delete")
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
@@ -226,7 +271,7 @@ class StudentInfo(db.Model):
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     user = relationship('User', back_populates='student_info')
-    student_record = relationship('StudentRecord', back_populates="student_info", uselist=False)
+    student_record = relationship('StudentRecord', back_populates="student_info", uselist=False, cascade="delete")
     def as_dict(self):
         dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         if self.student_record:
@@ -290,6 +335,7 @@ class Post(db.Model):
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     author = relationship('User', back_populates='posts')
     class_ = relationship('Class', back_populates='posts')
+    unread_users = relationship('UserPost', back_populates='post', cascade="delete")
     def required_columns(self):
         return ['major_category', 'minor_category', 'title', 'body']
     def properties_new(self, new_properties):
@@ -332,6 +378,21 @@ class Post(db.Model):
         created_at_list = list(map(int, created_at_str.split('-')))
         self.created_at = datetime(created_at_list[0], created_at_list[1], created_at_list[2])
 
+    def create_user_posts(self):
+        if self.class_id is None:
+            return
+        enrollments = Enrollment.query.filter_by(class_id=self.class_id).all()
+        user_ids = []
+        for enrollment in enrollments:
+            if enrollment.student_id not in user_ids:
+                user_ids.append(enrollment.student_id)
+        for user_id in user_ids:
+            user_post = UserPost()
+            user_post.user_id = user_id
+            user_post.post_id = self.id
+            db.session.add(user_post)
+        db.session.commit()
+
     @staticmethod
     def major_categories():
         return [{'label':'홈페이지', 'value':'homepage'}, {'label':'아지트', 'value':'agit'}, {'label':'하우학교', 'value':'howcs'}]
@@ -372,8 +433,8 @@ class Class(db.Model):
     google_calendar = db.Column(db.String(256), nullable=True)
     teacher = relationship('User', back_populates='teaching_classes')
     students = relationship('Enrollment', back_populates='class_')
-    attendances = relationship('Attendance', back_populates='class_')
-    posts = relationship('Post', back_populates='class_')
+    attendances = relationship('Attendance', back_populates='class_', cascade="delete")
+    posts = relationship('Post', back_populates='class_', cascade="delete")
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     def required_columns(self):
@@ -451,18 +512,36 @@ class Payment(db.Model):
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     user = relationship('User', back_populates='payments')
+    def date_is(self, date_str):
+        if date_str is None:
+            return
+        try:
+            date_list = list(map(int, date_str.split('-')))
+        except:
+            return
+        if len(date_list) < 3:
+            return
+        self.date = date(date_list[0], date_list[1], date_list[2])
+
     def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        if self.user:
+            dic['user'] = self.user.as_dict()
+        return dic
+
+    def as_dict_from_user(self):
+        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return dic
 
 class StudentRecord(db.Model):
     __tablename__ = 'student_records'
     id = db.Column(db.Integer, primary_key=True)
     student_info_id = db.Column(db.Integer, ForeignKey('student_infos.id'))
     student_info = relationship('StudentInfo', back_populates='student_record')
-    student_annual_records = relationship('StudentAnnualRecord', back_populates='student_record')
-    student_award_records = relationship('StudentAwardRecord', back_populates='student_record')
-    student_school_registration_records = relationship('StudentSchoolRegistrationRecord', back_populates='student_record')
-    student_health_records = relationship('StudentHealthRecord', back_populates='student_record')
+    student_annual_records = relationship('StudentAnnualRecord', back_populates='student_record', cascade="delete")
+    student_award_records = relationship('StudentAwardRecord', back_populates='student_record', cascade="delete")
+    student_school_registration_records = relationship('StudentSchoolRegistrationRecord', back_populates='student_record', cascade="delete")
+    student_health_records = relationship('StudentHealthRecord', back_populates='student_record', cascade="delete")
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     def as_dict(self):
@@ -518,8 +597,8 @@ class StudentAnnualRecord(db.Model):
     content = db.Column(db.UnicodeText())
 
     student_record = relationship('StudentRecord', back_populates='student_annual_records')
-    student_attendance_records = relationship('StudentAttendanceRecord', back_populates='student_annual_record')
-    student_reading_records = relationship('StudentReadingRecord', back_populates='student_annual_record')
+    student_attendance_records = relationship('StudentAttendanceRecord', back_populates='student_annual_record', cascade="delete")
+    student_reading_records = relationship('StudentReadingRecord', back_populates='student_annual_record', cascade="delete")
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     def as_dict(self):
@@ -596,3 +675,21 @@ class StudentHealthRecord(db.Model):
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
+class UserPost(db.Model):
+    __tablename__ = 'user_posts'
+    user_id = db.Column(db.Integer, ForeignKey('users.id'), primary_key=True)
+    post_id = db.Column(db.Integer, ForeignKey('posts.id'), primary_key=True)
+    created_at = db.Column(db.DateTime(), default=datetime.now)
+    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    #parent = relationship('User', foreign_keys=[parent_id], back_populates='children')
+    #child = relationship('User', foreign_keys=[child_id], back_populates='parents')
+    user = relationship('User', back_populates='unread_posts')
+    post = relationship('Post', back_populates='unread_users')
+    def as_dict(self):
+        dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        if self.post:
+            dic['post'] = self.post.as_dict()
+        return dic
+
+    def required_columns(self):
+        return ['user_id', 'post_id']
