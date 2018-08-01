@@ -1,4 +1,6 @@
 import os
+from flask.ext.alchemydumps import AlchemyDumps, AlchemyDumpsCommand
+from flask.ext.script import Manager
 from flask import Flask
 from flask_mail import Mail
 from backend.config import Config
@@ -19,6 +21,7 @@ app.config.from_object(Config)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 100*1024*1024
 db = SQLAlchemy(app)
+manager = Manager(app)
 migrate = Migrate(app, db)
 app.config.update(dict(
     DEBUG = True,
@@ -29,7 +32,9 @@ app.config.update(dict(
 ))
 mail = Mail(app)
 
-
+# init Alchemy Dumps
+alchemydumps = AlchemyDumps(app, db)
+manager.add_command('alchemydumps', AlchemyDumpsCommand)
 
 class CustomJSONEncoder(JSONEncoder):
     def default(self, obj):
