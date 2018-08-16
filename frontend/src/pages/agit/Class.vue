@@ -19,52 +19,52 @@
 
 <div class="agit__container">
   <div id="box__blue">
-	 <div class="row">
-	
-		
+     <div class="row">
+    
+        
 
 
         <div class="col-xs-12 col-sm-5 col-md-5 col-lg-5">
-			 <div id="notice_table5"> 
-			    <p align="center"><img src="~assets/img/agit_sample.jpg" width="90%"></p>
-			  </div>
-		</div><!--end-->
+             <div id="notice_table5"> 
+                <p align="center"><img src="~assets/img/agit_sample.jpg" width="90%"></p>
+              </div>
+        </div><!--end-->
 
-		<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7">
-			 <div id="notice_table5"> 
-			    <table>
-					<tr>
-						<td width="17%">강좌명 </td>
-						<td class="agit__ftitle_bl">{{ title }}</td>
-					</tr>
-					<tr>
-						<td>길잡이 교사</td>
-						<td>{{ teacher.name }}</td>
-					</tr>
-					<tr>
-						<td width="15%">대상</td>
-						<td>{{ audience }}</td>
-					</tr>
-					<tr>
-						<td>요일/시간</td>
-						<td>{{ weekday_label[time_slot_weekday]}}/{{time_slot_hour}} </td>
-					</tr>
-					<tr>
-						<td>기간</td>
-						<td>{{year}}{{semester_label[semester]}}</td>
-					</tr>
-				</table>
-			  </div>
-		</div><!--end-->
+        <div class="col-xs-12 col-sm-7 col-md-7 col-lg-7">
+             <div id="notice_table5"> 
+                <table>
+                    <tr>
+                        <td width="17%">강좌명 </td>
+                        <td class="agit__ftitle_bl">{{ title }}</td>
+                    </tr>
+                    <tr>
+                        <td>길잡이 교사</td>
+                        <td>{{ teacher.name }}</td>
+                    </tr>
+                    <tr>
+                        <td width="15%">대상</td>
+                        <td>{{ audience }}</td>
+                    </tr>
+                    <tr>
+                        <td>요일/시간</td>
+                        <td>{{ weekday_label[time_slot_weekday]}}/{{time_slot_hour}} </td>
+                    </tr>
+                    <tr>
+                        <td>기간</td>
+                        <td>{{year}}{{semester_label[semester]}}</td>
+                    </tr>
+                </table>
+              </div>
+        </div><!--end-->
 
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			 <div class="mg15" align="center">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+             <div class="mg15" align="center">
 <q-btn label="강좌신청하기" @click="apply" />
 </div>
-		</div><!--end-->
+        </div><!--end-->
 
 
-		
+        
 
 
       </div>
@@ -82,52 +82,52 @@
 
 <div class="agit__container">
   <div id="box__gray">
-	 
-	 <div class="row">
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			 <p class="agit__title"><span class="glyphicon glyphicon-star" aria-hidden="true" style="font-size:12px"></span> 길잡이 교사 소개<p> 
-			 <div class="agit__content">
-				<p class="agit__subtitle">{{teacher.name}}</p>
+     
+     <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+             <p class="agit__title"><span class="glyphicon glyphicon-star" aria-hidden="true" style="font-size:12px"></span> 길잡이 교사 소개<p> 
+             <div class="agit__content">
+                <p class="agit__subtitle">{{teacher.name}}</p>
 <q-input hide-underline disabled v-model="teacher.agit_teacher_info.career" type="textarea" />
-			</div>
-		</div><!--end-->
+            </div>
+        </div><!--end-->
 
-	 </div>
+     </div>
 
 
 
-	 <div class="row">
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			 <p class="agit__title"><span class="glyphicon glyphicon-star" aria-hidden="true" style="font-size:12px"></span> 연락처<p> 
-			 <div class="agit__content">
+     <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+             <p class="agit__title"><span class="glyphicon glyphicon-star" aria-hidden="true" style="font-size:12px"></span> 연락처<p> 
+             <div class="agit__content">
 {{ teacher.phone }}
-			</div>
-		</div><!--end-->
+            </div>
+        </div><!--end-->
 
-	 </div>
+     </div>
 
 
 
-	 <div class="row">
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			 <p class="agit__title"><span class="glyphicon glyphicon-star" aria-hidden="true" style="font-size:12px"></span> 개설배경<p> 
-			 <div class="agit__content">
+     <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+             <p class="agit__title"><span class="glyphicon glyphicon-star" aria-hidden="true" style="font-size:12px"></span> 개설배경<p> 
+             <div class="agit__content">
 {{ background }}
-			</div>
-		</div><!--end-->
+            </div>
+        </div><!--end-->
 
-	 </div>
-	  
+     </div>
+      
 
 
 
       <div class="row">
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			 <div class="mg15" align="center">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+             <div class="mg15" align="center">
 <q-btn label="목록 보기" @click="$router.go(-1)" />
 </div>
-		</div><!--end-->
-	  </div>
+        </div><!--end-->
+      </div>
 
 
   </div>
@@ -209,7 +209,10 @@ export default {
           position:'center', timeout:100})
         return
       } 
+<<<<<<< HEAD
 
+=======
+>>>>>>> alchemy_dump
       var self = this
       self.$axios.post('enrollments/agit', {
         'class_id': self.id,
@@ -236,7 +239,10 @@ export default {
         self.audience = data.audience
         self.background = data.background
         self.content = data.content
+<<<<<<< HEAD
 
+=======
+>>>>>>> alchemy_dump
             let aud_arr = self.audience.split(',')
             self.audience = ''
             for (var j = 1; j < 21; j++) {
@@ -269,7 +275,10 @@ export default {
 * {
   box-sizing: border-box;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> alchemy_dump
 /* Style the search field */
 form.example input[type=text] {
   padding: 7px;
@@ -279,7 +288,10 @@ form.example input[type=text] {
   width: 100%;
   background: #f1f1f1;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> alchemy_dump
 /* Clear floats */
 form.example::after {
   content: "";

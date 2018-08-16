@@ -80,10 +80,16 @@
           <q-input v-model="background" type="textarea"/>
         </q-field>
         <q-field
-          label="내용"
+          label="봄 교과 내용"
           icon="create"
           :label-width="3">
-          <q-input v-model="content" type="textarea"/>
+          <q-input v-model="content.spring" />
+        </q-field>
+        <q-field
+          label="여름 교과 내용"
+          icon="create"
+          :label-width="3">
+          <q-input v-model="content.summer" />
         </q-field>
         <q-field
           label="승인"
@@ -202,7 +208,7 @@ export default {
       audience_min: '',
       audience_max: '',
       background: '',
-      content: '',
+      content: { 'spring':'', 'summer':'' },
       save_label: '등록',
       ages: [
         {label: '1세', value: '1'},
@@ -418,7 +424,7 @@ export default {
         self.google_calendar = data.google_calendar
         self.audience = data.audience.split(',')
         self.background = data.background
-        self.content = data.content
+        self.content = JSON.parse(data.content)
         self.approval = data.approval
         if (self.approval) {
           self.approval_str = '승인'

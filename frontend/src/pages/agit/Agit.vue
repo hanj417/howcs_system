@@ -78,30 +78,25 @@
           </div>
  <div class="container">
       <div class="row">
-
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 about__title-container">
           <div class="agit__title"><i class="glyphicon glyphicon-circle-arrow-right" aria-hidden="true"></i> 강좌제목</div>
     </div>
-
       </div>
     </div> -->
 
 <!--
       <div class="agit__container">
         <div class="row">
-
           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 agit__title_container">
             <div class="agit__subject"><span
               class="glyphicon glyphicon-circle-arrow-right"
               aria-hidden="true"
               style="font-size:15px"/> 강좌제목</div>
           </div>
-
           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <div
               id="notice_table3"
               style="overflow-x:auto;">
-
               <table>
                 <tr>
                   <th>어학교실</th>
@@ -121,15 +116,12 @@
                   <td><a href="#">과학2</a></td>
                   <td><a href="#">쿠킹</a></td>
                 </tr>
-
               </table>
             </div>
           </div>
-
           <div>
             <div class="space"/>
           </div>
-
         </div>
       </div>
 -->
@@ -355,19 +347,16 @@ export default {
         .then(function (response) {
           let data = response.data
           self.all_items = data
-
           let age_label = {}
           for (let i = 1; i < 21; i++) {
             age_label[i.toString()] = i.toString() + '세'
           }
           age_label['adult'] = '성인'
-
           for (let i = 0; i < self.all_items.length; i++ ) {
             let ts_arr = self.all_items[i].time_slot.split(',')
 console.log(ts_arr)
             self.all_items[i].weekday = ts_arr[0]
             self.all_items[i].time_slot = self.weekday_label[ts_arr[0]] + ' ' + ts_arr[1]
-
             let aud_arr = self.all_items[i].audience.split(',')
             self.all_items[i].audience_array = aud_arr
             self.all_items[i].audience = ''
@@ -403,7 +392,6 @@ console.log(ts_arr)
 * {
   box-sizing: border-box;
 }
-
 /* Style the search field */
 form.example input[type=text] {
   padding: 7px;
@@ -413,7 +401,6 @@ form.example input[type=text] {
   width: 100%;
   background: #f1f1f1;
 }
-
 /* Clear floats */
 form.example::after {
   content: "";

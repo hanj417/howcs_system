@@ -104,6 +104,8 @@ export default {
         this.$router.push({name: 'post_class', params: {class_id: row.class.id}})
       } else if (this.action === 'attendance') {
         this.$router.push({name: 'attendance_student', params: {student_id: row.student_id, class_id: row.class_id}})
+      } else if (this.action === 'fruit') {
+        this.$router.push({name: 'student_fruit_record', params: {action: 'view', id: row.id}})
       }
     }
   },

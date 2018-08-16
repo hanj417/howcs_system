@@ -161,6 +161,8 @@ export default {
         this.$router.push({name: 'post_class', params: {class_id: row.id}})
       } else if (this.action === 'student_health_record') {
         this.$router.push({name: 'enrollment_class_action', params: {class_id: row.id, action: 'student_health_record'}})
+      } else if (this.action === 'student_fruit_record') {
+        this.$router.push({name: 'enrollment_class_action', params: {class_id: row.id, action: 'student_fruit_record'}})
       } else if (this.action === 'edit') {
         if (this.$route.name === 'class_all') {
           this.$router.push({name: 'class_form_edit', params: {role: 'admin', class_id: row.id, action: 'edit'}})
