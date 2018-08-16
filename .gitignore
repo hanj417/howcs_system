@@ -11,10 +11,16 @@ client_secret.json
 dist/
 frontend.bak/
 frontend/.gitignore
+frontend/quasar.conf
+frontend/.quasar
+frontend/server.py
+frontend/node_modules
+frontend/src/plugin/axios.js
 migrations/
 *.py
 *.csv
 uploads/
 uwsgi.log
 wsgi.pyc
-
+howcs_system.ini
+alchemydumps

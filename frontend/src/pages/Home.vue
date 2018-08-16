@@ -445,6 +445,42 @@
       <div class="space"/>
     </div>
 
+    <div class="container landing__section landing__section--how-story">
+      <div class="section__title">
+        하우학교 2020
+      </div>
+      <div class="section__subtitle">
+        2020학년도 학교 이전 계획
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-md-6 col-lg-6">
+          <img
+            src="/assets/img/school_photo.jpg"
+            class="full-width" >
+        </div>
+
+        <div
+          class="col-sm-5 col-md-5 col-lg-5">
+          <div class="normal-text">
+위치 : 경기도 오산시 지곶동 산33-1, 260-1  <br>
+<br>
+대지면적 : 약 1,660평<br>
+ <br>
+학교시설 : 2~3층에 주로 배치<br>
+초등교실(6) 중등교실(3) 그룹실(5) 실내체육관 도서관 강당<br>
+과학/미술실 음악실 교무실 행정실 상담실 보건실 텃밭 식당<br>
+ <br>
+<a href="https://howcs.kr/story/story_view/44">※ 하우학교 2020 자세히 보기</a><br>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hidden-xs">
+      <div class="space"/>
+      <div class="space"/>
+    </div>
+
     <div class="landing__section">
       <div class="section__title">
         하우학교와 함께하는 사람들
