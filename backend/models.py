@@ -137,6 +137,10 @@ class Privilege(db.Model):
     howcs_student_health_record_new = db.Column(db.Boolean, default=False)
     howcs_student_health_record_update = db.Column(db.Boolean, default=False)
     howcs_student_health_record_del = db.Column(db.Boolean, default=False)
+    howcs_student_fruit_record = db.Column(db.Boolean, default=False)
+    howcs_student_fruit_record_new = db.Column(db.Boolean, default=False)
+    howcs_student_fruit_record_update = db.Column(db.Boolean, default=False)
+    howcs_student_fruit_record_del = db.Column(db.Boolean, default=False)
     howcs_post = db.Column(db.Boolean, default=False)
     howcs_post_new = db.Column(db.Boolean, default=False)
     howcs_post_update = db.Column(db.Boolean, default=False)
@@ -321,6 +325,8 @@ class Class(db.Model):
     title = db.Column(db.String(256))
     major_category = db.Column(db.String(64))
     minor_category = db.Column(db.String(64))
+    category = db.Column(db.String(64))
+    subject_code = db.Column(db.String(16))
     year = db.Column(db.Integer)
     semester = db.Column(db.Integer, nullable=True)
     approval = db.Column(db.Boolean, default=False)
@@ -360,15 +366,34 @@ class Class(db.Model):
                     {'label':'수업', 'value':'subject'},
                     {'label':'학급', 'value':'class'}]}
 
+    def audience_new(self, new_audience):
+        audience = []
+        if self.audience:
+            audience = literal_eval(self.audience)
+        audience.append(new_audience)
+        print(audience)
+        self.audience = json.dumps(audience)
+
+    def audience_del(self, del_audience):
+        audience = []
+        if self.audience:
+            audience = literal_eval(self.audience)
+        audience.remove(del_audience)
+        print(audience)
+        self.audience = json.dumps(audience)
+
+
 class Enrollment(db.Model):
     __tablename__ = 'enrollments'
-    class_id = db.Column(db.Integer, ForeignKey('classes.id'), primary_key=True)
-    student_id = db.Column(db.Integer, ForeignKey('users.id'), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    class_id = db.Column(db.Integer, ForeignKey('classes.id'))
+    student_id = db.Column(db.Integer, ForeignKey('users.id'))
     approval = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     class_ = relationship('Class', back_populates='students')
     student = relationship('User', back_populates='attending_classes')
+    student_fruit_records = relationship('StudentFruitRecord', back_populates='enrollment')
     def required_columns(self):
         return ['class_id']
     def as_dict(self):
@@ -478,6 +503,7 @@ class StudentAnnualRecord(db.Model):
     student_record = relationship('StudentRecord', back_populates='student_annual_records')
     student_attendance_records = relationship('StudentAttendanceRecord', back_populates='student_annual_record')
     student_reading_records = relationship('StudentReadingRecord', back_populates='student_annual_record')
+    student_fruit_records = relationship('StudentFruitRecord', back_populates='student_annual_record')
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
     def as_dict(self):
@@ -554,3 +580,17 @@ class StudentHealthRecord(db.Model):
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
+class StudentFruitRecord(db.Model):
+    __tablename__ = 'student_fruit_records'
+    id = db.Column(db.Integer, primary_key=True)
+    student_annual_record_id = db.Column(db.Integer, ForeignKey('student_annual_records.id'))
+    enrollment_id = db.Column(db.Integer, ForeignKey('enrollments.id'))
+    semester = db.Column(db.String(64), nullable=True)
+    content = db.Column(db.UnicodeText(), nullable=True)
+    enrollment = relationship('Enrollment', back_populates='student_fruit_records')
+    student_annual_record = relationship('StudentAnnualRecord', back_populates='student_fruit_records')
+    created_at = db.Column(db.DateTime(), default=datetime.now)
+    updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}

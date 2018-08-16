@@ -5,7 +5,7 @@ from flask import Flask
 from flask_mail import Mail
 from backend.config import Config
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from flask_migrate import Migrate, MigrateCommand
 from flask.json import JSONEncoder
 from datetime import datetime
 from flask import request, redirect, url_for
@@ -35,6 +35,7 @@ mail = Mail(app)
 # init Alchemy Dumps
 alchemydumps = AlchemyDumps(app, db)
 manager.add_command('alchemydumps', AlchemyDumpsCommand)
+manager.add_command('db', MigrateCommand)
 
 class CustomJSONEncoder(JSONEncoder):
     def default(self, obj):

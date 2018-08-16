@@ -1,0 +1,103 @@
+<template>
+  <q-page
+    padding
+    class="row justify-center">
+    <div
+      style="width: 600px; max-width: 90vw;"
+      class="shadow-8">
+      <div class="col-xs-12 text-center q-title text-weight-bold q-pa-md">하우학교 열매</div>
+      <div class="col-xs-10 docs-input q-mx-xl">
+        <q-field
+          label="봄 교과 내용"
+          :label-width="3">
+          <q-input v-model="content.spring" />
+        </q-field>
+        <q-field
+          label="여름 교과 내용"
+          :label-width="3">
+          <q-input v-model="content.summer" />
+        </q-field>
+      </div>
+      <div class="col-xs-10 docs-input q-mx-xl">
+        <q-table
+          :data="fruit_table_data"
+          :columns="fruit_columns"
+          row-key="id"
+          color="secondary"
+          class="col-xs-12 no-shadow"
+          dense
+        >
+          <q-tr
+            slot="body"
+            slot-scope="props"
+            :props="props"
+            @click.native="$router.push({name:'student_fruit_record_edit', params:{id:props.row.id}})"
+            class="cursor-pointer">
+            <q-td
+              v-for="col in props.cols"
+              :key="col.name"
+              :props="props">
+              {{ col.value }}
+            </q-td>
+          </q-tr>
+        </q-table>
+        <div
+          v-if="action == 'edit'"
+          class="row q-ma-md col-xs-12 justify-end">
+          <div class="col-xs-3">
+            <q-btn
+              @click="$router.push({name: 'student_fruit_record_new', params: {id:id}})"
+              label="추가" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  </q-page>
+</template>
+
+<script>
+import { LocalStorage } from 'quasar'
+import { required, email } from 'vuelidate/lib/validators'
+
+export default {
+  data: function () {
+    return {
+      content: {
+        sprint: '',
+        summer: ''},
+      fruit_table_data: [],
+      fruit_columns: [
+        { name: 'semester', label: '학기', field: 'semester', sortable: true, align: 'left' },
+        { name: 'content', label: '내용', field: 'content', sortable: true, align: 'left' },
+      ]
+    }
+  },
+  props: ['action', 'id'],
+  methods: {
+  },
+  created: function () {
+    let query = {'enrollment_id': this.id}
+    var self = this
+    self.$axios.get('student_fruit_records', {params: query}
+    ).then(function (response) {
+      let data = response.data
+      self.fruit_table_data = data
+    })
+
+    self.$axios.get('enrollments/' + this.id
+    ).then(function (response) {
+      let data = response.data
+      self.$axios.get('classes/' + data.class_id
+      ).then(function (response) {
+        let data = response.data
+        self.content = JSON.parse(data.content)
+        console.log(JSON.parse(data.content))
+      })
+    })
+    
+
+  }
+}
+</script>

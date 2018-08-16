@@ -79,10 +79,16 @@
           <q-input v-model="background" />
         </q-field>
         <q-field
-          label="내용"
+          label="봄 교과 내용"
           icon="create"
           :label-width="3">
-          <q-input v-model="content" />
+          <q-input v-model="content.spring" />
+        </q-field>
+        <q-field
+          label="여름 교과 내용"
+          icon="create"
+          :label-width="3">
+          <q-input v-model="content.summer" />
         </q-field>
       </div>
       <div class="col-xs-12 row justify-end q-mt-lg">
@@ -176,7 +182,7 @@ export default {
       google_calendar: '',
       audience: '',
       background: '',
-      content: '',
+      content: { 'spring':'', 'summer':'' },
       save_label: '등록',
 
       search_modal: false,
@@ -335,7 +341,7 @@ export default {
         self.google_calendar = data.google_calendar
         self.audience = data.audience
         self.background = data.background
-        self.content = data.content
+        self.content = JSON.parse(data.content)
       })
     }
   }

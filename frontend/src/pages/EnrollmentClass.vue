@@ -244,6 +244,8 @@ export default {
     rowClick: function (row) {
       if (this.action === 'student_health_record') {
         this.$router.push({name: 'student_health_record', params: {id: row.student.id, action: 'edit'}})
+      } else if (this.action === 'student_fruit_record') {
+        this.$router.push({name: 'student_fruit_record', params: {id: row.id, action: 'edit'}})
       }
     }
   },

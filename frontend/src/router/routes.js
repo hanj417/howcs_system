@@ -32,7 +32,8 @@ export default [
     props: {leftDrawerOpen: false},
     children: [
       { path: '', name: 'agit', component: () => import('pages/agit/Agit') },
-      { path: 'agit1', name: 'agit1', component: () => import('pages/agit/Agit1') }
+      { path: 'agit1', name: 'agit1', component: () => import('pages/agit/Agit1') },
+      { path: 'class1/:id', name: 'class1', component: () => import('pages/agit/Class'), props: true }
     ]
   },
   {
@@ -107,6 +108,11 @@ export default [
       { path: 'student_health_record/:action/:id', name: 'student_health_record', component: () => import('pages/StudentHealthRecord'), props: true },
       { path: 'student_health_record_new/:id', name: 'student_health_record_new', component: () => import('pages/StudentHealthRecordForm'), props: true },
       { path: 'student_health_record_edit/:id', name: 'student_health_record_edit', component: () => import('pages/StudentHealthRecordForm'), props: true },
+      { path: 'student_fruit_record/:action/:id', name: 'student_fruit_record', component: () => import('pages/StudentFruitRecord'), props: true },
+      { path: 'student_fruit_record_new/:id', name: 'student_fruit_record_new', component: () => import('pages/StudentFruitRecordForm'), props: true },
+      { path: 'student_fruit_record_edit/:id', name: 'student_fruit_record_edit', component: () => import('pages/StudentFruitRecordForm'), props: true },
+      { path: 'agit_class_teacher/:teacher_id/:major_category/:action', name: 'agit_class_teacher', component: () => import('pages/AgitClass'), props: true },
+      { path: 'agit_class_admin/:major_category/:action', name: 'agit_class_admin', component: () => import('pages/AgitClass'), props: true },
       { path: 'class/:major_category/:action', name: 'class_all', component: () => import('pages/Class'), props: true },
       { path: 'class_teacher/:teacher_id/:major_category/:action', name: 'class_teacher', component: () => import('pages/Class'), props: true },
       { path: 'class_teacher/:teacher_id/:major_category/:minor_category/:action', name: 'howcs_class_teacher', component: () => import('pages/Class'), props: true },
@@ -119,11 +125,12 @@ export default [
       { path: 'post_view/:id', name: 'post_view', component: () => import('pages/PostView'), props: true },
       { path: 'post_form/:action/:id', name: 'post_form', component: () => import('pages/PostForm'), props: true },
       { path: 'post_form/:action', name: 'post_form_admin', component: () => import('pages/PostForm'), props: true },
-      // { path: 'agit_teacher_application_form', name: 'agit_teacher_application_form', component: () => import('pages/AgitTeacherApplicationForm'), props: true },
-      // { path: 'agit_teacher', name: 'agit_teacher', component: () => import('pages/AgitTeacher'), props: true },
+      { path: 'agit_teacher_application', name: 'agit_teacher_application', component: () => import('pages/AgitTeacherApplication'), props: true },
+      { path: 'agit_teacher', name: 'agit_teacher', component: () => import('pages/AgitTeacher'), props: true },
       { path: 'howcs_teacher', name: 'howcs_teacher', component: () => import('pages/HowcsTeacher'), props: true },
       { path: 'enrollments/classes/:class_id', name: 'enrollment_class', component: () => import('pages/EnrollmentClass'), props: true },
       { path: 'enrollments/classes/:class_id/:action', name: 'enrollment_class_action', component: () => import('pages/EnrollmentClass'), props: true },
+      { path: 'agit_enrollments/classes/:class_id', name: 'agit_enrollment_class', component: () => import('pages/AgitEnrollmentClass'), props: true },
       { path: 'enrollments/students/:id/:major_category/:action', name: 'enrollment_student_all', component: () => import('pages/EnrollmentStudent'), props: true },
       { path: 'enrollments/students/:id/:major_category/:minor_category/:action', name: 'enrollment_student', component: () => import('pages/EnrollmentStudent'), props: true },
       { path: 'attendances/classes/:class_id', name: 'attendance_class', component: () => import('pages/AttendanceClass'), props: true },

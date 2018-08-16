@@ -52,13 +52,13 @@
         v-if="$route.name == 'class_all' && priv_new"
         round
         color="primary"
-        @click="$router.push({name:'class_form_new', params:{major_category:'howcs', role:'admin'}})"
+        @click="$router.push({name:'class_form_new', params:{major_category:'agit', role:'admin'}})"
         icon="add" />
       <q-btn
-        v-if="$route.name == 'howcs_class_teacher' && priv_new"
+        v-if="$route.name == 'agit_class_teacher' && priv_new"
         round
         color="primary"
-        @click="$router.push({name:'class_form_new', params:{major_category:'howcs', role:'teacher'}})"
+        @click="$router.push({name:'class_form_new', params:{major_category:'agit', role:'teacher'}})"
         icon="add" />
     </q-page-sticky>
   </q-page>
@@ -76,10 +76,11 @@ export default {
         { name: 'teacher_name', label: '선생님', field: function (row) { return row.teacher.name }, sortable: true, align: 'left' },
         { name: 'title', label: '제목', field: 'title', sortable: true, align: 'left' },
         { name: 'major_category', label: '대분류', field: 'major_category', sortable: true, align: 'left' },
-        { name: 'minor_category', label: '분류', field: 'minor_category', sortable: true, align: 'left' }
+        { name: 'minor_category', label: '분류', field: 'minor_category', sortable: true, align: 'left' },
+        { name: 'approval', label: '승인', field: function (row) { if (row.approval) { return "승인"} return "대기" }, sortable: true, align: 'left' },
       ],
       filter: '',
-      visible_columns: ['teacher_name', 'title', 'major_category', 'minor_category'],
+      visible_columns: ['teacher_name', 'title', 'major_category', 'minor_category', 'approval'],
       selection: 'none',
       item: []
     }
@@ -101,45 +102,37 @@ export default {
       this.fetch_data()
     }
   },
-  props: ['major_category', 'minor_category', 'action', 'teacher_id'],
+  props: ['major_category', 'action', 'teacher_id'],
   methods: {
     check_priv: function () {
       var self = this
-      let priv_new_query = {priv: 'howcs_class_new'}
+      let priv_new_query = {priv: 'agit_class_new'}
       self.$axios.get('privileges', {params: priv_new_query})
         .then(function (response) {
           let data = response.data
           self.priv_new = data
         })
   
-      let priv_update_query = {priv: 'howcs_class_update'}
+      let priv_update_query = {priv: 'agit_class_update'}
       self.$axios.get('privileges', {params: priv_update_query})
         .then(function (response) {
           let data = response.data
           self.priv_update = data
         })
   
-      let priv_del_query = {priv: 'howcs_class_del'}
+      let priv_del_query = {priv: 'agit_class_del'}
       self.$axios.get('privileges', {params: priv_del_query})
         .then(function (response) {
           let data = response.data
           self.priv_del = data
         })
-
-      let priv_query = {priv: 'howcs_attendance_update'}
-      self.$axios.get('privileges', {params: priv_query})
-        .then(function (response) {
-          let data = response.data
-          self.priv = data
-      })
     },
     fetch_data: function () {
       let query = {}
-      if (this.$route.name === 'class_all') {
+      if (this.$route.name === 'agit_class_admin') {
         query['major_category'] = this.major_category
-      } else if (this.$route.name === 'howcs_class_teacher') {
+      } else if (this.$route.name === 'agit_class_teacher') {
         query['major_category'] = this.major_category
-        query['minor_category'] = this.minor_category
         query['teacher_id'] = this.teacher_id
       } else if (this.$route.name === 'class_teacher') {
         query['major_category'] = this.major_category
@@ -161,18 +154,25 @@ export default {
         this.$router.push({name: 'post_class', params: {class_id: row.id}})
       } else if (this.action === 'student_health_record') {
         this.$router.push({name: 'enrollment_class_action', params: {class_id: row.id, action: 'student_health_record'}})
-      } else if (this.action === 'student_fruit_record') {
-        this.$router.push({name: 'enrollment_class_action', params: {class_id: row.id, action: 'student_fruit_record'}})
       } else if (this.action === 'edit') {
-        if (this.$route.name === 'class_all') {
+        if (this.$route.name === 'agit_class_admin') {
           this.$router.push({name: 'class_form_edit', params: {role: 'admin', class_id: row.id, action: 'edit'}})
         } else if (this.$route.name === 'class_teacher') {
           this.$router.push({name: 'class_form_edit', params: {role: 'teacher', class_id: row.id, action: 'edit'}})
-        } else if (this.$route.name === 'howcs_class_teacher') {
+        } else if (this.$route.name === 'agit_class_teacher') {
           this.$router.push({name: 'class_form_edit', params: {role: 'teacher', class_id: row.id, action: 'edit'}})
         }
       }
-    }
+    },
+    toggle: function (item) {
+      var self = this
+      self.$axios.put('classes/' + item.id, {
+          'approval': !item.approval
+        }).then(function (response) {
+          let data = response.data
+          self.fetch_data()
+        })
+    },
   },
   created: function () {
     this.check_priv()

@@ -339,10 +339,32 @@ def privilege_update(id):
     privilege.howcs_student_health_record_new = request.json.get('howcs_student_health_record_new', privilege.howcs_student_health_record_new)
     privilege.howcs_student_health_record_update = request.json.get('howcs_student_health_record_update', privilege.howcs_student_health_record_update)
     privilege.howcs_student_health_record_del = request.json.get('howcs_student_health_record_del', privilege.howcs_student_health_record_del)
+    privilege.howcs_student_fruit_record = request.json.get('howcs_student_fruit_record', privilege.howcs_student_fruit_record)
+    privilege.howcs_student_fruit_record_new = request.json.get('howcs_student_fruit_record_new', privilege.howcs_student_fruit_record_new)
+    privilege.howcs_student_fruit_record_update = request.json.get('howcs_student_fruit_record_update', privilege.howcs_student_fruit_record_update)
+    privilege.howcs_student_fruit_record_del = request.json.get('howcs_student_fruit_record_del', privilege.howcs_student_fruit_record_del)
     privilege.howcs_post = request.json.get('howcs_post', privilege.howcs_post)
     privilege.howcs_post_new = request.json.get('howcs_post_new', privilege.howcs_post_new)
     privilege.howcs_post_update = request.json.get('howcs_post_update', privilege.howcs_post_update)
     privilege.howcs_post_del = request.json.get('howcs_post_del', privilege.howcs_post_del)
+    '''
+    privilege.agit_class = request.json.get('agit_class', privilege.agit_class)
+    privilege.agit_class_new = request.json.get('agit_class_new', privilege.agit_class_new)
+    privilege.agit_class_update = request.json.get('agit_class_update', privilege.agit_class_update)
+    privilege.agit_class_del = request.json.get('agit_class_del', privilege.agit_class_del)
+    privilege.agit_teacher = request.json.get('agit_teacher', privilege.agit_teacher)
+    privilege.agit_teacher_new = request.json.get('agit_teacher_new', privilege.agit_teacher_new)
+    privilege.agit_teacher_update = request.json.get('agit_teacher_update', privilege.agit_teacher_update)
+    privilege.agit_teacher_del = request.json.get('agit_teacher_del', privilege.agit_teacher_del)
+    privilege.agit_enrollment = request.json.get('agit_enrollment', privilege.agit_enrollment)
+    privilege.agit_enrollment_new = request.json.get('agit_enrollment_new', privilege.agit_enrollment_new)
+    privilege.agit_enrollment_update = request.json.get('agit_enrollment_update', privilege.agit_enrollment_update)
+    privilege.agit_enrollment_del = request.json.get('agit_enrollment_del', privilege.agit_enrollment_del)
+    privilege.agit_attendance = request.json.get('agit_attendance', privilege.agit_attendance)
+    privilege.agit_attendance_new = request.json.get('agit_attendance_new', privilege.agit_attendance_new)
+    privilege.agit_attendance_update = request.json.get('agit_attendance_update', privilege.agit_attendance_update)
+    privilege.agit_attendance_del = request.json.get('agit_attendance_del', privilege.agit_attendance_del)
+    '''
     privilege.homepage_post = request.json.get('homepage_post', privilege.homepage_post)
     privilege.homepage_post_new = request.json.get('homepage_post_new', privilege.homepage_post_new)
     privilege.homepage_post_update = request.json.get('homepage_post_update', privilege.homepage_post_update)
@@ -710,7 +732,7 @@ def class_new():
     class_.google_calendar = request.json.get('google_calendar', '')
     class_.audience = request.json.get('audience', '')
     class_.background = request.json.get('background', '')
-    class_.content = request.json.get('content', '')
+    class_.content = json.dumps(request.json.get('content', '{}'))
     class_.teacher = teacher
     db.session.add(class_)
     db.session.commit()
@@ -724,6 +746,17 @@ def class_get(id):
         abort(404)
     class_dict = class_.as_dict()
     return jsonify(class_dict)
+
+@app.route('/api/classes/agit/<int:id>', methods=['GET'])
+def agit_class_get(id):
+    class_ = Class.query.get(id)
+    if not class_:
+        abort(404)
+    if class_.major_category != 'agit':
+        abort(404)
+    class_dict = class_.as_dict()
+    return jsonify(class_dict)
+
 
 @app.route('/api/classes/<int:id>', methods=['PUT'])
 @multi_auth.login_required
@@ -753,7 +786,7 @@ def class_update(id):
     class_.google_calendar = request.json.get('google_calendar')
     class_.audience = request.json.get('audience', class_.audience)
     class_.background = request.json.get('time_slot', class_.background)
-    class_.content = request.json.get('content', class_.content)
+    class_.content = json.dumps(request.json.get('content', '{}'))
     db.session.add(class_)
     db.session.commit()
     return jsonify({'class_': class_.as_dict()})
@@ -780,6 +813,7 @@ def enrollment_all():
         enrollments = enrollments.filter_by(class_id=request.args['class_id'])
     if 'student_id' in request.args:
         enrollments = enrollments.filter_by(student_id=request.args['student_id'])
+    #enrollments = enrollments.order_by('subject_code asc')
     enrollments = enrollments.all()
     enrollments_json = []
     for enrollment in enrollments:
@@ -816,9 +850,47 @@ def enrollment_new():
     db.session.commit()
     return jsonify({'enrollment': enrollment.as_dict()}), 201
 
+@app.route('/api/enrollments/agit', methods=['POST'])
+@multi_auth.login_required
+def agit_enrollment_new():
+    user = g.user
+    if not user:
+        abort(401)
+    if not request.json:
+        abort(400)
+    class_id = request.json.get('class_id')
+    student_id = user.id
+    if Enrollment.query.filter_by(class_id = class_id, student_id = student_id).first():
+        enrollment = Enrollment.query.filter_by(class_id = class_id, student_id = student_id).first()
+        return jsonify({'enrollment': enrollment.as_dict()}), 201
+        
+    enrollment = Enrollment()
+    for column in enrollment.required_columns():
+        if column not in request.json:
+            abort(400)
+    enrollment.class_id = request.json.get('class_id')
+    enrollment.student_id = user.id
+    enrollment.approval = False
+    enrollment.student = User.query.filter_by(id = enrollment.student_id).first()
+    class_ = Class.query.filter_by(id = enrollment.class_id).first()
+    class_.students.append(enrollment)
+    db.session.add(enrollment)
+    db.session.commit()
+    return jsonify({'enrollment': enrollment.as_dict()}), 201
+
+
+@app.route('/api/enrollments/<int:id>', methods=['GET'])
+@multi_auth.login_required
+def enrollment_get(id):
+    enrollment = Enrollment.query.filter_by(id = id).first()
+    if not enrollment:
+        abort(404)
+    enrollmentdict = enrollment.as_dict()
+    return jsonify(enrollmentdict)
+
 @app.route('/api/enrollments/<int:class_id>/<int:student_id>', methods=['GET'])
 @multi_auth.login_required
-def enrollment_get(class_id, student_id):
+def enrollment_get_by_class_student(class_id, student_id):
     enrollment = Enrollment.query.filter_by(class_id = class_id, student_id = student_id).first()
     if not enrollment:
         abort(404)
@@ -1355,6 +1427,107 @@ def student_health_record_del(id):
     db.session.commit()
     return jsonify({'result': True})
 
+##################################################
+# student_fruit_record 
+##################################################
+@app.route('/api/student_fruit_records', methods=['get'])
+@multi_auth.login_required
+def student_fruit_record_all():
+    user = g.user
+    if not user:
+        abort(400)
+
+    student_fruit_records = StudentFruitRecord.query
+    if 'enrollment_id' in request.args:
+        student_fruit_records = student_fruit_records.filter_by(enrollment_id=request.args['enrollment_id'])
+    student_fruit_records = student_fruit_records.all()
+    if 'student_user_id' in request.args:
+        if user.id != request.args['student_user_id']:
+            abort(400)
+        user  = User.query.filter_by(id=request.args['student_user_id']).first()
+        student_fruit_records = user.student_info.student_record.student_annual_records[0].student_fruit_records
+        student_fruit_records.sort(key=lambda x: x.subject_code)
+    student_fruit_records_json = []
+    for student_fruit_record in student_fruit_records:
+        student_fruit_records_json.append(student_fruit_record.as_dict())
+    return jsonify(student_fruit_records_json)
+        
+
+@app.route('/api/student_fruit_records', methods=['POST'])
+@multi_auth.login_required
+def student_fruit_record_new():
+    if not request.json:
+        abort(400)
+
+    user = g.user
+    if not user:
+        abort(400)
+
+    if 'enrollment_id' not in request.json:
+        abort(404)
+
+    enrollment_id = request.json.get('enrollment_id')
+    enrollment = Enrollment.query.filter_by(id = enrollment_id).first()
+
+    student_record = enrollment.student.student_info.student_record
+    student_annual_records = student_record.student_annual_records
+    if len(student_annual_records) == 0:
+        student_annual_record = StudentAnnualRecord()
+        student_annual_record.year = 2018
+        student_annual_record.content = ''
+        student_annual_records.append(student_annual_record)
+    student_annual_record = student_annual_records[0]
+
+    student_fruit_record = StudentFruitRecord()
+
+    student_fruit_record.enrollment_id = enrollment_id
+    student_fruit_record.student_annual_record_id = student_annual_record.id
+    student_fruit_record.semester = request.json.get('semester', '')
+    student_fruit_record.content = request.json.get('content', '')
+
+    enrollment.student_fruit_records.append(student_fruit_record)
+    student_annual_record.student_fruit_records.append(student_fruit_record)
+
+    db.session.add(student_fruit_record)
+    db.session.add(student_annual_record)
+    db.session.add(enrollment)
+    db.session.commit()
+    return jsonify({'student_fruit_record': student_fruit_record.as_dict()}), 201
+
+@app.route('/api/student_fruit_records/<int:id>', methods=['PUT'])
+@multi_auth.login_required
+def student_fruit_record_update(id):
+    if not request.json:
+        abort(400)
+    student_fruit_record = StudentFruitRecord.query.get(id)
+    if not student_fruit_record:
+        abort(404)
+
+    student_fruit_record.semester = request.json.get('semester', student_fruit_record.semester)
+    student_fruit_record.content = request.json.get('content', student_fruit_record.content)
+    
+    db.session.add(student_fruit_record)
+    db.session.commit()
+    return jsonify({'student_fruit_record': student_fruit_record.as_dict()})
+
+@app.route('/api/student_fruit_records/<int:id>', methods=['GET'])
+@multi_auth.login_required
+def student_fruit_record_get(id):
+    student_fruit_record = StudentFruitRecord.query.get(id)
+    if not student_fruit_record:
+        abort(404)
+    return jsonify(student_fruit_record.as_dict())
+
+@app.route('/api/student_fruit_records/<int:id>', methods=['DELETE'])
+@multi_auth.login_required
+def student_fruit_record_del(id):
+    student_fruit_record = StudentFruitRecord.query.get(id)
+    if not student_fruit_record:
+        abort(404)
+    db.session.delete(student_fruit_record)
+    db.session.commit()
+    return jsonify({'result': True})
+
 
 
 @app.route('/api/menu')
@@ -1387,20 +1560,24 @@ def get_menu():
     
         
          
-
-
-    '''
     if 'agit_student' in user.role and 'agit_teacher' not in user.role and 'admin' not in user.role:
-        menu.append({ 'href': '/hana/agit_teacher_application_form', 'params': {}, 'text': '교사 신청', 'icon': 'teach' })
+        menu.append({ 'heading': '아지트 학생'})
+        menu.append({ 'href': 'enrollment_student_all', 'params': {'major_category':'agit', 'action':'post', 'id':user.id}, 'text': '공지사항', 'icon': 'sms failed' })
+        menu.append({ 'href': 'agit_teacher_application', 'params': {}, 'text': '아지트 교사 신청', 'icon': 'account circle' })
     
     if 'agit_teacher' in user.role:
-        menu.append({ 'href': '/hana/class_teacher', 'params': {'major_category':'agit', 'id':user.id}, 'text': '수업 관리', 'icon': 'clipboard-text' })
-    '''
+        menu.append({ 'heading': '아지트 교사'})
+        menu.append({ 'href': 'agit_class_teacher', 'params': {'major_category':'agit', 'action':'edit', 'teacher_id':user.id}, 'text': '수업 목록', 'icon': 'class' })
+        menu.append({ 'href': 'class_teacher', 'params': {'major_category':'agit', 'action':'enrollment', 'teacher_id':user.id}, 'text': '수강생 관리', 'icon': 'group add' })
+        menu.append({ 'href': 'class_teacher', 'params': {'major_category':'agit', 'action':'post', 'teacher_id':user.id}, 'text': '공지사항', 'icon': 'sms failed' })
+    
     
     if 'howcs_student' in user.role:
         menu.append({ 'heading': '하우학교'})
         menu.append({ 'href': 'student_record', 'params': {'action':'view', 'id':user.id}, 'text': '인적사항', 'icon': 'assignment ind' })
         menu.append({ 'href': 'student_health_record', 'params': {'action':'view', 'id':user.id}, 'text': '건강기록부', 'icon': 'local hospital' })
+        menu.append({ 'href': 'student_fruit_record', 'params': {'major_category':'howcs', 'minor_category':'subject', 'action':'view', 'id':user.id}, 'text': '열매 나누기', 'icon': 'event available' })
+        #menu.append({ 'href': 'enrollment_student', 'params': {'major_category':'howcs', 'minor_category':'subject', 'action':'fruit', 'id':user.id}, 'text': '과목별 열매', 'icon': 'event available' })
         menu.append({ 'href': 'enrollment_student_all', 'params': {'major_category':'howcs', 'action':'post', 'id':user.id}, 'text': '공지사항', 'icon': 'sms failed' })
         menu.append({ 'href': 'enrollment_student', 'params': {'major_category':'howcs', 'minor_category':'class', 'action':'attendance', 'id':user.id}, 'text': '출결 관리', 'icon': 'event available' })
         menu.append({ 'href': 'enrollment_student', 'params': {'major_category':'howcs', 'minor_category':'parent_school', 'action':'attendance', 'id':user.id}, 'text': '부모학교', 'icon': 'wc' })
@@ -1415,6 +1592,7 @@ def get_menu():
         menu.append({ 'href': 'class_teacher', 'params': {'major_category':'howcs', 'action':'enrollment', 'teacher_id':user.id}, 'text': '수강생 관리', 'icon': 'group add' })
         menu.append({ 'href': 'class_teacher', 'params': {'major_category':'howcs', 'action':'post', 'teacher_id':user.id}, 'text': '공지사항', 'icon': 'sms failed' })
         menu.append({ 'href': 'class_teacher', 'params': {'major_category':'howcs', 'action':'student_health_record', 'teacher_id':user.id}, 'text': '건강 기록 관리', 'icon': 'local hospital' })
+        #menu.append({ 'href': 'class_teacher', 'params': {'major_category':'howcs', 'action':'student_fruit_record', 'teacher_id':user.id}, 'text': '열매 기록 관리', 'icon': 'local hospital' })
         menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'edu_resource'}, 'text': '교육자료실', 'icon': 'folder' })
         menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'academic_resource'}, 'text': '교무자료실', 'icon': 'folder open' })
     
@@ -1422,7 +1600,8 @@ def get_menu():
         menu.append({ 'heading': '관리자'})
         menu.append({ 'href': 'post_admin', 'params': {}, 'text': '글쓰기', 'icon': 'note add' })
         menu.append({ 'href': 'user', 'params': {}, 'text': '아지트 회원관리', 'icon': 'people' })
-        #menu.append({ 'href': '/hana/agit_teacher', 'params': {}, 'text': '아지트 교사관리', 'icon': 'account-plus' })
+        menu.append({ 'href': 'agit_teacher', 'params': {}, 'text': '아지트 교사관리', 'icon': 'person' })
+        menu.append({ 'href': 'agit_class_admin', 'params': {'major_category':'agit', 'action':'edit'}, 'text': '아지트 수업관리', 'icon': 'class' })
         #menu.append({ 'href': '/hana/payment', 'params': {}, 'text': '아지트 회비관리', 'icon': 'currency-krw' })
         menu.append({ 'href': 'student', 'params': {'action':'student_record'}, 'text': '하우학교 학생관리', 'icon': 'group add' })
         menu.append({ 'href': 'student', 'params': {'action':'student_health_record'}, 'text': '하우학교 학생 건강기록', 'icon': 'local hospital' })
