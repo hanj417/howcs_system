@@ -159,10 +159,6 @@ class Privilege(db.Model):
     howcs_attendance_new = db.Column(db.Boolean, default=False)
     howcs_attendance_update = db.Column(db.Boolean, default=False)
     howcs_attendance_del = db.Column(db.Boolean, default=False)
-    howcs_student_health_record = db.Column(db.Boolean, default=False)
-    howcs_student_health_record_new = db.Column(db.Boolean, default=False)
-    howcs_student_health_record_update = db.Column(db.Boolean, default=False)
-    howcs_student_health_record_del = db.Column(db.Boolean, default=False)
     howcs_student_fruit_record = db.Column(db.Boolean, default=False)
     howcs_student_fruit_record_new = db.Column(db.Boolean, default=False)
     howcs_student_fruit_record_update = db.Column(db.Boolean, default=False)
@@ -185,6 +181,10 @@ class Privilege(db.Model):
     homepage_post_del = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime(), default=datetime.now)
     updated_at = db.Column(db.DateTime(), onupdate=datetime.now)
+    howcs_student_health_record = db.Column(db.Boolean, default=False)
+    howcs_student_health_record_new = db.Column(db.Boolean, default=False)
+    howcs_student_health_record_update = db.Column(db.Boolean, default=False)
+    howcs_student_health_record_del = db.Column(db.Boolean, default=False)
     def as_dict(self):
         dic = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         return dic

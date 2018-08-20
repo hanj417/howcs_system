@@ -875,38 +875,6 @@ def agit_enrollment_new():
         abort(401)
     if not request.json:
         abort(400)
-
-    class_id = request.json.get('class_id')
-    student_id = user.id
-
-    if Enrollment.query.filter_by(class_id = class_id, student_id = student_id).first():
-        enrollment = Enrollment.query.filter_by(class_id = class_id, student_id = student_id).first()
-        return jsonify({'enrollment': enrollment.as_dict()}), 201
-        
-
-    enrollment = Enrollment()
-    for column in enrollment.required_columns():
-        if column not in request.json:
-            abort(400)
-
-    enrollment.class_id = request.json.get('class_id')
-    enrollment.student_id = user.id
-    enrollment.approval = False
-    enrollment.student = User.query.filter_by(id = enrollment.student_id).first()
-    class_ = Class.query.filter_by(id = enrollment.class_id).first()
-    class_.students.append(enrollment)
-    db.session.add(enrollment)
-    db.session.commit()
-    return jsonify({'enrollment': enrollment.as_dict()}), 201
-
-@app.route('/api/enrollments/agit', methods=['POST'])
-@multi_auth.login_required
-def agit_enrollment_new():
-    user = g.user
-    if not user:
-        abort(401)
-    if not request.json:
-        abort(400)
     class_id = request.json.get('class_id')
     student_id = user.id
     if Enrollment.query.filter_by(class_id = class_id, student_id = student_id).first():
@@ -1610,7 +1578,7 @@ def get_menu():
     if 'agit_student' in user.role and 'agit_teacher' not in user.role and 'admin' not in user.role:
         menu.append({ 'heading': '아지트 학생'})
         menu.append({ 'href': 'enrollment_student_all', 'params': {'major_category':'agit', 'action':'post', 'id':user.id}, 'text': '공지사항', 'icon': 'sms failed' })
-        menu.append({ 'href': 'agit_teacher_application', 'params': {}, 'text': '아지트 교사 신청', 'icon': 'account circle' })
+        #menu.append({ 'href': 'agit_teacher_application', 'params': {}, 'text': '아지트 교사 신청', 'icon': 'account circle' })
     
     if 'agit_teacher' in user.role:
         menu.append({ 'heading': '아지트 교사'})
@@ -1624,7 +1592,8 @@ def get_menu():
         menu.append({ 'href': 'student_health_record', 'params': {'action':'view', 'id':user.id}, 'text': '건강기록부', 'icon': 'local hospital' })
         menu.append({ 'href': 'student_fruit_record', 'params': {'major_category':'howcs', 'minor_category':'subject', 'action':'view', 'id':user.id}, 'text': '열매 나누기', 'icon': 'event available' })
         #menu.append({ 'href': 'enrollment_student', 'params': {'major_category':'howcs', 'minor_category':'subject', 'action':'fruit', 'id':user.id}, 'text': '과목별 열매', 'icon': 'event available' })
-        menu.append({ 'href': 'enrollment_student_all', 'params': {'major_category':'howcs', 'action':'post', 'id':user.id}, 'text': '공지사항', 'icon': 'sms failed' })
+        #menu.append({ 'href': 'enrollment_student_all', 'params': {'major_category':'howcs', 'action':'post', 'id':user.id}, 'text': '공지사항', 'icon': 'sms failed' })
+        menu.append({ 'href': 'enrollment_student', 'params': {'major_category':'howcs', 'minor_category':'class', 'action':'post', 'id':user.id}, 'text': '공지사항', 'icon': 'sms failed' })
         menu.append({ 'href': 'enrollment_student', 'params': {'major_category':'howcs', 'minor_category':'class', 'action':'attendance', 'id':user.id}, 'text': '출결 관리', 'icon': 'event available' })
         menu.append({ 'href': 'enrollment_student', 'params': {'major_category':'howcs', 'minor_category':'parent_school', 'action':'attendance', 'id':user.id}, 'text': '부모학교', 'icon': 'wc' })
         menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'edu_resource'}, 'text': '교육자료실', 'icon': 'folder' })

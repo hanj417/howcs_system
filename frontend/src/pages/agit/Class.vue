@@ -209,10 +209,6 @@ export default {
           position:'center', timeout:100})
         return
       } 
-<<<<<<< HEAD
-
-=======
->>>>>>> alchemy_dump
       var self = this
       self.$axios.post('enrollments/agit', {
         'class_id': self.id,
@@ -239,10 +235,6 @@ export default {
         self.audience = data.audience
         self.background = data.background
         self.content = data.content
-<<<<<<< HEAD
-
-=======
->>>>>>> alchemy_dump
             let aud_arr = self.audience.split(',')
             self.audience = ''
             for (var j = 1; j < 21; j++) {
@@ -275,10 +267,6 @@ export default {
 * {
   box-sizing: border-box;
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> alchemy_dump
 /* Style the search field */
 form.example input[type=text] {
   padding: 7px;
@@ -288,10 +276,6 @@ form.example input[type=text] {
   width: 100%;
   background: #f1f1f1;
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> alchemy_dump
 /* Clear floats */
 form.example::after {
   content: "";
