@@ -59,8 +59,7 @@
           <div class="project__content">
             <li style="margin-left:15px">각 학년별 담임교사 외 수학(수와논리), 영어, 음악, 미술, 체육교과의 경우 교과전담교사가 교육합니다.</li>
             <li style="margin-left:15px">하우스콜레(HowSkole)는 13~16세를 위한 무학년제 자기주도형교육과정으로 운영하며 하우학교 중등과정(2020학년도 모집 예정)에 우선 편입학할 수 있습니다.</li><br>
-            ※ 하우스콜레의 경우 수시로 지원 및 입학이 가능합니다.<br>
-            ※ 2018 가을학기 편입학 전형도 동일한 일정으로 진행합니다.<br><br><br>
+            ※ 하우스콜레의 경우 수시로 지원 및 입학이 가능합니다.<br><br><br>
             <p>나. 지원 자격</p>
             <li style="margin-left:15px">기독교교육에 동의하며 본교가 추구하는 교육철학과 핵심가치에 적극적으로 동의하는 부모의 자녀</li>
             <li style="margin-left:15px">2~5학년 편입 지원 학생은 이전 학년 과정을 이수했거나 해당 학력이 있다고 인정된 학생</li><br>
@@ -72,17 +71,17 @@
             <table align="center">
               <tr>
                 <th align="center">원서접수 마감</th>
-                <th align="center">여름캠프</th>
+                <th align="center">하우만나다(선발캠프)</th>
                 <th align="center">가족면접</th>
                 <th align="center">합격자발표</th>
-                <th align="center">합격자 등록</th>
+                <th align="center">합격자등록</th>
               </tr>
               <tr>
-                <td align="center">~7/19(목)17시</td>
-                <td align="center">7/24(화)~26(목)</td>
-                <td align="center">7/25(수)~27(금)</td>
-                <td align="center">7/30(월)</td>
-                <td align="center">~8/9(목)</td>
+                <td align="center">10/24(수)17시</td>
+                <td align="center">10/27(토) 09:00~15:00</td>
+                <td align="center">10/27~31(수)</td>
+                <td align="center">11/05(월)</td>
+                <td align="center">11/15(목)</td>
               </tr>
             </table>
           </div>
@@ -118,7 +117,9 @@
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 about__subtitle-container">
           <!--  <div class="project__subtitle">text</div> -->
           <div class="project__content">
-※ 입학설명회 영상 보러가기(<a href="https://youtu.be/j6CFeTtShPI">유투브</a>)
+9.29(토) 11:00 동탄중앙이음터도서관(동탄대로시범길 115)<br>
+9.30(일) 15:30 하늘빛우리교회(동탄중심상가2길 26-15)<br>
+10.04(목) 10:30 놀라운교회(동탄대로시범길148-22)<br>
             
           </div>
         </div>

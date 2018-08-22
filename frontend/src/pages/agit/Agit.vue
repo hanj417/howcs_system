@@ -69,6 +69,48 @@
       </div>
 
       <div class="agit__container">
+        <div class="page-name">아지트</div>
+        <hr class="page-name--bottom-border" >
+        <div class="normal-text">
+          <div class="edu_title">
+          수강신청 및 등록
+          </div>
+
+          <ol>
+            <li style="margin-left:15px">하우학교 홈페이지 로그인(회원가입 필요)</li>
+            <li style="margin-left:15px">홈페이지 <아지트> 메뉴에서 강좌 확인 후 수강신청</li>
+            <li style="margin-left:15px">온라인 신청이 어려울 경우 전화 신청 가능</li>
+            <li style="margin-left:15px">홈페이지 회원가입 및 입학금(10만원)을 납입한 자는 우선 수강할 수 있음</li>
+            <li style="margin-left:15px">기존에 입학금을 납입한 자는 이번 가을학기부터 강좌마다 수강료 납입</li>
+            ※ 강좌(8주 단위) 당 수강료는 4만원 <br>
+            ※ 교통비, 식비, 재료비, 악기 구입 등 활동 시 발생하는 제반 비용은 본인 부담<br>
+            <li style="margin-left:15px">신입 회원은 입학금을 납입한 해당 학기의 모든 강좌를 무료로 수강할 수 있음</li>
+            <li style="margin-left:15px">수강신청 후 수강료를 납입하면 수강확정 여부와 일정에 대한 안내를 받게 됨</li>
+          </ol> <br>
+ 
+          <b>입학금/수강료 납입계좌</b><br>
+          기업은행 504-065625-01-020 하늘빛우리교육공동체<br><br>
+ 
+          <b>문의 </b><br>
+          아지트 코디네이터 010-5703-5804<br><br><br>
+ 
+          <div class="edu_title">
+          2018가을아지트 일정
+          </div>
+          08.26~31 수강 신청 <br>
+          09.03(월) 개강, 11.03(토) 종강  <br>
+          ※ 학기 단위(8주)로 진행하나 학기 구분 없이 진행되는 강좌도 있습니다. <br><br><br>
+ 
+          <div class="edu_title">
+          누구나 재능기부를 통해 길잡이교사로 참여할 수 있습니다<br>
+          </div>
+          하우학교의 비전과 사명선언에 공감하며 ‘숨, 몫, 삶, 꿈’의 핵심가치를 이해하는 분으로 아지트를 찾는 아동과 청소년을 사랑으로 품을 수 있는 분이면 누구나 참여할 수 있습니다.<br>
+          ※ 길잡이교사는 매 학기마다 강좌를 개설해 수업을 진행합니다.<br>
+        </div>
+      </div>
+
+
+      <div class="agit__container">
         <div class="page-name">강좌소개</div>
         <hr class="page-name--bottom-border" >
       </div>
