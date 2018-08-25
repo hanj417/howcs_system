@@ -394,6 +394,14 @@ def agit_teacher_infos_all():
         agit_teacher_infos_json.append(agit_teacher_info.as_dict())
     return jsonify(agit_teacher_infos_json)
 
+@app.route('/api/agit_teacher_infos/<int:user_id>', methods=['GET'])
+def agit_teacher_infos_get(user_id):
+    agit_teacher_info = AgitTeacherInfo.query.filter_by(user_id=user_id).first()
+    if not agit_teacher_info:
+        abort(404)
+    agit_teacher_info_dict = agit_teacher_info.as_dict()
+    return jsonify(agit_teacher_info_dict)
+
 @app.route('/api/agit_teacher_infos', methods=['POST'])
 @multi_auth.login_required
 def agit_teacher_infos_new():
@@ -758,6 +766,11 @@ def agit_class_get(id):
     if class_.major_category != 'agit':
         abort(404)
     class_dict = class_.as_dict()
+    enrollments = Enrollment.query.filter_by(class_id=class_.id).all()
+    class_dict['full'] = False
+    if class_.size and class_.size > 0 and len(enrollments) >= class_.size:
+        class_dict['full'] = True
+
     return jsonify(class_dict)
 
 @app.route('/api/classes/<int:id>', methods=['PUT'])
@@ -1557,8 +1570,7 @@ def get_menu():
     menu = [
         { 'heading': '회원' },
         { 'href': 'user_form', 'params': {'action':'update'}, 'text': '회원정보', 'icon': 'account circle' },
-        #{ 'href': '/hana/class', 'params': {'major_category':'agit'}, 'text': '수강신청', 'icon': 'plus' },
-        #{ 'href': '/hana/enrollment_student', 'params': {'major_category':'agit', 'id':user.id}, 'text': '수강과목', 'icon': 'pencil' },
+        { 'href': 'enrollment_student_all', 'params': {'major_category':'agit', 'action':'view', 'id':user.id}, 'text': '아지트수강과목', 'icon': 'class' },
     ]
     '''
     roles = literal_eval(user.role)
@@ -1612,22 +1624,28 @@ def get_menu():
         menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'academic_resource'}, 'text': '교무자료실', 'icon': 'folder open' })
     
     if 'admin' in user.role:
-        menu.append({ 'heading': '관리자'})
-        menu.append({ 'href': 'post_admin', 'params': {}, 'text': '글쓰기', 'icon': 'note add' })
-        menu.append({ 'href': 'user', 'params': {}, 'text': '아지트 회원관리', 'icon': 'people' })
-        menu.append({ 'href': 'agit_teacher', 'params': {}, 'text': '아지트 교사관리', 'icon': 'person' })
-        menu.append({ 'href': 'agit_class_admin', 'params': {'major_category':'agit', 'action':'edit'}, 'text': '아지트 수업관리', 'icon': 'class' })
-        menu.append({ 'href': 'class_all', 'params': {'major_category':'agit', 'action':'enrollment'}, 'text': '아지트 수강관리', 'icon': 'group add' })
-        #menu.append({ 'href': '/hana/payment', 'params': {}, 'text': '아지트 회비관리', 'icon': 'currency-krw' })
-        menu.append({ 'href': 'student', 'params': {'action':'student_record'}, 'text': '하우학교 학생관리', 'icon': 'group add' })
-        menu.append({ 'href': 'student', 'params': {'action':'student_health_record'}, 'text': '하우학교 학생 건강기록', 'icon': 'local hospital' })
-        menu.append({ 'href': 'howcs_teacher', 'params': {}, 'text': '하우학교 교사관리', 'icon': 'person' })
-        menu.append({ 'href': 'class_all', 'params': {'major_category':'howcs', 'action':'edit'}, 'text': '하우학교 수업관리', 'icon': 'class' })
-        menu.append({ 'href': 'class_all', 'params': {'major_category':'howcs', 'action':'attendance'}, 'text': '하우학교 출결관리', 'icon': 'event available' })
-        menu.append({ 'href': 'class_all', 'params': {'major_category':'howcs', 'action':'enrollment'}, 'text': '하우학교 수강관리', 'icon': 'group add' })
-        menu.append({ 'href': 'role', 'params': {}, 'text': '권한 관리', 'icon': 'lock' })
-        menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'edu_resource'}, 'text': '교육자료실', 'icon': 'folder' })
-        menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'academic_resource'}, 'text': '교무자료실', 'icon': 'folder open' })
+        if 'agit_admin' in user.role:
+            menu.append({ 'heading': '아지트 관리자'})
+            menu.append({ 'href': 'agit_class_admin', 'params': {'major_category':'agit', 'action':'edit'}, 'text': '아지트 수업관리', 'icon': 'class' })
+            menu.append({ 'href': 'class_all', 'params': {'major_category':'agit', 'action':'enrollment'}, 'text': '아지트 수강관리', 'icon': 'group add' })
+        else:
+            menu.append({ 'heading': '관리자'})
+            menu.append({ 'href': 'post_admin', 'params': {}, 'text': '글쓰기', 'icon': 'note add' })
+            menu.append({ 'href': 'user', 'params': {}, 'text': '아지트 회원관리', 'icon': 'people' })
+            menu.append({ 'href': 'agit_teacher', 'params': {}, 'text': '아지트 교사관리', 'icon': 'person' })
+            menu.append({ 'href': 'agit_class_admin', 'params': {'major_category':'agit', 'action':'edit'}, 'text': '아지트 수업관리', 'icon': 'class' })
+            menu.append({ 'href': 'class_all', 'params': {'major_category':'agit', 'action':'enrollment'}, 'text': '아지트 수강관리', 'icon': 'group add' })
+            #menu.append({ 'href': '/hana/payment', 'params': {}, 'text': '아지트 회비관리', 'icon': 'currency-krw' })
+            menu.append({ 'href': 'student', 'params': {'action':'student_record'}, 'text': '하우학교 학생관리', 'icon': 'group add' })
+            menu.append({ 'href': 'student', 'params': {'action':'student_health_record'}, 'text': '하우학교 학생 건강기록', 'icon': 'local hospital' })
+            menu.append({ 'href': 'howcs_teacher', 'params': {}, 'text': '하우학교 교사관리', 'icon': 'person' })
+            menu.append({ 'href': 'class_all', 'params': {'major_category':'howcs', 'action':'edit'}, 'text': '하우학교 수업관리', 'icon': 'class' })
+            menu.append({ 'href': 'class_all', 'params': {'major_category':'howcs', 'action':'attendance'}, 'text': '하우학교 출결관리', 'icon': 'event available' })
+            menu.append({ 'href': 'class_all', 'params': {'major_category':'howcs', 'action':'enrollment'}, 'text': '하우학교 수강관리', 'icon': 'group add' })
+            menu.append({ 'href': 'role', 'params': {}, 'text': '권한 관리', 'icon': 'lock' })
+            menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'edu_resource'}, 'text': '교육자료실', 'icon': 'folder' })
+            menu.append({ 'href': 'resource', 'params': {'major_category':'howcs', 'minor_category':'academic_resource'}, 'text': '교무자료실', 'icon': 'folder open' })
+
     return jsonify(menu)
 
 @app.route('/', defaults={'path': ''})

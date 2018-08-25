@@ -26,7 +26,7 @@
 
         <div class="col-xs-12 col-sm-5 col-md-5 col-lg-5">
              <div id="notice_table5"> 
-                <p align="center"><img src="~assets/img/agit_sample.jpg" width="90%"></p>
+                <p align="center"><img :src="img" width="90%"></p>
               </div>
         </div><!--end-->
 
@@ -59,7 +59,15 @@
 
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
              <div class="mg15" align="center">
+<template v-if="enrolled">
+<q-btn label="강좌신청완료"  disable="true"/>
+</template>
+<template v-else-if="full">
+<q-btn label="수강인원초과" disable="true"/>
+</template>
+<template v-else>
 <q-btn label="강좌신청하기" @click="apply" />
+</template>
 </div>
         </div><!--end-->
 
@@ -88,7 +96,7 @@
              <p class="agit__title"><span class="glyphicon glyphicon-star" aria-hidden="true" style="font-size:12px"></span> 길잡이 교사 소개<p> 
              <div class="agit__content">
                 <p class="agit__subtitle">{{teacher.name}}</p>
-<q-input hide-underline disabled v-model="teacher.agit_teacher_info.career" type="textarea" />
+<q-input hide-underline disabled v-model="agit_teacher_info.career" type="textarea" />
             </div>
         </div><!--end-->
 
@@ -96,15 +104,6 @@
 
 
 
-     <div class="row">
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-             <p class="agit__title"><span class="glyphicon glyphicon-star" aria-hidden="true" style="font-size:12px"></span> 연락처<p> 
-             <div class="agit__content">
-{{ teacher.phone }}
-            </div>
-        </div><!--end-->
-
-     </div>
 
 
 
@@ -154,6 +153,8 @@ export default {
   data: function () {
     return {
       teacher: {name: '' },
+      img: '',
+      agit_teacher_info: {career: '' },
       title: '',
       minor_categories: [],
       minor_category: '',
@@ -181,6 +182,8 @@ export default {
       audience: [],
       audience_min: '',
       audience_max: '',
+      enrolled: false,
+      full: false,
       background: '',
       content: '',
       semester_label: {
@@ -219,10 +222,27 @@ export default {
   },
   created: function () {
       var self = this
+      let loggedIn = LocalStorage.has('user_')
+      if (loggedIn) {
+        let user = LocalStorage.get.item('user_')
+        self.$axios.get('enrollments/' + self.id + '/' + user.id
+        ).then(function (response) {
+            let data = response.data
+            self.enrolled = true
+        })
+      }
+
       self.$axios.get('classes/agit/' + self.id
       ).then(function (response) {
         let data = response.data
         self.teacher = data.teacher
+        self.$axios.get('agit_teacher_infos/' + self.teacher.id
+        ).then(function (response) {
+            let data = response.data
+            self.agit_teacher_info = data
+        })
+        
+        self.img = "/assets/img/" + data.subject_code + ".jpg"
         self.title = data.title
         self.major_category = data.major_category
         self.minor_category = data.minor_category
@@ -233,9 +253,10 @@ export default {
         self.time_slot_hour = self.time_slot.split(',')[1]
         self.google_calendar = data.google_calendar
         self.audience = data.audience
-        self.background = data.background
+        self.background = data.content
         self.content = data.content
-            let aud_arr = self.audience.split(',')
+        self.full = data.full
+            let aud_arr = JSON.parse(data.audience)
             self.audience = ''
             for (var j = 1; j < 21; j++) {
               if (aud_arr.includes(j.toString())) {

@@ -58,8 +58,13 @@ export default {
         { name: 'title', label: '제목', field: function (row) { return row.class.title }, sortable: true, align: 'left' },
         { name: 'teacher_name', label: '선생님', field: function (row) { return row.class.teacher.name }, sortable: true, align: 'left' }
       ],
+      agit_columns: [
+        { name: 'title', label: '제목', field: function (row) { return row.class.title }, sortable: true, align: 'left' },
+        { name: 'teacher_name', label: '선생님', field: function (row) { return row.class.teacher.name }, sortable: true, align: 'left' },
+        { name: 'time_slot', label: '시간', field: function (row) { return row.class.time_slot}, sortable: true, align: 'left' }
+      ],
       filter: '',
-      visible_columns: ['minor_category', 'title', 'teacher_name'],
+      visible_columns: ['minor_category', 'title', 'teacher_name', 'time_slot'],
       item: [],
       major_categories: [],
       minor_categories: []
@@ -122,6 +127,9 @@ export default {
         self.fetch_data()
       })
     })
+    if (this.major_category === 'agit') {
+      this.columns = this.agit_columns
+    }
   }
 }
 </script>

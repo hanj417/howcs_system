@@ -222,7 +222,7 @@
           <div class="col-xs-12 col-sm-5 col-md-5 col-lg-5">
             <div id="notice_table5">
               <p align="center"><img
-                src="~assets/img/agit_sample.jpg"
+                :src="item.img"
                 width="90%"></p>
             </div>
           </div><!--end-->
@@ -395,13 +395,15 @@ export default {
           }
           age_label['adult'] = '성인'
           for (let i = 0; i < self.all_items.length; i++ ) {
+            self.all_items[i].img = "/assets/img/" + self.all_items[i].subject_code + ".jpg"
             let ts_arr = self.all_items[i].time_slot.split(',')
 console.log(ts_arr)
             self.all_items[i].weekday = ts_arr[0]
             self.all_items[i].time_slot = self.weekday_label[ts_arr[0]] + ' ' + ts_arr[1]
-            let aud_arr = self.all_items[i].audience.split(',')
+            let aud_arr = JSON.parse(self.all_items[i].audience)
             self.all_items[i].audience_array = aud_arr
             self.all_items[i].audience = ''
+console.log(aud_arr)
             for (var j = 1; j < 21; j++) {
               if (aud_arr.includes(j.toString())) {
                 self.all_items[i].audience = j.toString()

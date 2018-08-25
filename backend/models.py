@@ -373,6 +373,7 @@ class Class(db.Model):
     approval = db.Column(db.Boolean, default=False)
     time_slot = db.Column(db.String(64), nullable=True)
     audience = db.Column(db.String(64), nullable=True)
+    size = db.Column(db.Integer)
     background = db.Column(db.UnicodeText(), nullable=True)
     content = db.Column(db.UnicodeText(), nullable=True)
     google_calendar = db.Column(db.String(256), nullable=True)
