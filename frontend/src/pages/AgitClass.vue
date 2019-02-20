@@ -138,6 +138,7 @@ export default {
         query['major_category'] = this.major_category
         query['teacher_id'] = this.teacher_id
       }
+      query['semester'] = '겨울'
       var self = this
       self.$axios.get('classes', {params: query})
         .then(function (response) {

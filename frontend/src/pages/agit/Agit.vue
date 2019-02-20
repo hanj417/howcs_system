@@ -243,6 +243,10 @@
                   <td>{{ item.audience }}</td>
                 </tr>
                 <tr>
+                  <td>최대인원수</td>
+                  <td>{{ item.size }}</td>
+                </tr>
+                <tr>
                   <td>요일/시간</td>
                   <td>{{ item.time_slot}}</td>
                 </tr>
@@ -384,6 +388,7 @@ export default {
   created: function() {
       let query = {}
       query['major_category'] = 'agit'
+      query['semester'] = '겨울'
       var self = this
       self.$axios.get('classes', {params: query})
         .then(function (response) {
@@ -396,6 +401,11 @@ export default {
           age_label['adult'] = '성인'
           for (let i = 0; i < self.all_items.length; i++ ) {
             self.all_items[i].img = "/assets/img/" + self.all_items[i].subject_code + ".jpg"
+            if (self.all_items[i].size == 0) {
+                self.all_items[i].size = '제한없음'
+            } else {
+                self.all_items[i].size = self.all_items[i].size.toString() + '명'
+            }
             let ts_arr = self.all_items[i].time_slot.split(',')
 console.log(ts_arr)
             self.all_items[i].weekday = ts_arr[0]

@@ -495,19 +495,24 @@
         <div class="social-media__icon-container--big">
           <p align="center">
             <a
-              href="#"
+              href="http://www.hbwoorichurch.org"
               target="_blank"><img
                 src="~assets/img/logoshow1.jpg"
                 class="social-media__icon--big" ></a>
             <a
-              href="#"
+              href="http://cedi.or.kr"
               target="_blank"><img
                 src="~assets/img/logoshow2.jpg"
                 class="social-media__icon--big" ></a>
             <a
-              href="#"
+              href="https://www.goodteacher.org"
               target="_blank"><img
                 src="~assets/img/logoshow3.jpg"
+                class="social-media__icon--big" ></a>
+            <a
+              href="http://www.wgst.ac.kr"
+              target="_blank"><img
+                src="~assets/img/logoshow4.gif"
                 class="social-media__icon--big" ></a>
           </p>
         </div>

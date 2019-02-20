@@ -700,6 +700,8 @@ def class_all():
         classes = classes.filter_by(major_category=request.args['major_category'])
     if 'minor_category' in request.args:
         classes = classes.filter_by(minor_category=request.args['minor_category'])
+    if 'semester' in request.args:
+        classes = classes.filter_by(semester=request.args['semester'])
     if 'id' in request.args:
         classes = classes.filter_by(id=request.args['id'])
     if 'teacher_id' in request.args:
@@ -847,12 +849,30 @@ def enrollment_all():
     #enrollments = enrollments.order_by('subject_code asc')
     enrollments = enrollments.all()
     enrollments_json = []
+
+    if 'class_id' in request.args and 'student_id' in request.args:
+        for enrollment in enrollments:
+            if enrollment.class_.major_category == 'agit':
+                if enrollment.class_.size == 0:
+                    enrollment.approval = True
+                else:
+                    e_sort = Enrollment.query.filter_by(class_id=request.args['class_id']).order_by('created_at asc').all()
+                    enrollment.approval = False
+                    i = 0
+                    for e in e_sort:
+                        if e.student_id == request.args['student_id'] and i < enrollment.class_.size:
+                            enrollment.approval = True
+                        i += 1
+
     for enrollment in enrollments:
         if 'major_category' in request.args and enrollment.class_.major_category != request.args.get('major_category'):
             continue
         if 'minor_category' in request.args and enrollment.class_.minor_category != request.args.get('minor_category'):
             continue
+        if 'semester' in request.args and enrollment.class_.semester != request.args.get('semester'):
+            continue
         enrollments_json.append(enrollment.as_dict())
+
     return jsonify(enrollments_json)
         
 

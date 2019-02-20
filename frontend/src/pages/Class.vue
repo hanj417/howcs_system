@@ -137,6 +137,9 @@ export default {
       let query = {}
       if (this.$route.name === 'class_all') {
         query['major_category'] = this.major_category
+        if (this.major_category === 'agit') {
+          query['semester'] = '겨울'
+        }
       } else if (this.$route.name === 'howcs_class_teacher') {
         query['major_category'] = this.major_category
         query['minor_category'] = this.minor_category

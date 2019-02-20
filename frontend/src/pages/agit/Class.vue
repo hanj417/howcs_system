@@ -46,6 +46,10 @@
                         <td>{{ audience }}</td>
                     </tr>
                     <tr>
+                      <td>최대인원수</td>
+                      <td>{{ size }}</td>
+                    </tr>
+                    <tr>
                         <td>요일/시간</td>
                         <td>{{ weekday_label[time_slot_weekday]}}/{{time_slot_hour}} </td>
                     </tr>
@@ -63,7 +67,7 @@
 <q-btn label="강좌신청완료"  disable="true"/>
 </template>
 <template v-else-if="full">
-<q-btn label="수강인원초과" disable="true"/>
+<q-btn label="수강인원초과/대기신청"  @click="apply_wait" />
 </template>
 <template v-else>
 <q-btn label="강좌신청하기" @click="apply" />
@@ -184,6 +188,7 @@ export default {
       audience_max: '',
       enrolled: false,
       full: false,
+      size: '',
       background: '',
       content: '',
       semester_label: {
@@ -205,6 +210,22 @@ export default {
   },
   props: ['id'],
   methods: {
+    apply_wait: function() {
+      let loggedIn = LocalStorage.has('user_')
+      if (!loggedIn) {
+        this.$q.notify({message:'로그인이 필요합니다',
+          position:'center', timeout:100})
+        return
+      } 
+      this.$q.notify({message:'대기 신청하였습니다',
+        position:'center', timeout:100})
+      var self = this
+      self.$axios.post('enrollments/agit', {
+        'class_id': self.id,
+      }).then(function (response) {
+        self.$router.go(-1)
+      })
+    },
     apply: function() {
       let loggedIn = LocalStorage.has('user_')
       if (!loggedIn) {
@@ -242,6 +263,11 @@ export default {
             self.agit_teacher_info = data
         })
         
+            if (data.size == 0) {
+                self.size = '제한없음'
+            } else {
+                self.size = data.size.toString() + '명'
+            }
         self.img = "/assets/img/" + data.subject_code + ".jpg"
         self.title = data.title
         self.major_category = data.major_category

@@ -17,7 +17,7 @@
       <div class="row">
         <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 about__title-container">
           <div class="project__title">
-            2019학년도 <br>하늘빛우리학교 신(편)입학 요강<br>
+            2019학년도 <br>하늘빛우리학교 신(편)입학 요강(추가)<br>
           </div>
         </div>
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 about__subtitle-container">
@@ -51,7 +51,7 @@
                 <td align="center">16</td>
                 <td align="center">16</td>
                 <td align="center">정원</td>
-                <td align="center">12명</td>
+                <td align="center">16명</td>
               </tr>
             </table>
           </div>
@@ -62,7 +62,7 @@
             ※ 하우스콜레의 경우 수시로 지원 및 입학이 가능합니다.<br><br><br>
             <p>나. 지원 자격</p>
             <li style="margin-left:15px">기독교교육에 동의하며 본교가 추구하는 교육철학과 핵심가치에 적극적으로 동의하는 부모의 자녀</li>
-            <li style="margin-left:15px">2~5학년 편입 지원 학생은 이전 학년 과정을 이수했거나 해당 학력이 있다고 인정된 학생</li><br>
+            <li style="margin-left:15px">2학년 이상 편입 지원 학생은 이전 학년 과정을 이수했거나 해당 학력이 있다고 인정된 학생</li><br>
             <p>다. 모집일정 및 절차</p>
           </div>
           <div
@@ -77,11 +77,11 @@
                 <th align="center">합격자등록</th>
               </tr>
               <tr>
-                <td align="center">10/24(수)17시</td>
-                <td align="center">10/27(토) 09:00~15:00</td>
-                <td align="center">10/27~31(수)</td>
-                <td align="center">11/05(월)</td>
-                <td align="center">11/15(목)</td>
+                <td align="center">12/27(목)17시</td>
+                <td align="center">1/8(화)~10(목) 09:00~15:00</td>
+                <td align="center">1/9(수)~11(금)</td>
+                <td align="center">1/14(월)</td>
+                <td align="center">1/24(목)</td>
               </tr>
             </table>
           </div>
@@ -95,7 +95,7 @@
             <li style="margin-left:15px"><b>주민등록등본 1부   </b></li>
             <li style="margin-left:15px"><b>사진</b>(반명함) <b>1장</b>(입학원서 이메일지원 시 사진 첨부가 어려운 경우에만 제출)</li>
             <li style="margin-left:15px">편입학 및 하우스콜레 지원자(2018년 현재 2~4학년, 12~15세)의 경우 <b>학교생활기록부(Ⅱ) 1부</b></li>
-            <li style="margin-left:15px"><b>입학전형료(선발캠프비 포함) 15만원+재료비(2018학년도 현재 예비초~3학년:3만원 4학년이상:5만원, 반드시 지원자 이름으로 입금)</b></li>
+            <li style="margin-left:15px"><b>입학전형료(선발캠프비 포함) 15만원 + 재료비(재료비는 별도 안내예정)</b></li>
             </ol>
             ※ <a href="assets/file/하우학교입학지원양식.zip">입학원서와 추천서(추천자 작성 후 직접 발송) 내려받기</a><br>
             <!--※ 입학원서와 추천서(추천자 작성 후 직접 발송)는 학교홈페이지 공지사항에서 내려받기<br>-->
@@ -117,9 +117,8 @@
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 about__subtitle-container">
           <!--  <div class="project__subtitle">text</div> -->
           <div class="project__content">
-9.29(토) 11:00 동탄중앙이음터도서관(동탄대로시범길 115)<br>
-9.30(일) 15:30 하늘빛우리교회(동탄중심상가2길 26-15)<br>
-10.04(목) 10:30 놀라운교회(동탄대로시범길148-22)<br>
+별도의 입학설명회는 없습니다. 다음 입학셜명회 영상을 참고하시길 바랍니다.<br>
+            ※ <a href="https://youtu.be/lNYUfNjYyjQ">입학설명회 영상 보러가기(유튜브)</a><br>
             
           </div>
         </div>
@@ -152,7 +151,7 @@
     <div class="container">
       <div class="row">
         <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 about__title-container">
-          <div class="project__title">2018학년도 교육비</div>
+          <div class="project__title">2019학년도 교육비</div>
         </div>
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 about__subtitle-container">
           <!--  <div class="project__subtitle">text</div> -->
@@ -164,6 +163,7 @@
             (4) 체험학습비/교육활동비 별도(월 2~3만원 예상)<br>
             (5) 식비 1식에 3,000원<br>
             ※ 하늘빛우리교회 성도의 자녀에게는 수업료 10%감면 혜택이 있습니다.<br>
+            ※ 협력교회 성도의 자녀에게는 수업료 5%감면 혜택이 있습니다.(협력교회 등록 문의: 031-613-0737, how@howcs.kr)<br>
             ※ 다자녀가 동시에 재학 중인 경우 둘째 20%, 셋째 50%, 넷째 100% 수업료를 감면합니다.<br>
             ※ 단, 상기 혜택이 중복 적용되지는 않습니다.<br>
             (6) 하우스콜레 과정의 경우 입학 시 크롬북 별도 구입(필수)<br>

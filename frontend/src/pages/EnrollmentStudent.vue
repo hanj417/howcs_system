@@ -97,6 +97,7 @@ export default {
       if (this.minor_category) {
         query['minor_category'] = this.minor_category
       }
+      query['semester'] = '겨울'
       var self = this
       self.$axios.get('enrollments', {params: query})
         .then(function (response) {

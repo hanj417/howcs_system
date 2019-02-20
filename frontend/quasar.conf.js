@@ -61,6 +61,7 @@ module.exports = function (ctx) {
     i18n: 'ko-kr',
       components: [
     //'PostCard',
+    'QSelect',
     'QChip',
     'QCheckbox',
     'QToggle',
